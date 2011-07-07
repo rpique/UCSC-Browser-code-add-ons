@@ -54,8 +54,10 @@ export PATH="$KENTBIN/$MACHTYPE:$KENTBIN/:$PATH"
 export HGSQL="$KENTBIN/$MACHTYPE/hgsql"
 # You will need to find out where your MySQL libs are.
 #	see notes in: README.building.source about finding them
-export MYSQLLIBS="/usr/lib64/mysql/libmysqlclient.a -lz"
+##export MYSQLLIBS="/usr/lib64/mysql/libmysqlclient.a -lz"
+export MYSQLLIBS=`mysql_config --libs`
 export MYSQLINC="/usr/include/mysql"
+##export MYSQLINC=`mysql_config --include`
 # If your mysql is SSL enabled, use the -lssl:
 # export MYSQLLIBS="/usr/lib64/mysql/libmysqlclient.a -lssl -lz"
 
@@ -89,6 +91,9 @@ export KNETFILE_HOOKS=0
 export TABIXDIR=${HOME}/tabix  ##/tabix-0.2.3
 export TABIXINC=${TABIXDIR}
 export TABIXLIB=${TABIXDIR}/libtabix.a
+
+## Something in cutMapper is not working if I use it... 
+export USE_SSL=0
 
 export ENCODE_PIPELINE_BIN="${BINDIR}"
 # protect these scripts by specifying the single machine on which they

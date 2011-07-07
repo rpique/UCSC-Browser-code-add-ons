@@ -1,0 +1,1 @@
+scanPwmVar /data/share/TRANSFAC/pwms/TRANSFAC.2009.1/M01200.dat /data/downloaded/HumanGenome/hg18Ref.2bit  /data/share/DNaseQTLs/1kSNP.YRI.myvcf.gz -verbose=2 -p=0.01 -base=2 -t=10 > CTCF.snp.V2.txt
