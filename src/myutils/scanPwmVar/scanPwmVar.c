@@ -19,9 +19,7 @@ void usage()
 errAbort(
   "scanPwmVar - Scan binding sites hit by SNPs\n"
   "usage:\n"
-  "   scanPwmVar XXX\n"
-  "usage:\n"
-  "   scanPwm motif.pwm sequence\n"
+  "   scanPwmVar motif.pwm sequence.2bit snpfile \n"
   "where:\n"
   "   sequence is a .fa , .nib or .2bit file or a file which is a list of sequence files.\n"
   "options:\n"
@@ -849,9 +847,6 @@ if (argc != 4)
 
  dnaUtilOpen();
 
-//motif = optionVal("motif", NULL);
-//chr = optionVal("chr", NULL);
-//strand = optionVal("strand", NULL);
  useJaspar = optionExists("j");
  useSnpRobust = optionExists("snp");
  maskRep = optionExists("mask");
@@ -863,7 +858,6 @@ if (argc != 4)
 
 
  // omp_set_num_threads(ompNumThreads); //Adjust this to env variable.... or option
-
 
 
 // wigOutput = optionExists("wigOutput");
