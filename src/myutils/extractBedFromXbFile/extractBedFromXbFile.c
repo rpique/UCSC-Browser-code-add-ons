@@ -59,7 +59,7 @@ void extractBedFromXbFile(char *xbFileName, char *bedFileName, char *outFileName
   int iChr,j;
   //  int MaxCutSites;
   int left,right;
-  int count;
+  int count=0;
   //  long int offset;
   //  double offsetCheck;
   char cStrand;
