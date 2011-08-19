@@ -38,6 +38,7 @@
 #include "pcrResult.h"
 #include "dgv.h"
 #include "transMapStuff.h"
+#include "vcfUi.h"
 #include "bbiFile.h"
 #include "ensFace.h"
 #include "microarray.h"
@@ -1433,17 +1434,17 @@ geneLabel = cartUsualString(cart, varName, "OMIM ID");
 printf("<BR><B>Include Entries of:</B> ");
 printf("<UL>\n");
 printf("<LI>");
-labelMakeCheckBox(tdb, "class1", "Class 1: the disorder has been placed on the map based on its association with a gene, but the underlying defect is not known.", TRUE);
+labelMakeCheckBox(tdb, "class1", "Phenotype map key 1: the disorder has been placed on the map based on its association with a gene, but the underlying defect is not known.", TRUE);
 printf("<LI>");
-labelMakeCheckBox(tdb, "class2", "Class 2: the disorder has been placed on the map by linkage; no mutation has been found.", TRUE);
+labelMakeCheckBox(tdb, "class2", "Phenotype map key 2: the disorder has been placed on the map by linkage; no mutation has been found.", TRUE);
 printf("<LI>");
-labelMakeCheckBox(tdb, "class3", "Class 3: the molecular basis for the disorder is known; a mutation has been found in the gene.", TRUE);
+labelMakeCheckBox(tdb, "class3", "Phenotype map key 3: the molecular basis for the disorder is known; a mutation has been found in the gene.", TRUE);
 printf("<LI>");
-labelMakeCheckBox(tdb, "class4", "Class 4: a contiguous gene deletion or duplication syndrome; multiple genes are deleted or duplicated causing the phenotype.", TRUE);
+labelMakeCheckBox(tdb, "class4", "Phenotype map key 4: a contiguous gene deletion or duplication syndrome; multiple genes are deleted or duplicated causing the phenotype.", TRUE);
 
 // removed the "others" option for the time being
 //printf("<LI>");
-//labelMakeCheckBox(tdb, "others", "Others: no associated OMIM phenotype class info available.", TRUE);
+//labelMakeCheckBox(tdb, "others", "Others: no associated OMIM phenotype map key info available.", TRUE);
 printf("</UL>");
 }
 
@@ -1457,15 +1458,15 @@ geneLabel = cartUsualString(cart, varName, "OMIM ID");
 printf("<BR><B>Include Entries of:</B> ");
 printf("<UL>\n");
 printf("<LI>");
-labelMakeCheckBox(tdb, "class1", "Class 1: the disorder has been placed on the map based on its association with a gene, but the underlying defect is not known.", TRUE);
+labelMakeCheckBox(tdb, "class1", "Phenotype map key 1: the disorder has been placed on the map based on its association with a gene, but the underlying defect is not known.", TRUE);
 printf("<LI>");
-labelMakeCheckBox(tdb, "class2", "Class 2: the disorder has been placed on the map by linkage; no mutation has been found.", TRUE);
+labelMakeCheckBox(tdb, "class2", "Phenotype map key 2: the disorder has been placed on the map by linkage; no mutation has been found.", TRUE);
 printf("<LI>");
-labelMakeCheckBox(tdb, "class3", "Class 3: the molecular basis for the disorder is known; a mutation has been found in the gene.", TRUE);
+labelMakeCheckBox(tdb, "class3", "Phenotype map key 3: the molecular basis for the disorder is known; a mutation has been found in the gene.", TRUE);
 printf("<LI>");
-labelMakeCheckBox(tdb, "class4", "Class 4: a contiguous gene deletion or duplication syndrome; multiple genes are deleted or duplicated causing the phenotype.", TRUE);
+labelMakeCheckBox(tdb, "class4", "Phenotype map key 4: a contiguous gene deletion or duplication syndrome; multiple genes are deleted or duplicated causing the phenotype.", TRUE);
 printf("<LI>");
-labelMakeCheckBox(tdb, "others", "Others: no associated OMIM phenotype class info available.", TRUE);
+labelMakeCheckBox(tdb, "others", "Others: no associated OMIM phenotype map key info available.", TRUE);
 printf("</UL>");
 }
 
@@ -2419,6 +2420,25 @@ for (childRef = superTdb->children; childRef != NULL; childRef = childRef->next)
 printf("</TABLE>");
 }
 
+void previewLinks(char *db, struct trackDb *tdb)
+/* Informational messages about preview browser (ENCODE tracks only) */
+{
+if (trackDbSetting(tdb, "wgEncode") != NULL)
+    {
+    if (hIsPreviewHost())
+        {
+        printf("<p><b>WARNING</b>: This data is provided for early access via the Preview Browser -- it is unreviewed and subject to change. For high quality reviewed annotations, see the <a target=_blank href='http://%s/cgi-bin/hgTracks?db=%s'>Genome Browser</a>.",
+            "genome.ucsc.edu", db);
+        }
+    else
+        {
+        // TODO: use hTrackUiName()
+        printf("<p><b>NOTE</b>: Early access to additional track data may be available on the <a target=_blank href='http://%s/cgi-bin/hgTrackUi?db=%s&g=%s'>Preview Browser</A>.",
+            "genome-preview.ucsc.edu", db, tdb->track);
+        }
+    }
+}
+
 void specificUi(struct trackDb *tdb, struct trackDb *tdbList, struct customTrack *ct, boolean ajax)
 /* Draw track specific parts of UI. */
 {
@@ -2590,8 +2610,10 @@ else if (sameString(track, "dgv") || (startsWith("dgvV", track) && isdigit(track
     dgvUi(tdb);
 #ifdef USE_BAM
 else if (sameString(tdb->type, "bam"))
-    bamCfgUi(cart, tdb, track, NULL, FALSE); // tim would like to see this boxed when at composite level: tdbIsComposite(tdb));
+    bamCfgUi(cart, tdb, track, NULL, FALSE);
 #endif
+else if (sameString(tdb->type, "vcfTabix"))
+    vcfCfgUi(cart, tdb, track, NULL, FALSE);
 else if (tdb->type != NULL)
     {
     /* handle all tracks with type genePred or bed or "psl xeno <otherDb>" */
@@ -2666,7 +2688,10 @@ else if (tdbIsComposite(tdb))  // for the moment generalizing this to include ot
     hCompositeUi(database, cart, tdb, NULL, NULL, MAIN_FORM, trackHash);
     }
 if (!ajax)
+    {
+    previewLinks(database, tdb);
     extraUiLinks(database,tdb, trackHash);
+    }
 }
 
 #ifdef UNUSED
@@ -2695,6 +2720,11 @@ if (!ajax)
     webIncludeResourceFile("jquery-ui.css");
     jsIncludeFile("jquery-ui.js", NULL);
     jsIncludeFile("utils.js",NULL);
+#ifdef NEW_JQUERY
+    printf("<script type='text/javascript'>var newJQuery=true;</script>\n");
+#else///ifndef NEW_JQUERY
+    printf("<script type='text/javascript'>var newJQuery=false;</script>\n");
+#endif///ndef NEW_JQUERY
     }
 #define RESET_TO_DEFAULTS "defaults"
 char setting[128];
@@ -2762,8 +2792,12 @@ if (sameWord(tdb->track,"ensGene"))
     printf("<B style='font-family:serif; font-size:200%%;'>%s%s</B>\n", longLabel, tdbIsSuper(tdb) ? " Tracks" : "");
     }
 else
-printf("<B style='font-family:serif; font-size:200%%;'>%s%s</B>\n", tdb->longLabel, tdbIsSuper(tdb) ? " Tracks" : "");
+    {
+    if (trackDbSetting(tdb, "wgEncode"))
+        printf("<A HREF='/ENCODE/index.html'><IMG style='vertical-align:middle;' width=100 src='/images/ENCODE_scaleup_logo.png'><A>");
+    printf("<B style='font-family:serif; font-size:200%%;'>%s%s</B>\n", tdb->longLabel, tdbIsSuper(tdb) ? " Tracks" : "");
 
+    }
 /* Print link for parent track */
 if (!ajax)
     {
@@ -2855,7 +2889,7 @@ if (!tdbIsDownloadsOnly(tdb))
         }
     }
 
-if (!tdbIsSuper(tdb) && !tdbIsDownloadsOnly(tdb))
+if (!tdbIsSuper(tdb) && !tdbIsDownloadsOnly(tdb) && !ajax)
     {
     // NAVLINKS - For pages w/ matrix, add Description, Subtracks and Downloads links
     if (trackDbSetting(tdb, "dimensions") || (trackDbSetting(tdb, "wgEncode") && tdbIsComposite(tdb)))
@@ -2863,6 +2897,12 @@ if (!tdbIsSuper(tdb) && !tdbIsDownloadsOnly(tdb))
         printf("\n&nbsp;&nbsp;<span id='navDown' style='float:right; display:none;'>");
         if (trackDbSetting(tdb, "wgEncode"))
             {
+            if (!hIsPreviewHost())
+                {
+                // TODO: get from hui.c
+                printf("<A TARGET=_BLANK HREF='http://%s/cgi-bin/hgTrackUi?db=%s&g=%s' TITLE='Early access to unreviewed new data on the Preview Browser...'>Preview</A>",
+                    "genome-preview.ucsc.edu", database, tdb->track);
+                }
             printf("&nbsp;&nbsp;");
             makeDownloadsLink(database, tdb, trackHash);
             }

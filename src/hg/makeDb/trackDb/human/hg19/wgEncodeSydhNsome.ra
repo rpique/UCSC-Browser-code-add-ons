@@ -4,15 +4,15 @@
 
 track wgEncodeSydhNsome
 compositeTrack on
-shortLabel Stanford Nucleosome
-longLabel ENCODE Stanford Snyder Nucleosome
+shortLabel Stanf Nucleosome
+longLabel Nucleosome Position by MNase-seq from ENCODE/Stanford/BYU
 group regulation
 subGroup1 view Views Signal=Signal Alignments=Alignments
-subGroup2 cellType Cell_Line GM12878=GM12878 K562=K562
+subGroup2 cellType Cell_Line GM12878=GM12878<b>&nbsp;(Tier_1)</b> K562=K562<b>&nbsp;(Tier_1)</b>
 dimensions dimensionX=cellType
 sortOrder cellType=+ view=+
-fileSortOrder cell=Cell_Line replicate=Rep view=View origAssembly=Assembly<BR>originally<BR>mapped<BR>to fileSize=Size fileType=File_Type dateSubmitted=Submitted dateUnrestricted=RESTRICTED<BR>Until
-controlledVocabulary encode/cv.ra cellType
+fileSortOrder cell=Cell_Line replicate=Rep view=View dccAccession=UCSC_Accession fileSize=Size fileType=File_Type dateSubmitted=Submitted dateUnrestricted=RESTRICTED<BR>Until
+controlledVocabulary encode/cv.ra cellType=cell
 dragAndDrop subTracks
 visibilityViewDefaults  Signal=full 
 priority 0
@@ -25,7 +25,7 @@ noInherit on
     	view Signal
     	visibility full
 	parent wgEncodeSydhNsome
-    	viewLimits 0:12
+    	viewLimits 0:8
     	autoScale off
     	maxHeightPixels 100:32:16
     	windowingFunction mean+whiskers
@@ -33,8 +33,8 @@ noInherit on
         track wgEncodeSydhNsomeK562Sig
         parent wgEncodeSydhNsomeViewSignal
         shortLabel K562 Sig
-        longLabel ENCODE Stanford Nucleosome Signal (in K562 cells)
-        subGroups view=Signal cellType=K562
+        longLabel K562 Nucleosome Signal from ENCODE/Stanford/BYU
+	subGroups view=Signal cellType=K562
         type bigWig 0.000000 31303.900391
         origAssembly hg19
         color 46,0,184
@@ -43,8 +43,8 @@ noInherit on
         track wgEncodeSydhNsomeGm12878Sig
         parent wgEncodeSydhNsomeViewSignal
         shortLabel GM12878 Sig
-        longLabel ENCODE Stanford Nucleosome Signal (in GM12878 cells)
-        subGroups view=Signal cellType=GM12878
+        longLabel GM12878 Nucleosome Signal from ENCODE/Stanford/BYU
+	subGroups view=Signal cellType=GM12878
         type bigWig 0.000000 16392.599609
         origAssembly hg19
         color 153,38,0

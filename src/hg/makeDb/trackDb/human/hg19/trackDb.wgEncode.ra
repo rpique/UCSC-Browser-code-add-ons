@@ -4,22 +4,19 @@ include wgEncodeSuper.ra
 
 # GENCODE genes (wrangler: braney )
 include wgEncodeGencodeV3.ra
-include wgEncodeGencodeV4.new.ra alpha
-include wgEncodeGencodeV4.ra beta,public
-include wgEncodeGencodeV5.ra alpha
-include wgEncodeGencodeV7.ra alpha
+include wgEncodeGencodeV4.ra
+#include wgEncodeGencodeV5.ra alpha
+include wgEncodeGencodeV7.ra
 
 # UNC/BSU Proteogenomics (wrangler: cline)
-# This line below is to be un-commented when the track is ready to go to beta (cline, 6/6/11)
-# include wgEncodeUncBsuProt.ra beta
-include wgEncodeUncBsuProt.new.ra alpha
+include wgEncodeUncBsuProt.ra alpha
 
 # Integrated Regulation (wrangler: kent)
 include wgEncodeReg.ra
 #include wgEncodeRegNorm.ra alpha
 
 # Nucleosome (wrangler: venkat)
-include wgEncodeSydhNsome.ra alpha
+include wgEncodeSydhNsome.ra
 
 # GIS RNA PET (wrangler: cricket)
 include wgEncodeGisRnaPet.ra alpha
@@ -28,7 +25,7 @@ include wgEncodeGisRnaPet.ra alpha
 include wgEncodeGisDnaPet.ra
 
 # HAIB Genotype (CNV) (wrangler: Cricket)
-include wgEncodeHaibGenotype.ra alpha
+include wgEncodeHaibGenotype.ra
 
 # BU Orchid (wrangler: cricket)
 include wgEncodeBuOrchid.ra
@@ -122,6 +119,7 @@ include wgEncodeHaibMethylSeq.ra
 #HAIB Methyl Array (wrangler:Cricket)
 #include wgEncodeHaibMethylArray.ra
 include wgEncodeHaibMethyl27.ra alpha
+include wgEncodeHaibMethyl450.ra alpha
 #HAIB Methyl RRBS (wrangler: Cricket) replaces Methyl-Seq
 include wgEncodeHaibMethylRrbs.ra beta,public
 include wgEncodeHaibMethylRrbs.new.ra alpha
@@ -160,7 +158,7 @@ include wgEncodeOpenChromChip.new.ra alpha
 include wgEncodeOpenChromChip.ra beta,public
 
 # HAIB TFBS (wrangler: Venkat)
-include wgEncodeHaibTfbs.ra alpha
+include wgEncodeHaibTfbs.ra 
 
 # SYDH TFBS (wrangler: Venkat)
 include wgEncodeSydhTfbs.ra alpha
@@ -175,11 +173,11 @@ include wgEncodeUchicagoTfbs.ra
 include wgEncodeSunyAlbanyGeneSt.ra
 
 # SUNY Tiling Array (wrangler: cricket)
-include wgEncodeSunyAlbanyTiling.ra beta,public
-include wgEncodeSunyAlbanyTiling.new.ra alpha
+include wgEncodeSunyAlbanyTiling.ra
+#include wgEncodeSunyAlbanyTiling.new.ra alpha
 
 # SUNY SwitchGear (wrangler: cricket)
-include wgEncodeSunySwitchgear.ra alpha
+include wgEncodeSunySwitchgear.ra
 
 # SUNY Rip-seq (wrangler: cricket)
 include wgEncodeSunyRipSeq.ra alpha

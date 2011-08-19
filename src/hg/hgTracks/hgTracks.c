@@ -4,6 +4,7 @@
  * routine got moved to create a new entry point to the bulk of the code for the
  * hgRenderTracks web service.  See mainMain.c for the main used by the hgTracks CGI. */
 
+#include <pthread.h>
 #include "common.h"
 #include "hCommon.h"
 #include "linefile.h"
@@ -84,6 +85,7 @@ int guidelineSpacing = 12;  /* Pixels between guidelines. */
 boolean withIdeogram = TRUE;            /* Display chromosome ideogram? */
 
 int rulerMode = tvHide;         /* on, off, full */
+struct hvGfx *hvgSide = NULL;     // An extra pointer to a side label image that can be built if needed
 
 char *rulerMenu[] =
 /* dropdown for ruler visibility */
@@ -103,6 +105,7 @@ boolean hgDebug = FALSE;      /* Activate debugging code. Set to true by hgDebug
 int imagePixelHeight = 0;
 boolean dragZooming = TRUE;
 struct hash *oldVars = NULL;
+struct jsonHashElement *jsonForClient = NULL;
 
 boolean hideControls = FALSE;		/* Hide all controls? */
 boolean trackImgOnly = FALSE;           /* caller wants just the track image and track table html */
@@ -1335,12 +1338,26 @@ labelColor = blackIndex();
 hvGfxNextItemButton(hvg, rightButtonX + NEXT_ITEM_ARROW_BUFFER, y, arrowWidth, arrowWidth, labelColor, fillColor, TRUE);
 hvGfxNextItemButton(hvg, portX + NEXT_ITEM_ARROW_BUFFER, y, arrowWidth, arrowWidth, labelColor, fillColor, FALSE);
 safef(buttonText, ArraySize(buttonText), "hgt.prevItem=%s", track->track);
-mapBoxReinvoke(hvg, portX, y + 1, arrowButtonWidth, insideHeight, NULL, FALSE,
+mapBoxReinvoke(hvg, portX, y + 1, arrowButtonWidth, insideHeight, track, FALSE,
            NULL, 0, 0, (revCmplDisp ? "Next item" : "Prev item"), buttonText);
+#ifdef IMAGEv2_SHORT_MAPITEMS
+char *label = (theImgBox ? track->longLabel : parentTrack->longLabel);
+int width = portWidth - (2 * arrowButtonWidth);
+int x = portX + arrowButtonWidth;
+// make toggle cover only actual label
+int size = mgFontStringWidth(font,label) + 12;  // get close enough to the label
+if (width > size)
+    {
+    x += width/2 - size/2;
+    width = size;
+    }
+mapBoxToggleVis(hvg, x, y + 1, width, insideHeight, (theImgBox ? track : parentTrack));
+#else///ifndef IMAGEv2_SHORT_MAPITEMS
 mapBoxToggleVis(hvg, portX + arrowButtonWidth, y + 1, portWidth - (2 * arrowButtonWidth),
                 insideHeight, (theImgBox ? track : parentTrack));
+#endif///ndef IMAGEv2_SHORT_MAPITEMS
 safef(buttonText, ArraySize(buttonText), "hgt.nextItem=%s", track->track);
-mapBoxReinvoke(hvg, portX + portWidth - arrowButtonWidth, y + 1, arrowButtonWidth, insideHeight, NULL, FALSE,
+mapBoxReinvoke(hvg, portX + portWidth - arrowButtonWidth, y + 1, arrowButtonWidth, insideHeight, track, FALSE,
            NULL, 0, 0, (revCmplDisp ? "Prev item" : "Next item"), buttonText);
 }
 
@@ -1374,8 +1391,19 @@ if (track->limitedVis != tvHide)
                 }
             }
         if (!toggleDone)
+            {
+        #ifdef IMAGEv2_SHORT_MAPITEMS
+            // make toggle cover only actual label
+            int size = mgFontStringWidth(font,label) + 12;  // get close enough to the label
+            if (trackPastTabWidth > size)
+                {
+                trackPastTabX = insideX + insideWidth/2 - size/2;
+                trackPastTabWidth = size;
+                }
+        #endif///def IMAGEv2_SHORT_MAPITEMS
             mapBoxToggleVis(hvg, trackPastTabX, y+1,trackPastTabWidth, insideHeight,
                             (theImgBox ? track : parentTrack));
+            }
         y += fontHeight;
         }
     y += track->totalHeight(track, track->limitedVis);
@@ -1532,8 +1560,10 @@ switch (track->limitedVis)
                             {
                             if (isCenterLabelIncluded(subtrack))
                                 y += fontHeight;
+                        #ifndef IMAGEv2_DRAG_SCROLL
                             if(theImgBox && subtrack->limitedVis == tvDense)
                                 mapBoxToggleVis(hvg, trackPastTabX, y, trackPastTabWidth, track->lineHeight, subtrack);
+                        #endif///ndef IMAGEv2_DRAG_SCROLL
                             y += subtrack->totalHeight(subtrack, subtrack->limitedVis);
                             }
                         }
@@ -1552,9 +1582,11 @@ switch (track->limitedVis)
             mapHeight = track->height;
         else
             mapHeight = track->lineHeight;
+    #ifndef IMAGEv2_DRAG_SCROLL
         int maxWinToDraw = getMaxWindowToDraw(track->tdb);
         if (maxWinToDraw <= 1 || (winEnd - winStart) <= maxWinToDraw)
             mapBoxToggleVis(hvg, trackPastTabX, y, trackPastTabWidth, mapHeight, track);
+    #endif///ndef IMAGEv2_DRAG_SCROLL
         y += mapHeight;
         break;
     case tvHide:
@@ -1896,7 +1928,6 @@ leftLabelWidth = insideX - gfxBorder*3;
 
 struct image *theOneImg  = NULL; // No need to be global, only the map needs to be global
 struct image *theSideImg = NULL; // Because dragScroll drags off end of image, the side label gets seen. Therefore we need 2 images!!
-struct hvGfx *hvgSide = NULL;    // Strategy an extra pointer to a side image that can be built if needed
 //struct imgTrack *curImgTrack = NULL; // Make this global for now to avoid huge rewrite
 struct imgSlice *curSlice    = NULL; // No need to be global, only the map needs to be global
 struct mapSet   *curMap      = NULL; // Make this global for now to avoid huge rewrite
@@ -2406,8 +2437,10 @@ if (withCenterLabels)
         else
             y = doDrawItems(track, hvg, font, y, &lastTime);
 
+        #ifndef IMAGEv2_DRAG_SCROLL
         if (theImgBox && track->limitedVis == tvDense && tdbIsCompositeChild(track->tdb))
             mapBoxToggleVis(hvg, 0, yStart,tl.picWidth, sliceHeight,track); // Strange mabBoxToggleLogic handles reverse complement itself so x=0, width=tl.picWidth
+        #endif///ndef IMAGEv2_DRAG_SCROLL
 
         if(yEnd!=y)
             warn("Slice height does not add up.  Expecting %d != %d actual",yEnd - yStart - 1,y-yStart);
@@ -2466,14 +2499,16 @@ for (flatTrack = flatTracks; flatTrack != NULL; flatTrack = flatTrack->next)
 /* Finish map. */
 hPrintf("</MAP>\n");
 
-hPrintf("<input type='hidden' id='hgt.dragSelection' name='dragSelection' value='%d'>\n", dragZooming ? 1 : 0);
+jsonHashAddBoolean(jsonForClient, "dragSelection", dragZooming);
+jsonHashAddBoolean(jsonForClient, "inPlaceUpdate", IN_PLACE_UPDATE);
+
 if(rulerClickHeight)
     {
-    hPrintf("<input type='hidden' id='hgt.rulerClickHeight' name='rulerClickHeight' value='%d'>\n", rulerClickHeight);
+    jsonHashAddNumber(jsonForClient, "rulerClickHeight", rulerClickHeight);
     }
 if(newWinWidth)
     {
-    hPrintf("<input type='hidden' id='hgt.newWinWidth' name='newWinWidth' value='%d'>\n", newWinWidth);
+    jsonHashAddNumber(jsonForClient, "newWinWidth", newWinWidth);
     }
 
 /* Save out picture and tell html file about it. */
@@ -3770,6 +3805,15 @@ if (!tdbIsSuper(tdb))
 return (tdb->visibility != tvHide);
 }
 
+int hubCmpAlpha(const void *va, const void *vb)
+/* Compare to sort hubs based on name */
+{
+const struct trackHub *a = *((struct trackHub **)va);
+const struct trackHub *b = *((struct trackHub **)vb);
+
+return strcmp(a->shortLabel, b->shortLabel);
+}
+
 static void groupTracks(struct trackHub *hubList, struct track **pTrackList,
 	struct group **pGroupList, int vis)
 /* Make up groups and assign tracks to groups.
@@ -3782,14 +3826,15 @@ struct track *track;
 struct trackRef *tr;
 struct grp* grps = hLoadGrps(database);
 struct grp *grp;
-float maxPriority = 0;
+float minPriority = 100000; // something really large
 
 /* build group objects from database. */
 for (grp = grps; grp != NULL; grp = grp->next)
     {
     /* deal with group reordering */
     float priority = grp->priority;
-    if (priority > maxPriority) maxPriority = priority;
+    // we want to get the minimum priority over 1 (which is custom tracks)
+    if ((priority > 1.0) && (priority < minPriority)) minPriority = priority;
     if (withPriorityOverride)
         {
         char cartVar[512];
@@ -3813,16 +3858,31 @@ grpFreeList(&grps);
 
 /* build group objects from hub */
     {
-    struct trackHub *hub;
-    for (hub = hubList; hub != NULL; hub = hub->next)
-        {
-	AllocVar(group);
-	group->name = cloneString(hub->name);
-	group->label = cloneString(hub->shortLabel);
-	group->defaultPriority = group->priority = maxPriority;
-	maxPriority += 1;
-	slAddHead(&list, group);
-	hashAdd(hash, group->name, group);
+    int count = slCount(hubList);
+
+    if (count) // if we have track hubs
+	{
+	slSort(&hubList, hubCmpAlpha);	// alphabetize
+	minPriority -= 1.0;             // priority is 1-based
+	// the idea here is to get enough room between priority 1
+	// (which is custom tracks) and the group with the next
+	// priority number, so that the hub nestle inbetween the
+	// custom tracks and everything else at the top of the list
+	// of track groups
+	double priorityInc = (0.9 * minPriority) / count;
+	double priority = 1.0 + priorityInc;
+
+	struct trackHub *hub;
+	for (hub = hubList; hub != NULL; hub = hub->next)
+	    {
+	    AllocVar(group);
+	    group->name = cloneString(hub->name);
+	    group->label = cloneString(hub->shortLabel);
+	    group->defaultPriority = group->priority = priority;
+	    priority += priorityInc;
+	    slAddHead(&list, group);
+	    hashAdd(hash, group->name, group);
+	    }
 	}
     }
 
@@ -4004,7 +4064,11 @@ else
     for (i=0; i<len; i++)
         paddedLabel[i+1] = label[i];
     }
+#if IN_PLACE_UPDATE
+hButtonWithOnClick(var, paddedLabel, NULL, "return navigateButtonClick(this);");
+#else
 hButton(var, paddedLabel);
+#endif
 }
 
 void limitSuperTrackVis(struct track *track)
@@ -4079,8 +4143,11 @@ if (wikiTrackEnabled(database, NULL))
     wikiDisconnect(&conn);
     }
 
-loadTrackHubs(&trackList, &hubList);
-slReverse(&hubList);
+if (cartOptionalString(cart, "hgt.trackNameFilter") == NULL)
+    { // If a single track was asked for and it is from a hub, then it is already in trackList
+    loadTrackHubs(&trackList, &hubList);
+    slReverse(&hubList);
+    }
 loadCustomTracks(&trackList);
 groupTracks(hubList, &trackList, pGroupList, vis);
 setSearchedTrackToPackOrFull(trackList);
@@ -4114,9 +4181,6 @@ for (track = trackList; track != NULL; track = track->next)
 	    compositeTrackVis(track);
 	}
     }
-if (measureTiming)
-    uglyTime("getTrackList");
-
 return trackList;
 }
 
@@ -4204,17 +4268,11 @@ static void pruneRedundantCartVis(struct track *trackList)
  * more common case where track visibilities are tweaked. */
 {
 struct track *track;
-if (measureTiming)
-    uglyTime("Done with trackForm");
 for (track = trackList; track != NULL; track = track->next)
     {
     char *cartVis = cartOptionalString(cart, track->track);
     if (cartVis != NULL && hTvFromString(cartVis) == track->tdb->visibility)
     cartRemove(cart, track->track);
-    }
-if (measureTiming)
-    {
-    uglyTime("Pruned redundant vis from cart");
     }
 }
 
@@ -4313,6 +4371,7 @@ void parentChildCartCleanup(struct track *trackList,struct cart *newCart,struct 
 /* When composite/view settings changes, remove subtrack specific vis
    When superTrackChild is found and selected, shape superTrack to match. */
 {
+struct lm *lm = lmInit(0);	/* Speed tweak cleanup with scatch memory pool. */
 struct track *track = trackList;
 for (;track != NULL; track = track->next)
     {
@@ -4320,7 +4379,7 @@ for (;track != NULL; track = track->next)
     boolean cleanedByContainerSettings = FALSE;
 
     // Top-down 'cleanup' MUST GO BEFORE bottom up reshaping.
-    cleanedByContainerSettings = cartTdbTreeCleanupOverrides(track->tdb,newCart,oldVars);
+    cleanedByContainerSettings = cartTdbTreeCleanupOverrides(track->tdb,newCart,oldVars, lm);
 
     if (tdbIsContainer(track->tdb))
         {
@@ -4344,7 +4403,184 @@ for (;track != NULL; track = track->next)
             }
         }
     }
+lmCleanup(&lm);
 }
+
+
+struct paraFetchData
+    {
+    struct paraFetchData *next;
+    struct track *track;
+    boolean done;
+    };
+
+static boolean isTrackForParallelLoad(struct track *track)
+/* Is this a track that should be loaded in parallel ? */
+{
+char *bdu = trackDbSetting(track->tdb, "bigDataUrl");
+return (startsWithWord("bigWig"  , track->tdb->type)
+     || startsWithWord("bigBed"  , track->tdb->type)
+     || startsWithWord("bam"     , track->tdb->type)
+     || startsWithWord("vcfTabix", track->tdb->type))
+     && (bdu && strstr(bdu,"://"))
+     && (track->subtracks == NULL);
+}
+
+static void findLeavesForParallelLoad(struct track *trackList, struct paraFetchData **ppfdList)
+/* Find leaves of track tree that are remote network resources for parallel-fetch loading */
+{
+struct track *track;
+if (!trackList)
+    return;
+for (track = trackList; track != NULL; track = track->next)
+    {
+
+    if (track->visibility != tvHide)
+	{
+	if (isTrackForParallelLoad(track))
+	    {
+	    struct paraFetchData *pfd;
+	    AllocVar(pfd);
+	    pfd->track = track;  // need pointer to be stable
+	    slAddHead(ppfdList, pfd);
+	    track->parallelLoading = TRUE;
+	    }
+	struct track *subtrack;
+        for (subtrack=track->subtracks; subtrack; subtrack=subtrack->next)
+	    {
+	    if (isTrackForParallelLoad(subtrack))
+		{
+		if (tdbVisLimitedByAncestors(cart,subtrack->tdb,TRUE,TRUE) != tvHide)
+		    {
+		    struct paraFetchData *pfd;
+		    AllocVar(pfd);
+		    pfd->track = subtrack;  // need pointer to be stable
+		    slAddHead(ppfdList, pfd);
+		    subtrack->parallelLoading = TRUE;
+		    }
+		}
+	    }
+	}
+    }
+}
+
+static pthread_mutex_t pfdMutex = PTHREAD_MUTEX_INITIALIZER;
+static struct paraFetchData *pfdList = NULL, *pfdRunning = NULL, *pfdDone = NULL, *pfdNeverStarted = NULL;
+
+static void *remoteParallelLoad(void *threadParam)
+/* Each thread loads tracks in parallel until all work is done. */
+{
+pthread_t *pthread = threadParam;
+struct paraFetchData *pfd = NULL;
+pthread_detach(*pthread);  // this thread will never join back with it's progenitor
+    // Canceled threads that might leave locks behind,
+    // so the theads are detached and will be neither joined nor canceled.
+boolean allDone = FALSE;
+while(1)
+    {
+    pthread_mutex_lock( &pfdMutex );
+    if (!pfdList)
+	{
+	allDone = TRUE;
+	}
+    else
+	{  // move it from the waiting queue to the running queue
+	pfd = slPopHead(&pfdList);
+	slAddHead(&pfdRunning, pfd);
+	}
+    pthread_mutex_unlock( &pfdMutex );
+    if (allDone)
+	return NULL;
+
+    long thisTime = 0, lastTime = 0;
+
+    if (measureTiming)
+	lastTime = clock1000();
+
+    /* protect against errAbort */
+    struct errCatch *errCatch = errCatchNew();
+    if (errCatchStart(errCatch))
+	{
+	pfd->done = FALSE;
+	checkMaxWindowToDraw(pfd->track);
+	pfd->track->loadItems(pfd->track);
+	pfd->done = TRUE;
+	}
+    errCatchEnd(errCatch);
+    if (errCatch->gotError)
+	{
+	pfd->track->networkErrMsg = cloneString(errCatch->message->string);
+	pfd->done = TRUE;
+	}
+    errCatchFree(&errCatch);
+
+    if (measureTiming)
+	{
+	thisTime = clock1000();
+	pfd->track->loadTime = thisTime - lastTime;
+	}
+
+    pthread_mutex_lock( &pfdMutex );
+    slRemoveEl(&pfdRunning, pfd);  // this list will not be huge
+    slAddHead(&pfdDone, pfd);
+    pthread_mutex_unlock( &pfdMutex );
+
+    }
+}
+
+static int remoteParallelLoadWait(int maxTimeInSeconds)
+/* Wait, checking to see if finished (completed or errAborted).
+ * If timed-out or never-ran, record error status.
+ * Return error count. */
+{
+int maxTimeInMilliseconds = 1000 * maxTimeInSeconds;
+struct paraFetchData *pfd;
+int errCount = 0;
+int waitTime = 0;
+while(1)
+    {
+    sleep1000(50); // milliseconds
+    waitTime += 50;
+    boolean done = TRUE;
+    pthread_mutex_lock( &pfdMutex );
+    if (pfdList || pfdRunning)
+	done = FALSE;
+    pthread_mutex_unlock( &pfdMutex );
+    if (done)
+        break;
+    if (waitTime >= maxTimeInMilliseconds)
+        break;
+    }
+pthread_mutex_lock( &pfdMutex );
+pfdNeverStarted = pfdList;
+pfdList = NULL;  // stop the workers from starting any more waiting track loads
+for (pfd = pfdNeverStarted; pfd; pfd = pfd->next)
+    {
+    // track was never even started
+    char temp[256];
+    safef(temp, sizeof temp, "Ran out of time (%d milliseconds) unable to process  %s", maxTimeInMilliseconds, pfd->track->track);
+    pfd->track->networkErrMsg = cloneString(temp);
+    ++errCount;
+    }
+for (pfd = pfdRunning; pfd; pfd = pfd->next)
+    {
+    // unfinished track
+    char temp[256];
+    safef(temp, sizeof temp, "Timeout %d milliseconds exceeded processing %s", maxTimeInMilliseconds, pfd->track->track);
+    pfd->track->networkErrMsg = cloneString(temp);
+    ++errCount;
+    }
+for (pfd = pfdDone; pfd; pfd = pfd->next)
+    {
+    // some done tracks may have errors
+    if (pfd->track->networkErrMsg)
+        ++errCount;
+    }
+pthread_mutex_unlock( &pfdMutex );
+return errCount;
+}
+
+
 
 void doTrackForm(char *psOutput, struct tempName *ideoTn)
 /* Make the tracks display form with the zoom/scroll buttons and the active
@@ -4377,11 +4613,14 @@ if (psOutput != NULL)
 
 /* Tell browser where to go when they click on image. */
 hPrintf("<FORM ACTION=\"%s\" NAME=\"TrackHeaderForm\" id=\"TrackHeaderForm\" METHOD=\"GET\">\n\n", hgTracksName());
-hPrintf("<input type='hidden' id='hgt.insideX' name='insideX' value='%d'>\n", insideX);
-hPrintf("<input type='hidden' id='hgt.revCmplDisp' name='revCmplDisp' value='%d'>\n", revCmplDisp);
+jsonHashAddNumber(jsonForClient, "insideX", insideX);
+jsonHashAddBoolean(jsonForClient, "revCmplDisp", revCmplDisp);
+
 #ifdef NEW_JQUERY
-hPrintf("<input type='hidden' id='hgt.newJQuery' name='hgt.newJQuery' value='1'>\n");
-#endif
+hPrintf("<script type='text/javascript'>var newJQuery=true;</script>\n");
+#else///ifndef NEW_JQUERY
+hPrintf("<script type='text/javascript'>var newJQuery=false;</script>\n");
+#endif///ndef NEW_JQUERY
 if (!psOutput) cartSaveSession(cart);
 clearButtonJavascript = "document.TrackHeaderForm.position.value=''; document.getElementById('suggest').value='';";
 
@@ -4395,9 +4634,13 @@ if (userSeqString && !ssFilesExist(userSeqString))
 if (!hideControls)
     hideControls = cartUsualBoolean(cart, "hideControls", FALSE);
 if (measureTiming)
-    uglyTime("Time before getTrackList");
+    measureTime("Time before getTrackList");
 trackList = getTrackList(&groupList, defaultTracks ? -1 : -2);
+if (measureTiming)
+    measureTime("getTrackList");
 makeGlobalTrackHash(trackList);
+/* Tell tracks to load their items. */
+
 
 // honor defaultImgOrder
 if(cgiVarExists("hgt.defaultImgOrder"))
@@ -4407,6 +4650,8 @@ if(cgiVarExists("hgt.defaultImgOrder"))
     cartRemoveLike(cart, wildCard);
     }
 parentChildCartCleanup(trackList,cart,oldVars); // Subtrack settings must be removed when composite/view settings are updated
+if (measureTiming)
+    measureTime("parentChildCartCleanup");
 
 
 /* Honor hideAll and visAll variables */
@@ -4447,7 +4692,8 @@ if (!isEmpty(jsCommand))
    jsCommandDispatch(jsCommand, trackList);
    }
 
-/* Tell tracks to load their items. */
+
+/* adjust visibility */
 for (track = trackList; track != NULL; track = track->next)
     {
     /* adjust track visibility based on supertrack just before load loop */
@@ -4461,19 +4707,56 @@ for (track = trackList; track != NULL; track = track->next)
 	track->limitedVis = tvHide;
 	track->limitedVisSet = TRUE;
 	}
-    else if (track->visibility != tvHide)
+    }
+/* pre-load remote tracks in parallel */
+int ptMax = atoi(cfgOptionDefault("parallelFetch.threads", "20"));  // default number of threads for parallel fetch.
+pthread_t *threads = NULL;
+if (ptMax > 0)     // parallelFetch.threads=0 to disable parallel fetch
+    {
+    findLeavesForParallelLoad(trackList, &pfdList);
+    /* launch parallel threads */
+    ptMax = min(ptMax, slCount(pfdList));
+    if (ptMax > 0)
 	{
-	if (measureTiming)
-	    lastTime = clock1000();
-	checkMaxWindowToDraw(track);
-	track->loadItems(track);
-
-	if (measureTiming)
+	AllocArray(threads, ptMax);
+	int pt;
+	for (pt = 0; pt < ptMax; ++pt)
 	    {
-	    thisTime = clock1000();
-	    track->loadTime = thisTime - lastTime;
+	    int rc = pthread_create(&threads[pt], NULL, remoteParallelLoad, &threads[pt]);
+	    if (rc)
+		{
+		errAbort("Unexpected error %d from pthread_create(): %s",rc,strerror(rc));
+		}
 	    }
 	}
+    }
+/* load regular tracks */
+for (track = trackList; track != NULL; track = track->next)
+    {
+    if (track->visibility != tvHide)
+	{
+	if (!track->parallelLoading)
+	    {
+	    if (measureTiming)
+		lastTime = clock1000();
+
+	    checkMaxWindowToDraw(track);
+	    track->loadItems(track);
+
+	    if (measureTiming)
+		{
+		thisTime = clock1000();
+		track->loadTime = thisTime - lastTime;
+		}
+	    }
+	}
+    }
+if (ptMax > 0)
+    {
+    /* wait for remote parallel load to finish */
+    remoteParallelLoadWait(atoi(cfgOptionDefault("parallelFetch.timeout", "90")));  // wait up to default 90 seconds.
+    if (measureTiming)
+	measureTime("Waiting for parallel (%d thread) remote data fetch", ptMax);
     }
 
 printTrackInitJavascript(trackList);
@@ -4513,7 +4796,12 @@ if(theImgBox)
 /* Center everything from now on. */
 hPrintf("<CENTER>\n");
 
-if(trackImgOnly)
+// info for drag selection javascript
+jsonHashAddNumber(jsonForClient, "winStart", winStart);
+jsonHashAddNumber(jsonForClient, "winEnd", winEnd);
+jsonHashAddString(jsonForClient, "chromName", chromName);
+
+if(trackImgOnly && !ideogramToo)
     {
     struct track *ideoTrack = chromIdeoTrack(trackList);
     if (ideoTrack)
@@ -4568,12 +4856,21 @@ if (!hideControls)
     /* Put up scroll and zoom controls. */
 #ifndef USE_NAVIGATION_LINKS
     hWrites("move ");
+#if IN_PLACE_UPDATE
+    hButtonWithOnClick("hgt.left3", "<<<", "move 95% to the left", "return navigateButtonClick(this);");
+    hButtonWithOnClick("hgt.left2", " <<", "move 47.5% to the left", "return navigateButtonClick(this);");
+    hButtonWithOnClick("hgt.left1", " < ", "move 10% to the left", "return navigateButtonClick(this);");
+    hButtonWithOnClick("hgt.right1", " > ", "move 10% to the right", "return navigateButtonClick(this);");
+    hButtonWithOnClick("hgt.right2", ">> ", "move 47.5% to the right", "return navigateButtonClick(this);");
+    hButtonWithOnClick("hgt.right3", ">>>", "move 95% to the right", "return navigateButtonClick(this);");
+#else
     hButtonWithMsg("hgt.left3", "<<<", "move 95% to the left");
     hButtonWithMsg("hgt.left2", " <<", "move 47.5% to the left");
     hButtonWithMsg("hgt.left1", " < ", "move 10% to the left");
     hButtonWithMsg("hgt.right1", " > ", "move 10% to the right");
     hButtonWithMsg("hgt.right2", ">> ", "move 47.5% to the right");
     hButtonWithMsg("hgt.right3", ">>>", "move 95% to the right");
+#endif
     hWrites(" zoom in ");
     /* use button maker that determines padding, so we can share constants */
     topButton("hgt.in1", ZOOM_1PT5X);
@@ -4643,13 +4940,7 @@ if (!hideControls)
 	hButton("hgTracksConfigPage", "configure");
 	if (survey && differentWord(survey, "off"))
             hPrintf("&nbsp;&nbsp;<span style='background-color:yellow;'><A HREF='%s' TARGET=_BLANK><EM><B>%s</EM></B></A></span>\n", survey, surveyLabel ? surveyLabel : "Take survey");
-	// info for drag selection javascript
-	hPrintf("<input type='hidden' id='hgt.winStart' name='winStart' value='%d'>\n", winStart);
-	hPrintf("<input type='hidden' id='hgt.winEnd' name='winEnd' value='%d'>\n", winEnd);
-	hPrintf("<input type='hidden' id='hgt.chromName' name='chromName' value='%s'>\n", chromName);
-
 	hPutc('\n');
-
 	}
     }
 
@@ -4705,9 +4996,15 @@ if (!hideControls)
 #ifndef USE_NAVIGATION_LINKS
     hPrintf("<TD COLSPAN=6 ALIGN=left NOWRAP>");
     hPrintf("move start<BR>");
+#if IN_PLACE_UPDATE
+    hButtonWithOnClick("hgt.dinkLL", " < ", "move start position to the left", "return navigateButtonClick(this);");
+    hTextVar("dinkL", cartUsualString(cart, "dinkL", "2.0"), 3);
+    hButtonWithOnClick("hgt.dinkLR", " > ", "move start position to the right", "return navigateButtonClick(this);");
+#else
     hButton("hgt.dinkLL", " < ");
     hTextVar("dinkL", cartUsualString(cart, "dinkL", "2.0"), 3);
     hButton("hgt.dinkLR", " > ");
+#endif
     hPrintf("</TD>");
     hPrintf("<td width='30'>&nbsp;</td>\n");
 #endif//ndef USE_NAVIGATION_LINKS
@@ -4725,9 +5022,15 @@ if (!hideControls)
     hPrintf("<td width='30'>&nbsp;</td>\n");
     hPrintf("<TD COLSPAN=6 ALIGN=right NOWRAP>");
     hPrintf("move end<BR>");
+#if IN_PLACE_UPDATE
+    hButtonWithOnClick("hgt.dinkRL", " < ", "move end position to the left", "return navigateButtonClick(this);");
+    hTextVar("dinkR", cartUsualString(cart, "dinkR", "2.0"), 3);
+    hButtonWithOnClick("hgt.dinkRR", " > ", "move end position to the right", "return navigateButtonClick(this);");
+#else
     hButton("hgt.dinkRL", " < ");
     hTextVar("dinkR", cartUsualString(cart, "dinkR", "2.0"), 3);
     hButton("hgt.dinkRR", " > ");
+#endif
     hPrintf("</TD>");
 #endif//ndef USE_NAVIGATION_LINKS
     hPrintf("</TR></TABLE>\n");
@@ -4754,6 +5057,9 @@ if (!hideControls)
         hasCustomTracks ? "Manage your custom tracks" : "Add your own custom tracks");
 
     hPrintf(" ");
+    hPrintf("<INPUT TYPE='button' VALUE='track hubs' onClick='document.trackHubForm.submit();return false;' title='Import tracks from hubs'>");
+
+    hPrintf(" ");
     hButtonWithMsg("hgTracksConfigPage", "configure","Configure image and track selection");
     hPrintf(" ");
 
@@ -4763,6 +5069,9 @@ if (!hideControls)
             revCmplDisp?"Show forward strand at this location":"Show reverse strand at this location");
         hPrintf(" ");
 	}
+
+    hButtonWithOnClick("hgt.setWidth", "resize", "Resize image width to browser window size", "hgTracksSetWidth()");
+    hPrintf(" ");
 
     hButtonWithMsg("hgt.refresh", "refresh","Refresh image");
 
@@ -4804,7 +5113,6 @@ if (!hideControls)
 	    /* 4 cols fit GSID's display better */
 	    cg = startControlGrid(4, "left");
 	    }
-	boolean isFirstNotCtGroup = TRUE;
 	for (group = groupList; group != NULL; group = group->next)
 	    {
 	    if (group->trackList == NULL)
@@ -4836,10 +5144,11 @@ if (!hideControls)
             hPrintf("</td></tr></table></th>\n");
 	    controlGridEndRow(cg);
 
-	    /* First track group that is not custom track group gets ruler,
+	    /* First track group that is not the custom track group (#1)
+	     * or a track hub, gets the Base Position track
 	     * unless it's collapsed. */
-	    if (!showedRuler && isFirstNotCtGroup &&
-			differentString(group->name, "user"))
+	    if (!showedRuler && !isHubTrack(group->name) &&
+		    differentString(group->name, "user") )
 		{
 		char *url = trackUrl(RULER_TRACK_NAME, chromName);
 		showedRuler = TRUE;
@@ -4854,8 +5163,6 @@ if (!hideControls)
 		controlGridEndCell(cg);
 		freeMem(url);
 		}
-	    if (differentString(group->name, "user"))
-		isFirstNotCtGroup = FALSE;
 
 	    /* Add supertracks to  track list, sort by priority and
 	     * determine if they have visible member tracks */
@@ -4979,7 +5286,15 @@ hPrintf("<FORM ACTION='%s' NAME='customTrackForm'>", hgCustomName());
 cartSaveSession(cart);
 hPrintf("</FORM>\n");
 
+/* hidden form for track hub CGI */
+hPrintf("<FORM ACTION='%s' NAME='trackHubForm'>", hgHubConnectName());
+cgiMakeHiddenVar(hgHubConnectCgiDestUrl, "../cgi-bin/hgTracks");
+cartSaveSession(cart);
+hPrintf("</FORM>\n");
+
 pruneRedundantCartVis(trackList);
+if (measureTiming)
+    measureTime("Done with trackForm");
 }
 
 static void toggleRevCmplDisp()
@@ -5121,10 +5436,10 @@ doTrackForm(psTn.forCgi, &ideoPsTn);
 // postscript
 printf("<UL>\n");
 printf("<LI><A HREF=\"%s\">Click here</A> "
-       "to download the current browser graphic in PostScript.  ", psTn.forCgi);
+       "to download the current browser graphic in PostScript.\n", psTn.forCgi);
 if (strlen(ideoPsTn.forCgi))
     printf("<LI><A HREF=\"%s\">Click here</A> "
-           "to download the current chromosome ideogram in PostScript.  ", ideoPsTn.forCgi);
+           "to download the current chromosome ideogram in PostScript.\n", ideoPsTn.forCgi);
 printf("</UL>\n");
 
 pdfFile = convertEpsToPdf(psTn.forCgi);
@@ -5135,10 +5450,10 @@ if(pdfFile != NULL)
     printf("<BR>PDF can be viewed with Adobe Acrobat Reader.\n");
     printf("<UL>\n");
     printf("<LI><A TARGET=_blank HREF=\"%s\">Click here</A> "
-       "to download the current browser graphic in PDF.", pdfFile);
+       "to download the current browser graphic in PDF.\n", pdfFile);
     if (ideoPdfFile != NULL)
         printf("<LI><A TARGET=_blank HREF=\"%s\">Click here</A> "
-               "to download the current chromosome ideogram in PDF.", ideoPdfFile);
+               "to download the current chromosome ideogram in PDF.\n", ideoPdfFile);
     printf("</UL>\n");
     freez(&pdfFile);
     freez(&ideoPdfFile);
@@ -5146,8 +5461,7 @@ if(pdfFile != NULL)
 else
     printf("<BR><BR>PDF format not available");
 
-    #define RETURN_BUTTON "<FORM ACTION='../cgi-bin/hgTracks' NAME='TrackHeaderForm' id='TrackHeaderForm' METHOD='GET'><INPUT TYPE=SUBMIT ID='ChangeToNameToSetSomething' VALUE='Return to Browser'></FORM>"
-    printf(RETURN_BUTTON);
+    printf("<a href='../cgi-bin/hgTracks'><input type='button' VALUE='Return to Browser'></a>\n");
 }
 
 boolean isGenome(char *pos)
@@ -5548,6 +5862,10 @@ char *debugTmp = NULL;
 /* Initialize layout and database. */
 cart = theCart;
 
+measureTiming = isNotEmpty(cartOptionalString(cart, "measureTiming"));
+if (measureTiming)
+    measureTime("Get cart of %d for user:%u session:%u", theCart->hash->elCount,
+	    theCart->userId, theCart->sessionId);
 /* #if 1 this to see parameters for debugging. */
 /* Be careful though, it breaks if custom track
  * is more than 4k */
@@ -5575,7 +5893,6 @@ if (udcCacheTimeout() < timeout)
     udcSetCacheTimeout(timeout);
 
 initTl();
-measureTiming = isNotEmpty(cartOptionalString(cart, "measureTiming"));
 
 char *configPageCall = cartCgiUsualString(cart, "hgTracksConfigPage", "notSet");
 
@@ -5592,48 +5909,52 @@ if (cartUsualBoolean(cart, "hgt.trackImgOnly", FALSE))
     withNextExonArrows = FALSE;
     hgFindMatches = NULL;     // XXXX necessary ???
     }
-hWrites(commonCssStyles());
-jsIncludeFile("jquery.js", NULL);
-jsIncludeFile("utils.js", NULL);
-if(dragZooming)
+
+jsonForClient = newJsonHash(newHash(8));
+jsonHashAddString(jsonForClient, "cgiVersion", CGI_VERSION);
+boolean searching = differentString(cartUsualString(cart, TRACK_SEARCH,"0"), "0");
+
+if(!trackImgOnly)
     {
-    jsIncludeFile("jquery.imgareaselect.js", NULL);
+    // Write out includes for css and js files
+    hWrites(commonCssStyles());
+    jsIncludeFile("jquery.js", NULL);
+    jsIncludeFile("jquery-ui.js", NULL);
+    jsIncludeFile("utils.js", NULL);
     jsIncludeFile("ajax.js", NULL);
-#ifdef NEW_JQUERY
-    webIncludeResourceFile("jquery.ui.autocomplete.css");
-#else
-    webIncludeResourceFile("autocomplete.css");
-    jsIncludeFile("jquery.autocomplete.js", NULL);
-#endif
+    if(dragZooming && !searching)
+        {
+        jsIncludeFile("jquery.imgareaselect.js", NULL);
+#ifndef NEW_JQUERY
+        webIncludeResourceFile("autocomplete.css");
+        jsIncludeFile("jquery.autocomplete.js", NULL);
+#endif///ndef NEW_JQUERY
+        }
     jsIncludeFile("autocomplete.js", NULL);
-    }
-jsIncludeFile("hgTracks.js", NULL);
+    jsIncludeFile("hgTracks.js", NULL);
 
 #ifdef LOWELAB
-jsIncludeFile("lowetooltip.js", NULL);
+    jsIncludeFile("lowetooltip.js", NULL);
 #endif
 
-if(advancedJavascriptFeaturesEnabled(cart))
-    {
-    webIncludeResourceFile("jquery-ui.css");
-    if (sameString(cartUsualString(cart, TRACK_SEARCH,"0"),"0")) // NOT doing search
+    if(advancedJavascriptFeaturesEnabled(cart))
         {
-        webIncludeResourceFile("jquery.contextmenu.css");
-        jsIncludeFile("jquery.contextmenu.js", NULL);
-        webIncludeResourceFile("ui.dropdownchecklist.css");
-#ifndef NEW_JQUERY
-        jsIncludeFile("ui.core.js", NULL);
-#endif
-        jsIncludeFile("ui.dropdownchecklist.js", NULL);
+        webIncludeResourceFile("jquery-ui.css");
+        if (!searching) // NOT doing search
+            {
+            webIncludeResourceFile("jquery.contextmenu.css");
+            jsIncludeFile("jquery.contextmenu.js", NULL);
+            webIncludeResourceFile("ui.dropdownchecklist.css");
+            jsIncludeFile("ui.dropdownchecklist.js", NULL);
+#ifdef NEW_JQUERY
+            jsIncludeFile("ddcl.js", NULL);
+#endif///def NEW_JQUERY
+            }
         }
-    }
-jsIncludeFile("jquery-ui.js", NULL);
 
-//if (!trackImgOnly)
-    {
-hPrintf("<div id='hgTrackUiDialog' style='display: none'></div>\n");
-// XXXX stole this and '.hidden' from bioInt.css - needs work
-hPrintf("<div id='warning' class='ui-state-error ui-corner-all hidden' style='font-size: 0.75em; display: none;' onclick='$(this).hide();'><p><span class='ui-icon ui-icon-alert' style='float: left; margin-right: 0.3em;'></span><strong></strong><span id='warningText'></span> (click to hide)</p></div>\n");
+    hPrintf("<div id='hgTrackUiDialog' style='display: none'></div>\n");
+    // XXXX stole this and '.hidden' from bioInt.css - needs work
+    hPrintf("<div id='warning' class='ui-state-error ui-corner-all hidden' style='font-size: 0.75em; display: none;' onclick='$(this).hide();'><p><span class='ui-icon ui-icon-alert' style='float: left; margin-right: 0.3em;'></span><strong></strong><span id='warningText'></span> (click to hide)</p></div>\n");
     }
 
 /* check for new data hub */
@@ -5712,4 +6033,9 @@ else
     {
     tracksDisplay();
     }
+
+hPrintf("<script type='text/javascript'>\n");
+jsonPrint((struct jsonElement *) jsonForClient, "hgTracks", 0);
+hPrintf("</script>\n");
+
 }

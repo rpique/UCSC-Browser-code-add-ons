@@ -474,7 +474,7 @@ else
     hPrintf("</td></tr>\n");
 
     // Set up json for js functionality
-    struct dyString *jsonTdbVars = NULL;
+    struct jsonHashElement *jsonTdbVars = newJsonHash(newHash(8));
 
     int trackCount=0;
     boolean containerTrackCount = 0;
@@ -485,7 +485,7 @@ else
             break;
 
         struct track *track = (struct track *) ptr->val;
-        jsonTdbSettingsBuild(&jsonTdbVars, track, FALSE); // FALSE: No configuration from track search
+        jsonTdbSettingsBuild(jsonTdbVars, track, FALSE); // FALSE: No configuration from track search
 
         if (tdbIsFolder(track->tdb)) // supertrack
             hPrintf("<tr class='bgLevel4' valign='top' class='found'>\n");
@@ -571,7 +571,7 @@ else
     hPrintf("\n</form>\n");
 
     // be done with json
-    hWrites(jsonTdbSettingsUse(&jsonTdbVars));
+    jsonTdbSettingsUse(jsonTdbVars);
     }
 hPrintf("</div>"); // This div allows the clear button to empty it
 }
@@ -585,10 +585,15 @@ if (!advancedJavascriptFeaturesEnabled(cart))
     }
 
 webIncludeResourceFile("ui.dropdownchecklist.css");
-//jsIncludeFile("ui.core.js",NULL);   // NOTE: This appears to be not needed as long as jquery-ui.js comes before ui.dropdownchecklist.js
 jsIncludeFile("ui.dropdownchecklist.js",NULL);
 // This line is needed to get the multi-selects initialized
+#ifdef NEW_JQUERY
+jsIncludeFile("ddcl.js",NULL);
+hPrintf("<script type='text/javascript'>var newJQuery=true;</script>\n");
+#else///ifndef NEW_JQUERY
+hPrintf("<script type='text/javascript'>var newJQuery=false;</script>\n");
 hPrintf("<script type='text/javascript'>$(document).ready(function() { $('.filterBy').each( function(i) { $(this).dropdownchecklist({ firstItemChecksAll: true, noneIsAll: true, maxDropHeight: filterByMaxHeight(this) });});});</script>\n");
+#endif///ndef NEW_JQUERY
 
 struct group *group;
 char *groups[128];
@@ -768,7 +773,7 @@ hPrintf("</div>"); // Restricts to max-width:1000px;
 cgiDown(0.8);
 
 if (measureTiming)
-    uglyTime("Rendered tabs");
+    measureTime("Rendered tabs");
 
 if(descSearch != NULL && !strlen(descSearch))
     descSearch = NULL;
@@ -807,7 +812,7 @@ if(doSearch)
         tracks = advancedSearchForTracks(conn,groupList,descWords,descWordCount,nameSearch,typeSearch,descSearch,groupSearch,mdbSelects);
 
     if (measureTiming)
-        uglyTime("Searched for tracks");
+        measureTime("Searched for tracks");
 
     // Sort and Print results
     if(selectedTab!=filesTab)
@@ -820,7 +825,7 @@ if(doSearch)
         displayFoundTracks(cart,tracks,tracksFound,sortBy);
 
         if (measureTiming)
-            uglyTime("Displayed found tracks");
+            measureTime("Displayed found tracks");
         }
     slPairFreeList(&mdbSelects);
     }

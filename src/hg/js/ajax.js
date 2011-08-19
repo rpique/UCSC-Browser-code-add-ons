@@ -273,6 +273,7 @@ function lookupMetadata(trackName,showLonglabel,showShortLabel)
         thisData += "&showShortLabel=1";
     $.ajax({
         type: "GET",
+        dataType: "html",
         url: "../cgi-bin/hgApi",
         data: thisData,
         trueSuccess: loadMetadataTable,
@@ -422,3 +423,14 @@ function retrieveHtmlHandle(response, status)
         $(buttOk).focus();
 }
 
+function scrapeVariable(html, name)
+{
+// scrape a variable defintion out of html (see jsHelper.c::jsPrintHash)
+    var re = new RegExp("^// START " + name + "\\nvar " + name + " = ([\\S\\s]+);\\n// END " + name + "$", "m");
+    var a = re.exec(html);
+    var json;
+    if(a && a[1]) {
+        json = eval("(" + a[1] + ")");
+    }
+    return json;
+}

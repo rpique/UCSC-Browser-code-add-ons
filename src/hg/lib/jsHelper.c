@@ -211,9 +211,9 @@ hPrintf("<SCRIPT>var %s=%d;</SCRIPT>\n", jsVar, oldVal);
 hPrintf("<INPUT TYPE=CHECKBOX NAME=%s VALUE=1", cgiVar);
 if (oldVal)
     hPrintf(" CHECKED");
-hPrintf(" onClick=\"%s=%d;\"", jsVar, !oldVal);
+hPrintf(" onClick=\"%s=(%s+1)%%2;\"", jsVar, jsVar);
 hPrintf(">");
-sprintf(buf, "%s%s", cgiBooleanShadowPrefix(), cgiVar);
+safef(buf, sizeof(buf), "%s%s", cgiBooleanShadowPrefix(), cgiVar);
 cgiMakeHiddenVar(buf, "0");
 }
 
@@ -487,3 +487,197 @@ void jsEndCollapsibleSection()
 puts("</TD></TR>");
 }
 
+struct jsonStringElement *newJsonString(char *str)
+{
+struct jsonStringElement *ele;
+AllocVar(ele);
+ele->str = cloneString(str);
+ele->type = jsonString;
+return ele;
+}
+
+struct jsonHashElement *newJsonHash(struct hash *h)
+{
+struct jsonHashElement *ele;
+AllocVar(ele);
+ele->type = jsonHash;
+ele->hash = h;
+return ele;
+}
+
+struct jsonListElement *newJsonList(struct slRef *list)
+{
+struct jsonListElement *ele;
+AllocVar(ele);
+ele->type = jsonList;
+ele->list = list;
+return ele;
+}
+
+void jsonHashAdd(struct jsonHashElement *h, char *name, struct jsonElement *ele)
+{
+hashReplace(h->hash, name, ele);
+}
+
+void jsonHashAddString(struct jsonHashElement *h, char *name, char *val)
+{
+// Add a string to a hash which will be used to print a javascript object;
+// existing values are replaced.
+val = javaScriptLiteralEncode(val);
+char *str = needMem(strlen(val) + 3);
+sprintf(str, "'%s'", val);
+freez(&val);
+jsonHashAdd(h, name, (struct jsonElement *) newJsonString(str));
+}
+
+void jsonHashAddNumber(struct jsonHashElement *h, char *name, long val)
+{
+// Add a number to a hash which will be used to print a javascript object;
+// existing values are replaced.
+char buf[256];
+safef(buf, sizeof(buf), "%ld", val);
+jsonHashAdd(h, name, (struct jsonElement *) newJsonString(buf));
+}
+
+void jsonHashAddDouble(struct jsonHashElement *h, char *name, double val)
+{
+// Add a number to a hash which will be used to print a javascript object;
+// existing values are replaced.
+char buf[256];
+safef(buf, sizeof(buf), "%.10f", val);
+jsonHashAdd(h, name, (struct jsonElement *) newJsonString(buf));
+}
+
+void jsonHashAddBoolean(struct jsonHashElement *h, char *name, boolean val)
+{
+// Add a boolean to a hash which will be used to print a javascript object;
+// existing values are replaced.
+jsonHashAdd(h, name, (struct jsonElement *) newJsonString(val ? "true" : "false"));
+}
+
+void jsonListAdd(struct slRef **list, struct jsonElement *ele)
+{
+struct slRef *e;
+AllocVar(e);
+e->val = ele;
+slAddHead(list, e);
+}
+
+void jsonListAddString(struct slRef **list, char *val)
+{
+val = javaScriptLiteralEncode(val);
+char *str = needMem(strlen(val) + 3);
+sprintf(str, "'%s'", val);
+freez(&val);
+jsonListAdd(list, (struct jsonElement *) newJsonString(str));
+}
+
+void jsonListAddNumber(struct slRef **list, long val)
+{
+char buf[256];
+safef(buf, sizeof(buf), "%ld", val);
+jsonListAdd(list, (struct jsonElement *) newJsonString(buf));
+}
+
+void jsonListAddDouble(struct slRef **list, double val)
+{
+char buf[256];
+safef(buf, sizeof(buf), "%.10f", val);
+jsonListAdd(list, (struct jsonElement *) newJsonString(buf));
+}
+
+void jsonListAddBoolean(struct slRef **list, boolean val)
+{
+jsonListAdd(list, (struct jsonElement *) newJsonString(val ? "true" : "false"));
+}
+
+static char *makeIndentBuf(int indentLevel)
+{
+char *indentBuf;
+indentBuf = needMem(indentLevel + 1);
+memset(indentBuf, '\t', indentLevel);
+indentBuf[indentLevel] = 0;
+return indentBuf;
+}
+
+static void jsonPrintRecurse(struct jsonElement *json, int indentLevel)
+{
+char *indentBuf = makeIndentBuf(indentLevel);
+switch (json->type)
+    {
+    case jsonHash:
+        {
+        struct jsonHashElement *ele = (struct jsonHashElement *) json;
+        hPrintf("{\n");
+        if(hashNumEntries(ele->hash))
+            {
+            struct hashEl *el, *list = hashElListHash(ele->hash);
+            slSort(&list, hashElCmp);
+            for (el = list; el != NULL; el = el->next)
+                {
+                struct jsonElement *val = (struct jsonElement *) el->val;
+                hPrintf("%s\t\"%s\": ", indentBuf, el->name);
+                jsonPrintRecurse(val, indentLevel + 1);
+                hPrintf("%s\n", el->next == NULL ? "" : ",");
+                }
+            hashElFreeList(&list);
+            }
+        hPrintf("%s}", indentBuf);
+        break;
+        }
+    case jsonList:
+        {
+        struct jsonListElement *rec = (struct jsonListElement *) json;
+        struct slRef *el;
+        hPrintf("[\n");
+        if(rec->list)
+            {
+            for (el = rec->list; el != NULL; el = el->next)
+                {
+                struct jsonElement *val = (struct jsonElement *) el->val;
+                hPrintf("%s\t", indentBuf);
+                jsonPrintRecurse(val, indentLevel + 1);
+                hPrintf("%s\n", el->next == NULL ? "" : ",");
+                }
+            }
+        hPrintf("%s]", indentBuf);
+        break;
+        }
+    case jsonString:
+        {
+        hPrintf("%s", ((struct jsonStringElement *) json)->str);
+        break;
+        }
+    default:
+        {
+        errAbort("jsonPrintRecurse; invalid type: %d", json->type);
+        break;
+        }
+    }
+freez(&indentBuf);
+}
+
+void jsonPrint(struct jsonElement *json, char *name, int indentLevel)
+{
+// print out a jsonElement
+
+char *indentBuf = makeIndentBuf(indentLevel);
+hPrintf("// START %s\n%svar %s = ", name, indentBuf, name);
+jsonPrintRecurse(json, indentLevel);
+hPrintf("%s;\n// END %s\n", indentBuf, name);
+freez(&indentBuf);
+}
+
+void jsonErrPrintf(struct dyString *ds, char *format, ...)
+//  Printf a json error to a dyString for communicating with ajax code; format is:
+//  {"error": error message here}
+{
+va_list args;
+va_start(args, format);
+dyStringPrintf(ds, "{\"error\": \"");
+struct dyString *buf = newDyString(1000);
+dyStringVaPrintf(buf, format, args);
+dyStringAppend(ds, javaScriptLiteralEncode(dyStringCannibalize(&buf)));
+dyStringPrintf(ds, "\"}");
+va_end(args);
+}

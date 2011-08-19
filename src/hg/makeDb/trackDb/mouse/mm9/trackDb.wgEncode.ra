@@ -7,11 +7,11 @@ include wgEncodeSydhTfbs.ra beta,public
 include wgEncodeSydhTfbs.newR2.ra alpha
 
 # Stan/Yale Histone (wrangler: Venkat)
-include wgEncodeSydhHistone.ra alpha
+include wgEncodeSydhHistone.ra
 
 # UW DNaseI HS (wrangler: Venkat)
-include wgEncodeUwDnase.ra alpha
-#include wgEncodeUwDnase.new.ra alpha 
+include wgEncodeUwDnase.ra beta,public
+include wgEncodeUwDnase.new.ra alpha 
 
 # PSU TFBS (wrangler: Venkat)
 include wgEncodePsuTfbs.ra alpha
@@ -23,12 +23,16 @@ include wgEncodePsuHistone.ra alpha
 include wgEncodeLicrHistone.ra 
 
 # LICR TFBS (wrangler: Venkat)
-include wgEncodeLicrTfbs.ra alpha
+include wgEncodeLicrTfbs.ra 
 
 # Stan/Yale RNA-Seq (wrangler: Venkat)
 include wgEncodeSydhRnaSeq.ra alpha
 
 # Licr RNA-Seq (wrangler: Venkat)
-include wgEncodeLicrRnaSeq.ra alpha
+include wgEncodeLicrRnaSeq.ra
 
+# Uw RNA-Seq (wrangler: Venkat)
+include wgEncodeUwRnaSeq.ra alpha
 
+# Caltech TFBS (wrangler: Venkat)
+include wgEncodeCaltechTfbs.ra alpha

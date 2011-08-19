@@ -2,6 +2,7 @@ metaObject wgEncodeLicrHistone
 objType composite
 composite wgEncodeLicrHistone
 expVars lab,dataType,cell,antibody
+geoSeriesAccession GSE31039
 
 metaObject wgEncodeLicrHistoneBmarrowH3k4me1MAdult8wksC57bl6StdAlnRep1
 objType file
@@ -18,10 +19,10 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001435
 expId 1435
 fileName wgEncodeLicrHistoneBmarrowH3k4me1MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769024
 grant Ren
 lab LICR-m
 labVersion 12/09/09 Lane 1
-parentTable wgEncodeLicrHistoneBmarrowH3k4me1MAdult8wksC57bl6StdAlnRep1
 project wgEncode
 replicate 1
 seqPlatform Illumina_GA2
@@ -48,10 +49,10 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001435
 expId 1435
 fileName wgEncodeLicrHistoneBmarrowH3k4me1MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769024
 grant Ren
 lab LICR-m
 labVersion 02/10/10 Lane 6
-parentTable wgEncodeLicrHistoneBmarrowH3k4me1MAdult8wksC57bl6StdAlnRep2
 project wgEncode
 replicate 2
 seqPlatform Illumina_GA2
@@ -78,6 +79,7 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001435
 expId 1435
 fileName wgEncodeLicrHistoneBmarrowH3k4me1MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769024
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -107,10 +109,10 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001435
 expId 1435
 fileName wgEncodeLicrHistoneBmarrowH3k4me1MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769024
 grant Ren
 lab LICR-m
 labVersion 12/09/09 Lane 1
-parentTable wgEncodeLicrHistoneBmarrowH3k4me1MAdult8wksC57bl6StdRawSignalRep1
 project wgEncode
 replicate 1
 seqPlatform Illumina_GA2
@@ -137,10 +139,10 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001435
 expId 1435
 fileName wgEncodeLicrHistoneBmarrowH3k4me1MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769024
 grant Ren
 lab LICR-m
 labVersion 02/10/10 Lane 6
-parentTable wgEncodeLicrHistoneBmarrowH3k4me1MAdult8wksC57bl6StdRawSignalRep2
 project wgEncode
 replicate 2
 seqPlatform Illumina_GA2
@@ -167,6 +169,7 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001435
 expId 1435
 fileName wgEncodeLicrHistoneBmarrowH3k4me1MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769024
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -196,6 +199,7 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001436
 expId 1436
 fileName wgEncodeLicrHistoneBmarrowH3k4me3MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769021
 grant Ren
 lab LICR-m
 labVersion 11/19/09 Lane 3
@@ -225,6 +229,7 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001436
 expId 1436
 fileName wgEncodeLicrHistoneBmarrowH3k4me3MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769021
 grant Ren
 lab LICR-m
 labVersion 12/09/09 Lane 2
@@ -254,6 +259,7 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001436
 expId 1436
 fileName wgEncodeLicrHistoneBmarrowH3k4me3MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769021
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -283,6 +289,7 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001436
 expId 1436
 fileName wgEncodeLicrHistoneBmarrowH3k4me3MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769021
 grant Ren
 lab LICR-m
 labVersion 11/19/09 Lane 3
@@ -312,6 +319,7 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001436
 expId 1436
 fileName wgEncodeLicrHistoneBmarrowH3k4me3MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769021
 grant Ren
 lab LICR-m
 labVersion 12/09/09 Lane 2
@@ -341,6 +349,7 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001436
 expId 1436
 fileName wgEncodeLicrHistoneBmarrowH3k4me3MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769021
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -370,6 +379,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001447
 expId 1447
 fileName wgEncodeLicrHistoneBmarrowInputMAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769011
 grant Ren
 lab LICR-m
 labVersion 11/05/09 Lane 3
@@ -399,6 +409,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001447
 expId 1447
 fileName wgEncodeLicrHistoneBmarrowInputMAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769011
 grant Ren
 lab LICR-m
 labVersion 11/20/09 Lane 5
@@ -428,6 +439,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001447
 expId 1447
 fileName wgEncodeLicrHistoneBmarrowInputMAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769011
 grant Ren
 lab LICR-m
 labVersion 11/05/09 Lane 3
@@ -457,6 +469,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001447
 expId 1447
 fileName wgEncodeLicrHistoneBmarrowInputMAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769011
 grant Ren
 lab LICR-m
 labVersion 11/20/09 Lane 5
@@ -486,6 +499,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001447
 expId 1447
 fileName wgEncodeLicrHistoneBmarrowInputMAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769011
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -515,6 +529,7 @@ dateUnrestricted 2011-12-07
 dccAccession wgEncodeEM001440
 expId 1440
 fileName wgEncodeLicrHistoneCbellumH3k4me1MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769018
 grant Ren
 lab LICR-m
 labVersion 12/09/09 Lane 1
@@ -544,6 +559,7 @@ dateUnrestricted 2011-12-07
 dccAccession wgEncodeEM001440
 expId 1440
 fileName wgEncodeLicrHistoneCbellumH3k4me1MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769018
 grant Ren
 lab LICR-m
 labVersion 02/10/10 Lane 6
@@ -573,6 +589,7 @@ dateUnrestricted 2011-12-07
 dccAccession wgEncodeEM001440
 expId 1440
 fileName wgEncodeLicrHistoneCbellumH3k4me1MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769018
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -602,6 +619,7 @@ dateUnrestricted 2011-12-07
 dccAccession wgEncodeEM001440
 expId 1440
 fileName wgEncodeLicrHistoneCbellumH3k4me1MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769018
 grant Ren
 lab LICR-m
 labVersion 12/09/09 Lane 1
@@ -631,6 +649,7 @@ dateUnrestricted 2011-12-07
 dccAccession wgEncodeEM001440
 expId 1440
 fileName wgEncodeLicrHistoneCbellumH3k4me1MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769018
 grant Ren
 lab LICR-m
 labVersion 02/10/10 Lane 6
@@ -660,6 +679,7 @@ dateUnrestricted 2011-12-07
 dccAccession wgEncodeEM001440
 expId 1440
 fileName wgEncodeLicrHistoneCbellumH3k4me1MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769018
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -689,10 +709,10 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEM001439
 expId 1439
 fileName wgEncodeLicrHistoneCbellumH3k4me3MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769027
 grant Ren
 lab LICR-m
 labVersion 5/26/09 Lane 6
-parentTable wgEncodeLicrHistoneCbellumH3k4me3MAdult8wksC57bl6StdAlnRep1
 project wgEncode
 replicate 1
 seqPlatform Illumina_GA2
@@ -719,10 +739,10 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEM001439
 expId 1439
 fileName wgEncodeLicrHistoneCbellumH3k4me3MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769027
 grant Ren
 lab LICR-m
 labVersion 8/20/09 Lane 6
-parentTable wgEncodeLicrHistoneCbellumH3k4me3MAdult8wksC57bl6StdAlnRep2
 project wgEncode
 replicate 2
 seqPlatform Illumina_GA2
@@ -749,6 +769,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEM001439
 expId 1439
 fileName wgEncodeLicrHistoneCbellumH3k4me3MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769027
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -778,10 +799,10 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEM001439
 expId 1439
 fileName wgEncodeLicrHistoneCbellumH3k4me3MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769027
 grant Ren
 lab LICR-m
 labVersion 5/26/09 Lane 6
-parentTable wgEncodeLicrHistoneCbellumH3k4me3MAdult8wksC57bl6StdRawSignalRep1
 project wgEncode
 replicate 1
 seqPlatform Illumina_GA2
@@ -808,10 +829,10 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEM001439
 expId 1439
 fileName wgEncodeLicrHistoneCbellumH3k4me3MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769027
 grant Ren
 lab LICR-m
 labVersion 8/20/09 Lane 6
-parentTable wgEncodeLicrHistoneCbellumH3k4me3MAdult8wksC57bl6StdRawSignalRep2
 project wgEncode
 replicate 2
 seqPlatform Illumina_GA2
@@ -838,6 +859,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEM001439
 expId 1439
 fileName wgEncodeLicrHistoneCbellumH3k4me3MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769027
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -867,6 +889,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001448
 expId 1448
 fileName wgEncodeLicrHistoneCbellumInputMAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769020
 grant Ren
 lab LICR-m
 labVersion 05/27/09 Lane 1
@@ -896,6 +919,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001448
 expId 1448
 fileName wgEncodeLicrHistoneCbellumInputMAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769020
 grant Ren
 lab LICR-m
 labVersion 01/16/10 Lane 2
@@ -925,6 +949,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001448
 expId 1448
 fileName wgEncodeLicrHistoneCbellumInputMAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769020
 grant Ren
 lab LICR-m
 labVersion 05/27/09 Lane 1
@@ -954,6 +979,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001448
 expId 1448
 fileName wgEncodeLicrHistoneCbellumInputMAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769020
 grant Ren
 lab LICR-m
 labVersion 01/16/10 Lane 2
@@ -983,6 +1009,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001448
 expId 1448
 fileName wgEncodeLicrHistoneCbellumInputMAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769020
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -1012,10 +1039,10 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001437
 expId 1437
 fileName wgEncodeLicrHistoneCortexH3k4me1MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769022
 grant Ren
 lab LICR-m
 labVersion 05/26/09 Lane 4
-parentTable wgEncodeLicrHistoneCortexH3k4me1MAdult8wksC57bl6StdAlnRep1
 project wgEncode
 replicate 1
 seqPlatform Illumina_GA2
@@ -1042,10 +1069,10 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001437
 expId 1437
 fileName wgEncodeLicrHistoneCortexH3k4me1MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769022
 grant Ren
 lab LICR-m
 labVersion 12/14/09 Lane 2
-parentTable wgEncodeLicrHistoneCortexH3k4me1MAdult8wksC57bl6StdAlnRep2
 project wgEncode
 replicate 2
 seqPlatform Illumina_GA2
@@ -1072,6 +1099,7 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001437
 expId 1437
 fileName wgEncodeLicrHistoneCortexH3k4me1MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769022
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -1101,10 +1129,10 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001437
 expId 1437
 fileName wgEncodeLicrHistoneCortexH3k4me1MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769022
 grant Ren
 lab LICR-m
 labVersion 05/26/09 Lane 4
-parentTable wgEncodeLicrHistoneCortexH3k4me1MAdult8wksC57bl6StdRawSignalRep1
 project wgEncode
 replicate 1
 seqPlatform Illumina_GA2
@@ -1131,10 +1159,10 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001437
 expId 1437
 fileName wgEncodeLicrHistoneCortexH3k4me1MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769022
 grant Ren
 lab LICR-m
 labVersion 12/14/09 Lane 2
-parentTable wgEncodeLicrHistoneCortexH3k4me1MAdult8wksC57bl6StdRawSignalRep2
 project wgEncode
 replicate 2
 seqPlatform Illumina_GA2
@@ -1161,6 +1189,7 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001437
 expId 1437
 fileName wgEncodeLicrHistoneCortexH3k4me1MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769022
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -1190,10 +1219,10 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001438
 expId 1438
 fileName wgEncodeLicrHistoneCortexH3k4me3MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769026
 grant Ren
 lab LICR-m
 labVersion 05/26/09 Lane 1
-parentTable wgEncodeLicrHistoneCortexH3k4me3MAdult8wksC57bl6StdAlnRep1
 project wgEncode
 replicate 1
 seqPlatform Illumina_GA2
@@ -1220,10 +1249,10 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001438
 expId 1438
 fileName wgEncodeLicrHistoneCortexH3k4me3MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769026
 grant Ren
 lab LICR-m
 labVersion 08/21/09 Lane 1
-parentTable wgEncodeLicrHistoneCortexH3k4me3MAdult8wksC57bl6StdAlnRep2
 project wgEncode
 replicate 2
 seqPlatform Illumina_GA2
@@ -1250,6 +1279,7 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001438
 expId 1438
 fileName wgEncodeLicrHistoneCortexH3k4me3MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769026
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -1279,10 +1309,10 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001438
 expId 1438
 fileName wgEncodeLicrHistoneCortexH3k4me3MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769026
 grant Ren
 lab LICR-m
 labVersion 05/26/09 Lane 1
-parentTable wgEncodeLicrHistoneCortexH3k4me3MAdult8wksC57bl6StdRawSignalRep1
 project wgEncode
 replicate 1
 seqPlatform Illumina_GA2
@@ -1309,10 +1339,10 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001438
 expId 1438
 fileName wgEncodeLicrHistoneCortexH3k4me3MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769026
 grant Ren
 lab LICR-m
 labVersion 08/21/09 Lane 1
-parentTable wgEncodeLicrHistoneCortexH3k4me3MAdult8wksC57bl6StdRawSignalRep2
 project wgEncode
 replicate 2
 seqPlatform Illumina_GA2
@@ -1339,6 +1369,7 @@ dateUnrestricted 2011-10-19
 dccAccession wgEncodeEM001438
 expId 1438
 fileName wgEncodeLicrHistoneCortexH3k4me3MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769026
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -1368,6 +1399,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001449
 expId 1449
 fileName wgEncodeLicrHistoneCortexInputMAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769019
 grant Ren
 lab LICR-m
 labVersion 05/26/09 Lane 5
@@ -1397,6 +1429,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001449
 expId 1449
 fileName wgEncodeLicrHistoneCortexInputMAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769019
 grant Ren
 lab LICR-m
 labVersion 12/14/09 Lane 4
@@ -1426,6 +1459,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001449
 expId 1449
 fileName wgEncodeLicrHistoneCortexInputMAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769019
 grant Ren
 lab LICR-m
 labVersion 05/26/09 Lane 5
@@ -1455,6 +1489,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001449
 expId 1449
 fileName wgEncodeLicrHistoneCortexInputMAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769019
 grant Ren
 lab LICR-m
 labVersion 12/14/09 Lane 4
@@ -1484,6 +1519,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001449
 expId 1449
 fileName wgEncodeLicrHistoneCortexInputMAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769019
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -1513,6 +1549,7 @@ dateUnrestricted 2012-02-06
 dccAccession wgEncodeEM001681
 expId 1681
 fileName wgEncodeLicrHistoneEsb4H3k4me1ME0C57bl6StdAlnRep1.bam
+geoSampleAccession GSM769009
 grant Ren
 lab LICR-m
 labVersion 12/23/09 SOLEXA2 Lane 4
@@ -1542,6 +1579,7 @@ dateUnrestricted 2012-02-06
 dccAccession wgEncodeEM001681
 expId 1681
 fileName wgEncodeLicrHistoneEsb4H3k4me1ME0C57bl6StdAlnRep2.bam
+geoSampleAccession GSM769009
 grant Ren
 lab LICR-m
 labVersion 12/23/09 SOLEXA1 Lane 2
@@ -1571,6 +1609,7 @@ dateUnrestricted 2012-02-06
 dccAccession wgEncodeEM001681
 expId 1681
 fileName wgEncodeLicrHistoneEsb4H3k4me1ME0C57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769009
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -1600,6 +1639,7 @@ dateUnrestricted 2012-02-06
 dccAccession wgEncodeEM001681
 expId 1681
 fileName wgEncodeLicrHistoneEsb4H3k4me1ME0C57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769009
 grant Ren
 lab LICR-m
 labVersion 12/23/09 SOLEXA2 Lane 4
@@ -1629,6 +1669,7 @@ dateUnrestricted 2012-02-06
 dccAccession wgEncodeEM001681
 expId 1681
 fileName wgEncodeLicrHistoneEsb4H3k4me1ME0C57bl6StdRawDataRep2.fasta.gz
+geoSampleAccession GSM769009
 grant Ren
 lab LICR-m
 labVersion 12/23/09 SOLEXA1 Lane 2
@@ -1658,6 +1699,7 @@ dateUnrestricted 2012-02-06
 dccAccession wgEncodeEM001681
 expId 1681
 fileName wgEncodeLicrHistoneEsb4H3k4me1ME0C57bl6StdSig.bigWig
+geoSampleAccession GSM769009
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -1687,6 +1729,7 @@ dateUnrestricted 2012-02-05
 dccAccession wgEncodeEM001682
 expId 1682
 fileName wgEncodeLicrHistoneEsb4H3k4me3ME0C57bl6StdAlnRep1.bam
+geoSampleAccession GSM769008
 grant Ren
 lab LICR-m
 labVersion 12/07/09 Lane 4
@@ -1716,6 +1759,7 @@ dateUnrestricted 2012-02-05
 dccAccession wgEncodeEM001682
 expId 1682
 fileName wgEncodeLicrHistoneEsb4H3k4me3ME0C57bl6StdAlnRep2.bam
+geoSampleAccession GSM769008
 grant Ren
 lab LICR-m
 labVersion 12/07/09 Lane 5
@@ -1745,6 +1789,7 @@ dateUnrestricted 2012-02-05
 dccAccession wgEncodeEM001682
 expId 1682
 fileName wgEncodeLicrHistoneEsb4H3k4me3ME0C57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769008
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -1774,6 +1819,7 @@ dateUnrestricted 2012-02-05
 dccAccession wgEncodeEM001682
 expId 1682
 fileName wgEncodeLicrHistoneEsb4H3k4me3ME0C57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769008
 grant Ren
 lab LICR-m
 labVersion 12/07/09 Lane 4
@@ -1803,6 +1849,7 @@ dateUnrestricted 2012-02-05
 dccAccession wgEncodeEM001682
 expId 1682
 fileName wgEncodeLicrHistoneEsb4H3k4me3ME0C57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769008
 grant Ren
 lab LICR-m
 labVersion 12/07/09 Lane 5
@@ -1832,6 +1879,7 @@ dateUnrestricted 2012-02-05
 dccAccession wgEncodeEM001682
 expId 1682
 fileName wgEncodeLicrHistoneEsb4H3k4me3ME0C57bl6StdSig.bigWig
+geoSampleAccession GSM769008
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -1861,6 +1909,7 @@ dateUnrestricted 2012-02-05
 dccAccession wgEncodeEM001683
 expId 1683
 fileName wgEncodeLicrHistoneEsb4InputME0C57bl6StdAlnRep1.bam
+geoSampleAccession GSM769010
 grant Ren
 lab LICR-m
 labVersion 12/04/09 Lane 1
@@ -1890,6 +1939,7 @@ dateUnrestricted 2012-02-05
 dccAccession wgEncodeEM001683
 expId 1683
 fileName wgEncodeLicrHistoneEsb4InputME0C57bl6StdAlnRep2.bam
+geoSampleAccession GSM769010
 grant Ren
 lab LICR-m
 labVersion 12/04/09 Lane 2
@@ -1919,6 +1969,7 @@ dateUnrestricted 2012-02-05
 dccAccession wgEncodeEM001683
 expId 1683
 fileName wgEncodeLicrHistoneEsb4InputME0C57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769010
 grant Ren
 lab LICR-m
 labVersion 12/04/09 Lane 1
@@ -1948,6 +1999,7 @@ dateUnrestricted 2012-02-05
 dccAccession wgEncodeEM001683
 expId 1683
 fileName wgEncodeLicrHistoneEsb4InputME0C57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769010
 grant Ren
 lab LICR-m
 labVersion 12/04/09 Lane 2
@@ -1977,6 +2029,7 @@ dateUnrestricted 2012-02-05
 dccAccession wgEncodeEM001683
 expId 1683
 fileName wgEncodeLicrHistoneEsb4InputME0C57bl6StdSig.bigWig
+geoSampleAccession GSM769010
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -2007,10 +2060,10 @@ dateUnrestricted 2011-08-01
 dccAccession wgEncodeEM001433
 expId 1433
 fileName wgEncodeLicrHistoneHeartH3k4me1MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769025
 grant Ren
 lab LICR-m
 labVersion 07/29/09 Lane 5
-parentTable wgEncodeLicrHistoneHeartH3k4me1MAdult8wksC57bl6StdAlnRep1
 project wgEncode
 replicate 1
 seqPlatform Illumina_GA2
@@ -2038,10 +2091,10 @@ dateUnrestricted 2011-08-01
 dccAccession wgEncodeEM001433
 expId 1433
 fileName wgEncodeLicrHistoneHeartH3k4me1MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769025
 grant Ren
 lab LICR-m
 labVersion 02/24/10 Lane 1
-parentTable wgEncodeLicrHistoneHeartH3k4me1MAdult8wksC57bl6StdAlnRep2
 project wgEncode
 replicate 2
 seqPlatform Illumina_GA2
@@ -2069,6 +2122,7 @@ dateUnrestricted 2011-08-01
 dccAccession wgEncodeEM001433
 expId 1433
 fileName wgEncodeLicrHistoneHeartH3k4me1MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769025
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -2099,10 +2153,10 @@ dateUnrestricted 2011-08-01
 dccAccession wgEncodeEM001433
 expId 1433
 fileName wgEncodeLicrHistoneHeartH3k4me1MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769025
 grant Ren
 lab LICR-m
 labVersion 07/29/09 Lane 5
-parentTable wgEncodeLicrHistoneHeartH3k4me1MAdult8wksC57bl6StdRawSignalRep1
 project wgEncode
 replicate 1
 seqPlatform Illumina_GA2
@@ -2130,10 +2184,10 @@ dateUnrestricted 2011-08-01
 dccAccession wgEncodeEM001433
 expId 1433
 fileName wgEncodeLicrHistoneHeartH3k4me1MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769025
 grant Ren
 lab LICR-m
 labVersion 02/24/10 Lane 1
-parentTable wgEncodeLicrHistoneHeartH3k4me1MAdult8wksC57bl6StdRawSignalRep2
 project wgEncode
 replicate 2
 seqPlatform Illumina_GA2
@@ -2161,6 +2215,7 @@ dateUnrestricted 2011-08-01
 dccAccession wgEncodeEM001433
 expId 1433
 fileName wgEncodeLicrHistoneHeartH3k4me1MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769025
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -2190,6 +2245,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001441
 expId 1441
 fileName wgEncodeLicrHistoneHeartH3k4me3MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769017
 grant Ren
 lab LICR-m
 labVersion 04/01/09 Lane 7
@@ -2219,6 +2275,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001441
 expId 1441
 fileName wgEncodeLicrHistoneHeartH3k4me3MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769017
 grant Ren
 lab LICR-m
 labVersion 05/27/09 Lane 5
@@ -2248,6 +2305,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001441
 expId 1441
 fileName wgEncodeLicrHistoneHeartH3k4me3MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769017
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -2277,6 +2335,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001441
 expId 1441
 fileName wgEncodeLicrHistoneHeartH3k4me3MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769017
 grant Ren
 lab LICR-m
 labVersion 04/01/09 Lane 7
@@ -2306,6 +2365,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001441
 expId 1441
 fileName wgEncodeLicrHistoneHeartH3k4me3MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769017
 grant Ren
 lab LICR-m
 labVersion 05/27/09 Lane 5
@@ -2335,6 +2395,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001441
 expId 1441
 fileName wgEncodeLicrHistoneHeartH3k4me3MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769017
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -2364,6 +2425,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001450
 expId 1450
 fileName wgEncodeLicrHistoneHeartInputMAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769032
 grant Ren
 lab LICR-m
 labVersion 05/07/09 Lane 3
@@ -2393,6 +2455,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001450
 expId 1450
 fileName wgEncodeLicrHistoneHeartInputMAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769032
 grant Ren
 lab LICR-m
 labVersion 09/25/09 Lane 4
@@ -2422,6 +2485,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001450
 expId 1450
 fileName wgEncodeLicrHistoneHeartInputMAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769032
 grant Ren
 lab LICR-m
 labVersion 05/07/09 Lane 3
@@ -2451,6 +2515,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001450
 expId 1450
 fileName wgEncodeLicrHistoneHeartInputMAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769032
 grant Ren
 lab LICR-m
 labVersion 09/25/09 Lane 4
@@ -2480,6 +2545,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001450
 expId 1450
 fileName wgEncodeLicrHistoneHeartInputMAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769032
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -2510,6 +2576,7 @@ dateUnrestricted 2011-08-18
 dccAccession wgEncodeEM001434
 expId 1434
 fileName wgEncodeLicrHistoneKidneyH3k4me1MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769023
 grant Ren
 lab LICR-m
 labVersion 05/27/09 Lane 3
@@ -2540,6 +2607,7 @@ dateUnrestricted 2011-08-18
 dccAccession wgEncodeEM001434
 expId 1434
 fileName wgEncodeLicrHistoneKidneyH3k4me1MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769023
 grant Ren
 lab LICR-m
 labVersion 01/04/10 Lane 5
@@ -2570,6 +2638,7 @@ dateUnrestricted 2011-08-18
 dccAccession wgEncodeEM001434
 expId 1434
 fileName wgEncodeLicrHistoneKidneyH3k4me1MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769023
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -2600,6 +2669,7 @@ dateUnrestricted 2011-08-18
 dccAccession wgEncodeEM001434
 expId 1434
 fileName wgEncodeLicrHistoneKidneyH3k4me1MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769023
 grant Ren
 lab LICR-m
 labVersion 05/27/09 Lane 3
@@ -2630,6 +2700,7 @@ dateUnrestricted 2011-08-18
 dccAccession wgEncodeEM001434
 expId 1434
 fileName wgEncodeLicrHistoneKidneyH3k4me1MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769023
 grant Ren
 lab LICR-m
 labVersion 01/04/10 Lane 5
@@ -2660,6 +2731,7 @@ dateUnrestricted 2011-08-18
 dccAccession wgEncodeEM001434
 expId 1434
 fileName wgEncodeLicrHistoneKidneyH3k4me1MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769023
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -2689,6 +2761,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001442
 expId 1442
 fileName wgEncodeLicrHistoneKidneyH3k4me3MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769016
 grant Ren
 lab LICR-m
 labVersion 04/16/09 Lane 6
@@ -2718,6 +2791,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001442
 expId 1442
 fileName wgEncodeLicrHistoneKidneyH3k4me3MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769016
 grant Ren
 lab LICR-m
 labVersion 10/23/09 Lane 3
@@ -2747,6 +2821,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001442
 expId 1442
 fileName wgEncodeLicrHistoneKidneyH3k4me3MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769016
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -2776,6 +2851,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001442
 expId 1442
 fileName wgEncodeLicrHistoneKidneyH3k4me3MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769016
 grant Ren
 lab LICR-m
 labVersion 04/16/09 Lane 6
@@ -2805,6 +2881,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001442
 expId 1442
 fileName wgEncodeLicrHistoneKidneyH3k4me3MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769016
 grant Ren
 lab LICR-m
 labVersion 10/23/09 Lane 3
@@ -2834,6 +2911,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001442
 expId 1442
 fileName wgEncodeLicrHistoneKidneyH3k4me3MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769016
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -2863,6 +2941,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001451
 expId 1451
 fileName wgEncodeLicrHistoneKidneyInputMAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769033
 grant Ren
 lab LICR-m
 labVersion 05/07/09 Lane 7
@@ -2892,6 +2971,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001451
 expId 1451
 fileName wgEncodeLicrHistoneKidneyInputMAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769033
 grant Ren
 lab LICR-m
 labVersion 10/23/09 Lane 4
@@ -2921,6 +3001,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001451
 expId 1451
 fileName wgEncodeLicrHistoneKidneyInputMAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769033
 grant Ren
 lab LICR-m
 labVersion 05/07/09 Lane 7
@@ -2950,6 +3031,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001451
 expId 1451
 fileName wgEncodeLicrHistoneKidneyInputMAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769033
 grant Ren
 lab LICR-m
 labVersion 10/23/09 Lane 4
@@ -2979,6 +3061,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001451
 expId 1451
 fileName wgEncodeLicrHistoneKidneyInputMAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769033
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -3008,6 +3091,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001443
 expId 1443
 fileName wgEncodeLicrHistoneLiverH3k4me1MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769015
 grant Ren
 lab LICR-m
 labVersion 5/20/09 Lane 3
@@ -3037,6 +3121,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001443
 expId 1443
 fileName wgEncodeLicrHistoneLiverH3k4me1MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769015
 grant Ren
 lab LICR-m
 labVersion 7/29/09 Lane 4
@@ -3066,6 +3151,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001443
 expId 1443
 fileName wgEncodeLicrHistoneLiverH3k4me1MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769015
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -3095,6 +3181,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001443
 expId 1443
 fileName wgEncodeLicrHistoneLiverH3k4me1MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769015
 grant Ren
 lab LICR-m
 labVersion 5/20/09 Lane 3
@@ -3124,6 +3211,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001443
 expId 1443
 fileName wgEncodeLicrHistoneLiverH3k4me1MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769015
 grant Ren
 lab LICR-m
 labVersion 7/29/09 Lane 4
@@ -3153,6 +3241,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001443
 expId 1443
 fileName wgEncodeLicrHistoneLiverH3k4me1MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769015
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -3182,6 +3271,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001444
 expId 1444
 fileName wgEncodeLicrHistoneLiverH3k4me3MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769014
 grant Ren
 lab LICR-m
 labVersion 3/31/10 Lane 5
@@ -3211,6 +3301,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001444
 expId 1444
 fileName wgEncodeLicrHistoneLiverH3k4me3MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769014
 grant Ren
 lab LICR-m
 labVersion 5/21/09 Lane 5
@@ -3240,6 +3331,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001444
 expId 1444
 fileName wgEncodeLicrHistoneLiverH3k4me3MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769014
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -3269,6 +3361,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001444
 expId 1444
 fileName wgEncodeLicrHistoneLiverH3k4me3MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769014
 grant Ren
 lab LICR-m
 labVersion 3/31/10 Lane 5
@@ -3298,6 +3391,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001444
 expId 1444
 fileName wgEncodeLicrHistoneLiverH3k4me3MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769014
 grant Ren
 lab LICR-m
 labVersion 5/21/09 Lane 5
@@ -3327,6 +3421,7 @@ dateUnrestricted 2012-01-12
 dccAccession wgEncodeEM001444
 expId 1444
 fileName wgEncodeLicrHistoneLiverH3k4me3MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769014
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -3356,6 +3451,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001452
 expId 1452
 fileName wgEncodeLicrHistoneLiverInputMAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769034
 grant Ren
 lab LICR-m
 labVersion 05/7/09 Lane 4
@@ -3385,6 +3481,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001452
 expId 1452
 fileName wgEncodeLicrHistoneLiverInputMAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769034
 grant Ren
 lab LICR-m
 labVersion 01/22/10 Lane 5
@@ -3414,6 +3511,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001452
 expId 1452
 fileName wgEncodeLicrHistoneLiverInputMAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769034
 grant Ren
 lab LICR-m
 labVersion 05/07/09 Lane 4
@@ -3443,6 +3541,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001452
 expId 1452
 fileName wgEncodeLicrHistoneLiverInputMAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769034
 grant Ren
 lab LICR-m
 labVersion 01/22/10 Lane 5
@@ -3472,6 +3571,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001452
 expId 1452
 fileName wgEncodeLicrHistoneLiverInputMAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769034
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -3501,6 +3601,7 @@ dateUnrestricted 2012-01-14
 dccAccession wgEncodeEM001445
 expId 1445
 fileName wgEncodeLicrHistoneLungH3k4me1MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769013
 grant Ren
 lab LICR-m
 labVersion 05/27/09 Lane 4
@@ -3530,6 +3631,7 @@ dateUnrestricted 2012-01-14
 dccAccession wgEncodeEM001445
 expId 1445
 fileName wgEncodeLicrHistoneLungH3k4me1MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769013
 grant Ren
 lab LICR-m
 labVersion 08/12/09 Lane 6
@@ -3559,6 +3661,7 @@ dateUnrestricted 2012-01-14
 dccAccession wgEncodeEM001445
 expId 1445
 fileName wgEncodeLicrHistoneLungH3k4me1MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769013
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -3588,6 +3691,7 @@ dateUnrestricted 2012-01-14
 dccAccession wgEncodeEM001445
 expId 1445
 fileName wgEncodeLicrHistoneLungH3k4me1MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769013
 grant Ren
 lab LICR-m
 labVersion 05/27/09 Lane 4
@@ -3617,6 +3721,7 @@ dateUnrestricted 2012-01-14
 dccAccession wgEncodeEM001445
 expId 1445
 fileName wgEncodeLicrHistoneLungH3k4me1MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769013
 grant Ren
 lab LICR-m
 labVersion 08/12/09 Lane 6
@@ -3646,6 +3751,7 @@ dateUnrestricted 2012-01-14
 dccAccession wgEncodeEM001445
 expId 1445
 fileName wgEncodeLicrHistoneLungH3k4me1MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769013
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -3675,6 +3781,7 @@ dateUnrestricted 2012-01-14
 dccAccession wgEncodeEM001446
 expId 1446
 fileName wgEncodeLicrHistoneLungH3k4me3MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769012
 grant Ren
 lab LICR-m
 labVersion 03/20/09 Lane 7
@@ -3704,6 +3811,7 @@ dateUnrestricted 2012-01-14
 dccAccession wgEncodeEM001446
 expId 1446
 fileName wgEncodeLicrHistoneLungH3k4me3MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769012
 grant Ren
 lab LICR-m
 labVersion 08/21/09 Lane 4
@@ -3733,6 +3841,7 @@ dateUnrestricted 2012-01-14
 dccAccession wgEncodeEM001446
 expId 1446
 fileName wgEncodeLicrHistoneLungH3k4me3MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769012
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -3762,6 +3871,7 @@ dateUnrestricted 2012-01-14
 dccAccession wgEncodeEM001446
 expId 1446
 fileName wgEncodeLicrHistoneLungH3k4me3MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769012
 grant Ren
 lab LICR-m
 labVersion 03/20/09 Lane 7
@@ -3791,6 +3901,7 @@ dateUnrestricted 2012-01-14
 dccAccession wgEncodeEM001446
 expId 1446
 fileName wgEncodeLicrHistoneLungH3k4me3MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769012
 grant Ren
 lab LICR-m
 labVersion 08/21/09 Lane 4
@@ -3820,6 +3931,7 @@ dateUnrestricted 2012-01-14
 dccAccession wgEncodeEM001446
 expId 1446
 fileName wgEncodeLicrHistoneLungH3k4me3MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769012
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -3849,6 +3961,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001453
 expId 1453
 fileName wgEncodeLicrHistoneLungInputMAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769035
 grant Ren
 lab LICR-m
 labVersion 04/29/09 Lane 7
@@ -3878,6 +3991,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001453
 expId 1453
 fileName wgEncodeLicrHistoneLungInputMAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769035
 grant Ren
 lab LICR-m
 labVersion 05/07/09 Lane 5
@@ -3907,6 +4021,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001453
 expId 1453
 fileName wgEncodeLicrHistoneLungInputMAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769035
 grant Ren
 lab LICR-m
 labVersion 04/29/09 Lane 7
@@ -3936,6 +4051,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001453
 expId 1453
 fileName wgEncodeLicrHistoneLungInputMAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769035
 grant Ren
 lab LICR-m
 labVersion 05/07/09 Lane 5
@@ -3965,6 +4081,7 @@ dateUnrestricted 2012-01-26
 dccAccession wgEncodeEM001453
 expId 1453
 fileName wgEncodeLicrHistoneLungInputMAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769035
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -3994,6 +4111,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001454
 expId 1454
 fileName wgEncodeLicrHistoneMefH3k4me1MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769028
 grant Ren
 lab LICR-m
 labVersion 05/19/09 Lane 4
@@ -4023,6 +4141,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001454
 expId 1454
 fileName wgEncodeLicrHistoneMefH3k4me1MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769028
 grant Ren
 lab LICR-m
 labVersion 06/15/09 Lane 6
@@ -4052,6 +4171,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001454
 expId 1454
 fileName wgEncodeLicrHistoneMefH3k4me1MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769028
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -4081,6 +4201,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001454
 expId 1454
 fileName wgEncodeLicrHistoneMefH3k4me1MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769028
 grant Ren
 lab LICR-m
 labVersion 05/19/09 Lane 4
@@ -4110,6 +4231,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001454
 expId 1454
 fileName wgEncodeLicrHistoneMefH3k4me1MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769028
 grant Ren
 lab LICR-m
 labVersion 06/15/09 Lane 6
@@ -4139,6 +4261,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001454
 expId 1454
 fileName wgEncodeLicrHistoneMefH3k4me1MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769028
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -4168,6 +4291,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001455
 expId 1455
 fileName wgEncodeLicrHistoneMefH3k4me3MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769029
 grant Ren
 lab LICR-m
 labVersion 05/19/09 Lane 1
@@ -4197,6 +4321,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001455
 expId 1455
 fileName wgEncodeLicrHistoneMefH3k4me3MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769029
 grant Ren
 lab LICR-m
 labVersion 05/19/09 Lane 6
@@ -4226,6 +4351,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001455
 expId 1455
 fileName wgEncodeLicrHistoneMefH3k4me3MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769029
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -4255,6 +4381,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001455
 expId 1455
 fileName wgEncodeLicrHistoneMefH3k4me3MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769029
 grant Ren
 lab LICR-m
 labVersion 05/19/09 Lane 1
@@ -4284,6 +4411,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001455
 expId 1455
 fileName wgEncodeLicrHistoneMefH3k4me3MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769029
 grant Ren
 lab LICR-m
 labVersion 05/19/09 Lane 6
@@ -4313,6 +4441,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001455
 expId 1455
 fileName wgEncodeLicrHistoneMefH3k4me3MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769029
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -4342,6 +4471,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001456
 expId 1456
 fileName wgEncodeLicrHistoneMefInputMAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769030
 grant Ren
 lab LICR-m
 labVersion 03/09/10 Lane 4
@@ -4371,6 +4501,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001456
 expId 1456
 fileName wgEncodeLicrHistoneMefInputMAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769030
 grant Ren
 lab LICR-m
 labVersion 03/09/10 Lane 5
@@ -4400,6 +4531,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001456
 expId 1456
 fileName wgEncodeLicrHistoneMefInputMAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769030
 grant Ren
 lab LICR-m
 labVersion 03/09/10 Lane 4
@@ -4429,6 +4561,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001456
 expId 1456
 fileName wgEncodeLicrHistoneMefInputMAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769030
 grant Ren
 lab LICR-m
 labVersion 03/09/10 Lane 5
@@ -4458,6 +4591,7 @@ dateUnrestricted 2012-01-28
 dccAccession wgEncodeEM001456
 expId 1456
 fileName wgEncodeLicrHistoneMefInputMAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769030
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -4487,6 +4621,7 @@ dateUnrestricted 2012-02-01
 dccAccession wgEncodeEM001457
 expId 1457
 fileName wgEncodeLicrHistoneSpleenH3k4me1MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769031
 grant Ren
 lab LICR-m
 labVersion 09/19/10 Lane 8C
@@ -4516,6 +4651,7 @@ dateUnrestricted 2012-02-01
 dccAccession wgEncodeEM001457
 expId 1457
 fileName wgEncodeLicrHistoneSpleenH3k4me1MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769031
 grant Ren
 lab LICR-m
 labVersion 11/30/10 Lane 3F
@@ -4545,6 +4681,7 @@ dateUnrestricted 2012-02-01
 dccAccession wgEncodeEM001457
 expId 1457
 fileName wgEncodeLicrHistoneSpleenH3k4me1MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769031
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -4574,6 +4711,7 @@ dateUnrestricted 2012-02-01
 dccAccession wgEncodeEM001457
 expId 1457
 fileName wgEncodeLicrHistoneSpleenH3k4me1MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769031
 grant Ren
 lab LICR-m
 labVersion 09/19/10 Lane 8C
@@ -4603,6 +4741,7 @@ dateUnrestricted 2012-02-01
 dccAccession wgEncodeEM001457
 expId 1457
 fileName wgEncodeLicrHistoneSpleenH3k4me1MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769031
 grant Ren
 lab LICR-m
 labVersion 11/30/10 Lane 3F
@@ -4632,6 +4771,7 @@ dateUnrestricted 2012-02-01
 dccAccession wgEncodeEM001457
 expId 1457
 fileName wgEncodeLicrHistoneSpleenH3k4me1MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769031
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -4661,6 +4801,7 @@ dateUnrestricted 2012-02-01
 dccAccession wgEncodeEM001458
 expId 1458
 fileName wgEncodeLicrHistoneSpleenH3k4me3MAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769036
 grant Ren
 lab LICR-m
 labVersion 09/19/10 Lane 8D
@@ -4690,6 +4831,7 @@ dateUnrestricted 2012-02-01
 dccAccession wgEncodeEM001458
 expId 1458
 fileName wgEncodeLicrHistoneSpleenH3k4me3MAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769036
 grant Ren
 lab LICR-m
 labVersion 11/30/10 Lane 4G
@@ -4719,6 +4861,7 @@ dateUnrestricted 2012-02-01
 dccAccession wgEncodeEM001458
 expId 1458
 fileName wgEncodeLicrHistoneSpleenH3k4me3MAdult8wksC57bl6StdPk.broadPeak.gz
+geoSampleAccession GSM769036
 grant Ren
 lab LICR-m
 labVersion Pooled & filtered
@@ -4748,6 +4891,7 @@ dateUnrestricted 2012-02-01
 dccAccession wgEncodeEM001458
 expId 1458
 fileName wgEncodeLicrHistoneSpleenH3k4me3MAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769036
 grant Ren
 lab LICR-m
 labVersion 09/19/10 Lane 8D
@@ -4777,6 +4921,7 @@ dateUnrestricted 2012-02-01
 dccAccession wgEncodeEM001458
 expId 1458
 fileName wgEncodeLicrHistoneSpleenH3k4me3MAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769036
 grant Ren
 lab LICR-m
 labVersion 11/30/10 Lane 4G
@@ -4806,6 +4951,7 @@ dateUnrestricted 2012-02-01
 dccAccession wgEncodeEM001458
 expId 1458
 fileName wgEncodeLicrHistoneSpleenH3k4me3MAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769036
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -4835,6 +4981,7 @@ dateUnrestricted 2012-02-02
 dccAccession wgEncodeEM001459
 expId 1459
 fileName wgEncodeLicrHistoneSpleenInputMAdult8wksC57bl6StdAlnRep1.bam
+geoSampleAccession GSM769037
 grant Ren
 lab LICR-m
 labVersion 07/28/10 Lane 7
@@ -4864,6 +5011,7 @@ dateUnrestricted 2012-02-02
 dccAccession wgEncodeEM001459
 expId 1459
 fileName wgEncodeLicrHistoneSpleenInputMAdult8wksC57bl6StdAlnRep2.bam
+geoSampleAccession GSM769037
 grant Ren
 lab LICR-m
 labVersion 08/10/10 Lane 2B
@@ -4893,6 +5041,7 @@ dateUnrestricted 2012-02-02
 dccAccession wgEncodeEM001459
 expId 1459
 fileName wgEncodeLicrHistoneSpleenInputMAdult8wksC57bl6StdRawDataRep1.fastq.gz
+geoSampleAccession GSM769037
 grant Ren
 lab LICR-m
 labVersion 07/28/10 Lane 7
@@ -4922,6 +5071,7 @@ dateUnrestricted 2012-02-02
 dccAccession wgEncodeEM001459
 expId 1459
 fileName wgEncodeLicrHistoneSpleenInputMAdult8wksC57bl6StdRawDataRep2.fastq.gz
+geoSampleAccession GSM769037
 grant Ren
 lab LICR-m
 labVersion 08/10/10 Lane 2B
@@ -4951,6 +5101,7 @@ dateUnrestricted 2012-02-02
 dccAccession wgEncodeEM001459
 expId 1459
 fileName wgEncodeLicrHistoneSpleenInputMAdult8wksC57bl6StdSig.bigWig
+geoSampleAccession GSM769037
 grant Ren
 lab LICR-m
 labVersion Pooled & normalized
@@ -4965,4 +5116,4 @@ tableName wgEncodeLicrHistoneSpleenInputMAdult8wksC57bl6StdSig
 tissueSourceType Pooled
 view Signal
 
-# MAGIC: 1612028301
+# MAGIC: 1561539546

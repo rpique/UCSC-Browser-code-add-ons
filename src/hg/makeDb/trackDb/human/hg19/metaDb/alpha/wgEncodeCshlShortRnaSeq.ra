@@ -26,8 +26,10 @@ localization cell
 md5sum d7e227b6da65127a37e13f4d00954bbe
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4058
 tableName wgEncodeCshlShortRnaSeqA549CellShorttotalAlnRep1
 view Alignments
@@ -53,11 +55,38 @@ localization cell
 md5sum c5e1089ebbc3813538b430c870abab5c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4059
 tableName wgEncodeCshlShortRnaSeqA549CellShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqA549CellShorttotalContigs
+objType table
+bioRep 021WC,022WC
+cell A549
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001740
+expId 1740
+fileName wgEncodeCshlShortRnaSeqA549CellShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID20749,LID20750
+labProtocolId 021WCs,022WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4478
+tableName wgEncodeCshlShortRnaSeqA549CellShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqA549CellShorttotalExonsGencV3c
 objType file
@@ -80,7 +109,31 @@ localization cell
 project wgEncode
 rnaExtract shortTotal
 subId 4134
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqA549CellShorttotalExonsGencV7
+objType file
+bioRep 021WC,022WC
+cell A549
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001740
+expId 1740
+fileName wgEncodeCshlShortRnaSeqA549CellShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID20749,LID20750
+labProtocolId 021WCs,022WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4478
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqA549CellShorttotalMinusRawRep1
 objType table
@@ -103,8 +156,10 @@ localization cell
 md5sum 078889d783147b1967c91983268f18e7
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4058
 tableName wgEncodeCshlShortRnaSeqA549CellShorttotalMinusRawRep1
 view MinusRawSignal
@@ -130,8 +185,10 @@ localization cell
 md5sum 8d79aaa994c670e1cfeebf6acb3e6d09
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4059
 tableName wgEncodeCshlShortRnaSeqA549CellShorttotalMinusRawRep2
 view MinusRawSignal
@@ -157,8 +214,10 @@ localization cell
 md5sum aa6e2314d0bcbaee8dbfb5160525ba67
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4058
 tableName wgEncodeCshlShortRnaSeqA549CellShorttotalPlusRawRep1
 view PlusRawSignal
@@ -184,8 +243,10 @@ localization cell
 md5sum e0f8ca4ba5a4ca6df43badf72be2563f
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4059
 tableName wgEncodeCshlShortRnaSeqA549CellShorttotalPlusRawRep2
 view PlusRawSignal
@@ -211,8 +272,10 @@ localization cell
 md5sum c46483d72ea1793d613c7ddb829648f2
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4058
 view RawData
 
@@ -237,8 +300,10 @@ localization cell
 md5sum e80075b80e37905285234d584ca256b8
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4059
 view RawData
 
@@ -263,8 +328,10 @@ localization cell
 md5sum 037b138f43f920f809ad501447d1d3d8
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3335
 tableName wgEncodeCshlShortRnaSeqAg04450CellShorttotalAlnRep1
 view Alignments
@@ -290,11 +357,38 @@ localization cell
 md5sum 52e5e21990c255f31ca59085bfc9d449
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3336
 tableName wgEncodeCshlShortRnaSeqAg04450CellShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqAg04450CellShorttotalContigs
+objType table
+bioRep 017WC,018WC
+cell AG04450
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001081
+expId 1081
+fileName wgEncodeCshlShortRnaSeqAg04450CellShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID20745,LID20746
+labProtocolId 017WCs,018WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4488
+tableName wgEncodeCshlShortRnaSeqAg04450CellShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqAg04450CellShorttotalExonsGencV3c
 objType file
@@ -317,7 +411,31 @@ localization cell
 project wgEncode
 rnaExtract shortTotal
 subId 4141
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqAg04450CellShorttotalExonsGencV7
+objType file
+bioRep 017WC,018WC
+cell AG04450
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001081
+expId 1081
+fileName wgEncodeCshlShortRnaSeqAg04450CellShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID20745,LID20746
+labProtocolId 017WCs,018WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4488
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqAg04450CellShorttotalMinusRawRep1
 objType table
@@ -340,8 +458,10 @@ localization cell
 md5sum 209d292b3f189583c4c3a766e0cfb3cc
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3335
 tableName wgEncodeCshlShortRnaSeqAg04450CellShorttotalMinusRawRep1
 view MinusRawSignal
@@ -367,8 +487,10 @@ localization cell
 md5sum 74d77389d610696cf9ccf093c5df921e
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3336
 tableName wgEncodeCshlShortRnaSeqAg04450CellShorttotalMinusRawRep2
 view MinusRawSignal
@@ -394,8 +516,10 @@ localization cell
 md5sum edfa6744c8883f22aebf9e3eb950b21e
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3335
 tableName wgEncodeCshlShortRnaSeqAg04450CellShorttotalPlusRawRep1
 view PlusRawSignal
@@ -421,8 +545,10 @@ localization cell
 md5sum 3359dba672da5f6fad1cd2d33045a372
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3336
 tableName wgEncodeCshlShortRnaSeqAg04450CellShorttotalPlusRawRep2
 view PlusRawSignal
@@ -448,8 +574,10 @@ localization cell
 md5sum 01b2f0206db86547eccddbdcead616f4
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3335
 view RawData
 
@@ -474,8 +602,10 @@ localization cell
 md5sum 706d39a25612e65f3d97ec671d47c1eb
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3336
 view RawData
 
@@ -500,8 +630,10 @@ localization cell
 md5sum 37b9f5f7941794ae15d5d77bb928c3f7
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3294
 tableName wgEncodeCshlShortRnaSeqBjCellShorttotalAlnRep1
 view Alignments
@@ -527,11 +659,38 @@ localization cell
 md5sum c2ae5eab4f1100b16b035f771d7c89c4
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3293
 tableName wgEncodeCshlShortRnaSeqBjCellShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqBjCellShorttotalContigs
+objType table
+bioRep 037WC,038WC
+cell BJ
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001079
+expId 1079
+fileName wgEncodeCshlShortRnaSeqBjCellShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID20909,LID20910
+labProtocolId 037WCs,038WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4474
+tableName wgEncodeCshlShortRnaSeqBjCellShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqBjCellShorttotalExonsGencV3c
 objType file
@@ -554,7 +713,31 @@ localization cell
 project wgEncode
 rnaExtract shortTotal
 subId 4129
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqBjCellShorttotalExonsGencV7
+objType file
+bioRep 037WC,038WC
+cell BJ
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001079
+expId 1079
+fileName wgEncodeCshlShortRnaSeqBjCellShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID20909,LID20910
+labProtocolId 037WCs,038WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4474
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqBjCellShorttotalMinusRawRep1
 objType table
@@ -577,8 +760,10 @@ localization cell
 md5sum 48256f7699401a458862fb4070737029
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3294
 tableName wgEncodeCshlShortRnaSeqBjCellShorttotalMinusRawRep1
 view MinusRawSignal
@@ -604,8 +789,10 @@ localization cell
 md5sum 9404df46696fe113bab5fe0949a92732
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3293
 tableName wgEncodeCshlShortRnaSeqBjCellShorttotalMinusRawRep2
 view MinusRawSignal
@@ -631,8 +818,10 @@ localization cell
 md5sum 9b8fbd762726e01b7d8b9c6665331133
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3294
 tableName wgEncodeCshlShortRnaSeqBjCellShorttotalPlusRawRep1
 view PlusRawSignal
@@ -658,8 +847,10 @@ localization cell
 md5sum cace71c4c83f23b7a79e93fb26d9afa1
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3293
 tableName wgEncodeCshlShortRnaSeqBjCellShorttotalPlusRawRep2
 view PlusRawSignal
@@ -685,8 +876,10 @@ localization cell
 md5sum ab3568167cb4ce3d28d77f7ceafb6d98
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3294
 view RawData
 
@@ -711,8 +904,10 @@ localization cell
 md5sum 5e9eb2745e344a3cde79f9fcdcf1bb3e
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3293
 view RawData
 
@@ -855,8 +1050,10 @@ localization cell
 md5sum 26935ba53a77022957bb761f98a7791c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3302
 tableName wgEncodeCshlShortRnaSeqGm12878CellShorttotalAlnRep1
 view Alignments
@@ -882,11 +1079,38 @@ localization cell
 md5sum 689d64234d0da419adb9f0471ce50950
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3304
 tableName wgEncodeCshlShortRnaSeqGm12878CellShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqGm12878CellShorttotalContigs
+objType table
+bioRep 003WC,004WC
+cell GM12878
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000212
+expId 212
+fileName wgEncodeCshlShortRnaSeqGm12878CellShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID20899,LID20902
+labProtocolId 003WCs,004WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4482
+tableName wgEncodeCshlShortRnaSeqGm12878CellShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqGm12878CellShorttotalExonsGencV3c
 objType file
@@ -909,7 +1133,31 @@ localization cell
 project wgEncode
 rnaExtract shortTotal
 subId 4136
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqGm12878CellShorttotalExonsGencV7
+objType file
+bioRep 003WC,004WC
+cell GM12878
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000212
+expId 212
+fileName wgEncodeCshlShortRnaSeqGm12878CellShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID20899,LID20902
+labProtocolId 003WCs,004WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4482
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqGm12878CellShorttotalMinusRawRep1
 objType table
@@ -932,8 +1180,10 @@ localization cell
 md5sum 24710829d03156539f323530e398e0a3
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3302
 tableName wgEncodeCshlShortRnaSeqGm12878CellShorttotalMinusRawRep1
 view MinusRawSignal
@@ -959,8 +1209,10 @@ localization cell
 md5sum 143a411477be39cc3dda77db040b5191
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3304
 tableName wgEncodeCshlShortRnaSeqGm12878CellShorttotalMinusRawRep2
 view MinusRawSignal
@@ -986,8 +1238,10 @@ localization cell
 md5sum 2a38ce6feaf3e172f20dbd08a7ed41eb
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3302
 tableName wgEncodeCshlShortRnaSeqGm12878CellShorttotalPlusRawRep1
 view PlusRawSignal
@@ -1013,8 +1267,10 @@ localization cell
 md5sum 1aba1dae749ba1eac22245c0486ba6ae
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3304
 tableName wgEncodeCshlShortRnaSeqGm12878CellShorttotalPlusRawRep2
 view PlusRawSignal
@@ -1040,8 +1296,10 @@ localization cell
 md5sum b3e5e650aeca8f1050d16ca9525da622
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3302
 view RawData
 
@@ -1066,8 +1324,10 @@ localization cell
 md5sum f7402929d9a8377b295171c22f33742e
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3304
 view RawData
 
@@ -1240,8 +1500,10 @@ localization cytosol
 md5sum 32e18ca6acd794dbbb9ce8cc1f986f10
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3305
 tableName wgEncodeCshlShortRnaSeqGm12878CytosolShorttotalAlnRep1
 view Alignments
@@ -1267,11 +1529,38 @@ localization cytosol
 md5sum e41f8dd0aaf9c019f6f1f055c8ea9952
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3307
 tableName wgEncodeCshlShortRnaSeqGm12878CytosolShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqGm12878CytosolShorttotalContigs
+objType table
+bioRep 003C,004C
+cell GM12878
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000203
+expId 203
+fileName wgEncodeCshlShortRnaSeqGm12878CytosolShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID20901,LID20904
+labProtocolId 003Cs,004Cs
+labVersion iIDR
+localization cytosol
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4489
+tableName wgEncodeCshlShortRnaSeqGm12878CytosolShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqGm12878CytosolShorttotalExonsGencV3c
 objType file
@@ -1294,7 +1583,31 @@ localization cytosol
 project wgEncode
 rnaExtract shortTotal
 subId 4143
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqGm12878CytosolShorttotalExonsGencV7
+objType file
+bioRep 003C,004C
+cell GM12878
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000203
+expId 203
+fileName wgEncodeCshlShortRnaSeqGm12878CytosolShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID20901,LID20904
+labProtocolId 003Cs,004Cs
+labVersion iIDR
+localization cytosol
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4489
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqGm12878CytosolShorttotalMinusRawRep1
 objType table
@@ -1317,8 +1630,10 @@ localization cytosol
 md5sum 1b692145fbefb07ff3d2265dea52cd7b
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3305
 tableName wgEncodeCshlShortRnaSeqGm12878CytosolShorttotalMinusRawRep1
 view MinusRawSignal
@@ -1344,8 +1659,10 @@ localization cytosol
 md5sum 9bd53d6a6b7fd37604a8161d6ee013a8
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3307
 tableName wgEncodeCshlShortRnaSeqGm12878CytosolShorttotalMinusRawRep2
 view MinusRawSignal
@@ -1371,8 +1688,10 @@ localization cytosol
 md5sum 8af9e35cc9dc0c90df759ab5b64ecc0a
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3305
 tableName wgEncodeCshlShortRnaSeqGm12878CytosolShorttotalPlusRawRep1
 view PlusRawSignal
@@ -1398,8 +1717,10 @@ localization cytosol
 md5sum 34b5b31fccea887efdc370650f481b0f
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3307
 tableName wgEncodeCshlShortRnaSeqGm12878CytosolShorttotalPlusRawRep2
 view PlusRawSignal
@@ -1425,8 +1746,10 @@ localization cytosol
 md5sum 53d0fa4292dbe046e2c471ea4261f94e
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3305
 view RawData
 
@@ -1451,8 +1774,10 @@ localization cytosol
 md5sum bff82a306cc96cb35dd764cd7f1b3b09
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3307
 view RawData
 
@@ -1625,8 +1950,10 @@ localization nucleus
 md5sum 302ca6e4b1ea53fbe1d3e68cf0a59670
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3308
 tableName wgEncodeCshlShortRnaSeqGm12878NucleusShorttotalAlnRep1
 view Alignments
@@ -1652,11 +1979,38 @@ localization nucleus
 md5sum 23650e6de625f0de1148522020e302c9
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3338
 tableName wgEncodeCshlShortRnaSeqGm12878NucleusShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqGm12878NucleusShorttotalContigs
+objType table
+bioRep 003N,004N
+cell GM12878
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000204
+expId 204
+fileName wgEncodeCshlShortRnaSeqGm12878NucleusShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID20900,LID20903
+labProtocolId 003Ns,004Ns
+labVersion iIDR
+localization nucleus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4477
+tableName wgEncodeCshlShortRnaSeqGm12878NucleusShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqGm12878NucleusShorttotalExonsGencV3c
 objType file
@@ -1679,7 +2033,31 @@ localization nucleus
 project wgEncode
 rnaExtract shortTotal
 subId 4131
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqGm12878NucleusShorttotalExonsGencV7
+objType file
+bioRep 003N,004N
+cell GM12878
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000204
+expId 204
+fileName wgEncodeCshlShortRnaSeqGm12878NucleusShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID20900,LID20903
+labProtocolId 003Ns,004Ns
+labVersion iIDR
+localization nucleus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4477
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqGm12878NucleusShorttotalMinusRawRep1
 objType table
@@ -1702,8 +2080,10 @@ localization nucleus
 md5sum ca6b72d62e5f9dfa415ce1f537fa7dd3
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3308
 tableName wgEncodeCshlShortRnaSeqGm12878NucleusShorttotalMinusRawRep1
 view MinusRawSignal
@@ -1729,8 +2109,10 @@ localization nucleus
 md5sum e74bcdc8965d96a1de75625692083d13
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3338
 tableName wgEncodeCshlShortRnaSeqGm12878NucleusShorttotalMinusRawRep2
 view MinusRawSignal
@@ -1756,8 +2138,10 @@ localization nucleus
 md5sum f7a6b19f4d7f77116c43692c6a16ade7
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3308
 tableName wgEncodeCshlShortRnaSeqGm12878NucleusShorttotalPlusRawRep1
 view PlusRawSignal
@@ -1783,8 +2167,10 @@ localization nucleus
 md5sum 471ecceaac3018f1bd7cfabe77837878
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3338
 tableName wgEncodeCshlShortRnaSeqGm12878NucleusShorttotalPlusRawRep2
 view PlusRawSignal
@@ -1810,8 +2196,10 @@ localization nucleus
 md5sum bc98249bb02a5e7e6fe6c6a2a608b197
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3308
 view RawData
 
@@ -1836,8 +2224,10 @@ localization nucleus
 md5sum 1645e1c4b3ae9c3647b94d8e0d77efba
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3338
 view RawData
 
@@ -1862,8 +2252,10 @@ localization cell
 md5sum f2599972fca418b1ce0ab702f38aebb0
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3340
 tableName wgEncodeCshlShortRnaSeqH1hescCellShorttotalAlnRep1
 view Alignments
@@ -1889,11 +2281,38 @@ localization cell
 md5sum cc23a429bfe42213ae82c221514457b8
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3341
 tableName wgEncodeCshlShortRnaSeqH1hescCellShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqH1hescCellShorttotalContigs
+objType table
+bioRep 005WC,006WC
+cell H1-hESC
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001082
+expId 1082
+fileName wgEncodeCshlShortRnaSeqH1hescCellShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID20905,LID20906
+labProtocolId 005WCs,006WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4485
+tableName wgEncodeCshlShortRnaSeqH1hescCellShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqH1hescCellShorttotalExonsGencV3c
 objType file
@@ -1916,7 +2335,31 @@ localization cell
 project wgEncode
 rnaExtract shortTotal
 subId 4139
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqH1hescCellShorttotalExonsGencV7
+objType file
+bioRep 005WC,006WC
+cell H1-hESC
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001082
+expId 1082
+fileName wgEncodeCshlShortRnaSeqH1hescCellShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID20905,LID20906
+labProtocolId 005WCs,006WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4485
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqH1hescCellShorttotalMinusRawRep1
 objType table
@@ -1939,8 +2382,10 @@ localization cell
 md5sum 381ec3bdde95cf32cc2ef48dc2fe158d
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3340
 tableName wgEncodeCshlShortRnaSeqH1hescCellShorttotalMinusRawRep1
 view MinusRawSignal
@@ -1966,8 +2411,10 @@ localization cell
 md5sum fd9ee3f60e44bffb35696496e7234bf8
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3341
 tableName wgEncodeCshlShortRnaSeqH1hescCellShorttotalMinusRawRep2
 view MinusRawSignal
@@ -1993,8 +2440,10 @@ localization cell
 md5sum 876438b671af7d900f9d6c5351fdb7af
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3340
 tableName wgEncodeCshlShortRnaSeqH1hescCellShorttotalPlusRawRep1
 view PlusRawSignal
@@ -2020,8 +2469,10 @@ localization cell
 md5sum f1761d3d65f33865bb86849a81cc5594
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3341
 tableName wgEncodeCshlShortRnaSeqH1hescCellShorttotalPlusRawRep2
 view PlusRawSignal
@@ -2047,8 +2498,10 @@ localization cell
 md5sum 1dce5cd6d0e7f7db15d2a24c7b302773
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3340
 view RawData
 
@@ -2073,8 +2526,10 @@ localization cell
 md5sum 6a25b6692785467ed6d4f07b650c981d
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3341
 view RawData
 
@@ -2099,11 +2554,38 @@ localization cytosol
 md5sum fd572bffc038fe6b7943623867cb8250
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3342
 tableName wgEncodeCshlShortRnaSeqH1hescCytosolShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqH1hescCytosolShorttotalContigs
+objType table
+bioRep 006C
+cell H1-hESC
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001083
+expId 1083
+fileName wgEncodeCshlShortRnaSeqH1hescCytosolShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID20908
+labProtocolId 006Cs
+labVersion iIDR
+localization cytosol
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4495
+tableName wgEncodeCshlShortRnaSeqH1hescCytosolShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqH1hescCytosolShorttotalExonsGencV3c
 objType file
@@ -2124,9 +2606,35 @@ labProtocolId 006Cs
 labVersion iIDR
 localization cytosol
 project wgEncode
+readType 1x36
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4127
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqH1hescCytosolShorttotalExonsGencV7
+objType file
+bioRep 006C
+cell H1-hESC
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001083
+expId 1083
+fileName wgEncodeCshlShortRnaSeqH1hescCytosolShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID20908
+labProtocolId 006Cs
+labVersion iIDR
+localization cytosol
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4495
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqH1hescCytosolShorttotalMinusRawRep2
 objType table
@@ -2149,8 +2657,10 @@ localization cytosol
 md5sum 05f4e9214c02870fa6f7b0e807cbaffd
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3342
 tableName wgEncodeCshlShortRnaSeqH1hescCytosolShorttotalMinusRawRep2
 view MinusRawSignal
@@ -2176,8 +2686,10 @@ localization cytosol
 md5sum dcde810070f32fbdaf722c425cd2e7d5
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3342
 tableName wgEncodeCshlShortRnaSeqH1hescCytosolShorttotalPlusRawRep2
 view PlusRawSignal
@@ -2203,8 +2715,10 @@ localization cytosol
 md5sum 9c717d33ac5a9ff3b954d35dd914cf29
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3342
 view RawData
 
@@ -2229,11 +2743,38 @@ localization nucleus
 md5sum 773fae1c64130b176774ed9f69aef8e6
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3343
 tableName wgEncodeCshlShortRnaSeqH1hescNucleusShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqH1hescNucleusShorttotalContigs
+objType table
+bioRep 006N
+cell H1-hESC
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001084
+expId 1084
+fileName wgEncodeCshlShortRnaSeqH1hescNucleusShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID20907
+labProtocolId 006Ns
+labVersion iIDR
+localization nucleus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4496
+tableName wgEncodeCshlShortRnaSeqH1hescNucleusShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqH1hescNucleusShorttotalExonsGencV3c
 objType file
@@ -2254,9 +2795,35 @@ labProtocolId 006Ns
 labVersion iIDR
 localization nucleus
 project wgEncode
+readType 1x36
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4137
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqH1hescNucleusShorttotalExonsGencV7
+objType file
+bioRep 006N
+cell H1-hESC
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001084
+expId 1084
+fileName wgEncodeCshlShortRnaSeqH1hescNucleusShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID20907
+labProtocolId 006Ns
+labVersion iIDR
+localization nucleus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4496
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqH1hescNucleusShorttotalMinusRawRep2
 objType table
@@ -2279,8 +2846,10 @@ localization nucleus
 md5sum 34b0ee01cf0202a92ca5c8900898f79b
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3343
 tableName wgEncodeCshlShortRnaSeqH1hescNucleusShorttotalMinusRawRep2
 view MinusRawSignal
@@ -2306,8 +2875,10 @@ localization nucleus
 md5sum 813df911b2f3c04b72beed6f888b7749
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3343
 tableName wgEncodeCshlShortRnaSeqH1hescNucleusShorttotalPlusRawRep2
 view PlusRawSignal
@@ -2333,8 +2904,10 @@ localization nucleus
 md5sum 45ac3325433a21ac411e8dcf0f5dbbd9
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3343
 view RawData
 
@@ -2359,8 +2932,10 @@ localization cell
 md5sum bb601ea89be697303c2148860ddd9ec1
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3344
 tableName wgEncodeCshlShortRnaSeqHelas3CellShorttotalAlnRep1
 view Alignments
@@ -2386,11 +2961,38 @@ localization cell
 md5sum 1027f7e402f98a0ac1dae6125ce2a445
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3345
 tableName wgEncodeCshlShortRnaSeqHelas3CellShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqHelas3CellShorttotalContigs
+objType table
+bioRep 011WC,012WC
+cell HeLa-S3
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001089
+expId 1089
+fileName wgEncodeCshlShortRnaSeqHelas3CellShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID21143,LID21146
+labProtocolId 011WCs,012WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4486
+tableName wgEncodeCshlShortRnaSeqHelas3CellShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqHelas3CellShorttotalExonsGencV3c
 objType file
@@ -2413,7 +3015,31 @@ localization cell
 project wgEncode
 rnaExtract shortTotal
 subId 4140
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqHelas3CellShorttotalExonsGencV7
+objType file
+bioRep 011WC,012WC
+cell HeLa-S3
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001089
+expId 1089
+fileName wgEncodeCshlShortRnaSeqHelas3CellShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID21143,LID21146
+labProtocolId 011WCs,012WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4486
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqHelas3CellShorttotalMinusRawRep1
 objType table
@@ -2436,8 +3062,10 @@ localization cell
 md5sum 8260224488a6271a85b6498e185c0bc3
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3344
 tableName wgEncodeCshlShortRnaSeqHelas3CellShorttotalMinusRawRep1
 view MinusRawSignal
@@ -2463,8 +3091,10 @@ localization cell
 md5sum e5f7015c0722d153965d38ee1063a1ed
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3345
 tableName wgEncodeCshlShortRnaSeqHelas3CellShorttotalMinusRawRep2
 view MinusRawSignal
@@ -2490,8 +3120,10 @@ localization cell
 md5sum 4280926f2f48b85d793af36bcc26c494
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3344
 tableName wgEncodeCshlShortRnaSeqHelas3CellShorttotalPlusRawRep1
 view PlusRawSignal
@@ -2517,8 +3149,10 @@ localization cell
 md5sum 38240c3ed165bf6124fa05d7efd7861a
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3345
 tableName wgEncodeCshlShortRnaSeqHelas3CellShorttotalPlusRawRep2
 view PlusRawSignal
@@ -2544,8 +3178,10 @@ localization cell
 md5sum 4b95560edc2f405c0d40021d9558ded4
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3344
 view RawData
 
@@ -2570,8 +3206,10 @@ localization cell
 md5sum 2250920043dafed0e4513e23e1c76be7
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3345
 view RawData
 
@@ -2596,8 +3234,10 @@ localization cytosol
 md5sum 10a1ec54fb3bdf40a29a4163cc5e9995
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3346
 tableName wgEncodeCshlShortRnaSeqHelas3CytosolShorttotalAlnRep1
 view Alignments
@@ -2623,11 +3263,38 @@ localization cytosol
 md5sum 7eddb273e507a3a79df0173ff42e05f2
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3347
 tableName wgEncodeCshlShortRnaSeqHelas3CytosolShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqHelas3CytosolShorttotalContigs
+objType table
+bioRep 011C,012C
+cell HeLa-S3
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001087
+expId 1087
+fileName wgEncodeCshlShortRnaSeqHelas3CytosolShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID21145,LID21148
+labProtocolId 011Cs,012Cs
+labVersion iIDR
+localization cytosol
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4487
+tableName wgEncodeCshlShortRnaSeqHelas3CytosolShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqHelas3CytosolShorttotalExonsGencV3c
 objType file
@@ -2650,7 +3317,31 @@ localization cytosol
 project wgEncode
 rnaExtract shortTotal
 subId 4142
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqHelas3CytosolShorttotalExonsGencV7
+objType file
+bioRep 011C,012C
+cell HeLa-S3
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001087
+expId 1087
+fileName wgEncodeCshlShortRnaSeqHelas3CytosolShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID21145,LID21148
+labProtocolId 011Cs,012Cs
+labVersion iIDR
+localization cytosol
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4487
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqHelas3CytosolShorttotalMinusRawRep1
 objType table
@@ -2673,8 +3364,10 @@ localization cytosol
 md5sum 4293962ed61b5edb5c726b6ef9975c58
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3346
 tableName wgEncodeCshlShortRnaSeqHelas3CytosolShorttotalMinusRawRep1
 view MinusRawSignal
@@ -2700,8 +3393,10 @@ localization cytosol
 md5sum f5dd66f0c73b1f5c8ea4665a692e0c4d
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3347
 tableName wgEncodeCshlShortRnaSeqHelas3CytosolShorttotalMinusRawRep2
 view MinusRawSignal
@@ -2727,8 +3422,10 @@ localization cytosol
 md5sum 89987d9f0be770f7223b90256d7bd340
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3346
 tableName wgEncodeCshlShortRnaSeqHelas3CytosolShorttotalPlusRawRep1
 view PlusRawSignal
@@ -2754,8 +3451,10 @@ localization cytosol
 md5sum 14d80597887629f040093d3bda26ecd8
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3347
 tableName wgEncodeCshlShortRnaSeqHelas3CytosolShorttotalPlusRawRep2
 view PlusRawSignal
@@ -2781,8 +3480,10 @@ localization cytosol
 md5sum 71ab9acadfe6ae1cc5cb64ebcf9e965c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3346
 view RawData
 
@@ -2807,8 +3508,10 @@ localization cytosol
 md5sum 3d1698c7c3f0671c0dc81ed639cdae29
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3347
 view RawData
 
@@ -2833,8 +3536,10 @@ localization nucleus
 md5sum edd0a9021247c896f5346bbb3f707c33
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3348
 tableName wgEncodeCshlShortRnaSeqHelas3NucleusShorttotalAlnRep1
 view Alignments
@@ -2860,11 +3565,38 @@ localization nucleus
 md5sum bc3384ce4c6994a844333c3f5a712d8c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3349
 tableName wgEncodeCshlShortRnaSeqHelas3NucleusShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqHelas3NucleusShorttotalContigs
+objType table
+bioRep 011N,012N
+cell HeLa-S3
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001088
+expId 1088
+fileName wgEncodeCshlShortRnaSeqHelas3NucleusShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID21144,LID21147
+labProtocolId 011Ns,012Ns
+labVersion iIDR
+localization nucleus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4470
+tableName wgEncodeCshlShortRnaSeqHelas3NucleusShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqHelas3NucleusShorttotalExonsGencV3c
 objType file
@@ -2887,7 +3619,31 @@ localization nucleus
 project wgEncode
 rnaExtract shortTotal
 subId 4124
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqHelas3NucleusShorttotalExonsGencV7
+objType file
+bioRep 011N,012N
+cell HeLa-S3
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001088
+expId 1088
+fileName wgEncodeCshlShortRnaSeqHelas3NucleusShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID21144,LID21147
+labProtocolId 011Ns,012Ns
+labVersion iIDR
+localization nucleus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4470
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqHelas3NucleusShorttotalMinusRawRep1
 objType table
@@ -2910,8 +3666,10 @@ localization nucleus
 md5sum 87fbaea5961f1983d8b01aab3b2d96ab
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3348
 tableName wgEncodeCshlShortRnaSeqHelas3NucleusShorttotalMinusRawRep1
 view MinusRawSignal
@@ -2937,8 +3695,10 @@ localization nucleus
 md5sum 10473c0215e9a1481597846efb597ce4
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3349
 tableName wgEncodeCshlShortRnaSeqHelas3NucleusShorttotalMinusRawRep2
 view MinusRawSignal
@@ -2964,8 +3724,10 @@ localization nucleus
 md5sum 9a1de511d5522bf3ad92fd76c7c4c9cc
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3348
 tableName wgEncodeCshlShortRnaSeqHelas3NucleusShorttotalPlusRawRep1
 view PlusRawSignal
@@ -2991,8 +3753,10 @@ localization nucleus
 md5sum 57b97f38feea7d5255133ec475a6c99c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3349
 tableName wgEncodeCshlShortRnaSeqHelas3NucleusShorttotalPlusRawRep2
 view PlusRawSignal
@@ -3018,8 +3782,10 @@ localization nucleus
 md5sum 5b2587944b679f1be4f9400e5a79c240
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3348
 view RawData
 
@@ -3044,8 +3810,10 @@ localization nucleus
 md5sum a2a472e72f2e505814c5fbb4b6679f0c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3349
 view RawData
 
@@ -3070,8 +3838,10 @@ localization cell
 md5sum 2c351dc6f0523f40fc7e86dba023ba48
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4060
 tableName wgEncodeCshlShortRnaSeqHepg2CellShorttotalAlnRep1
 view Alignments
@@ -3097,11 +3867,38 @@ localization cell
 md5sum 8cefbe45153562f2f273ae51ea7091d7
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4062
 tableName wgEncodeCshlShortRnaSeqHepg2CellShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqHepg2CellShorttotalContigs
+objType table
+bioRep 013WC,014WC
+cell HepG2
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001741
+expId 1741
+fileName wgEncodeCshlShortRnaSeqHepg2CellShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID44460,LID44461
+labProtocolId 013WCs,014WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4479
+tableName wgEncodeCshlShortRnaSeqHepg2CellShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqHepg2CellShorttotalExonsGencV3c
 objType file
@@ -3124,7 +3921,31 @@ localization cell
 project wgEncode
 rnaExtract shortTotal
 subId 4132
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqHepg2CellShorttotalExonsGencV7
+objType file
+bioRep 013WC,014WC
+cell HepG2
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001741
+expId 1741
+fileName wgEncodeCshlShortRnaSeqHepg2CellShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID44460,LID44461
+labProtocolId 013WCs,014WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4479
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqHepg2CellShorttotalMinusRawRep1
 objType table
@@ -3147,8 +3968,10 @@ localization cell
 md5sum a5cb40841ef1432aa986919792cab224
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4060
 tableName wgEncodeCshlShortRnaSeqHepg2CellShorttotalMinusRawRep1
 view MinusRawSignal
@@ -3174,8 +3997,10 @@ localization cell
 md5sum f1f4063da30b2e9aa28fd3ffe9f128de
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4062
 tableName wgEncodeCshlShortRnaSeqHepg2CellShorttotalMinusRawRep2
 view MinusRawSignal
@@ -3201,8 +4026,10 @@ localization cell
 md5sum 94d57ceaed92102ff2999ae71fae9d0a
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4060
 tableName wgEncodeCshlShortRnaSeqHepg2CellShorttotalPlusRawRep1
 view PlusRawSignal
@@ -3228,8 +4055,10 @@ localization cell
 md5sum 0825aa29ea183af2270f2ac76f23e749
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4062
 tableName wgEncodeCshlShortRnaSeqHepg2CellShorttotalPlusRawRep2
 view PlusRawSignal
@@ -3255,8 +4084,10 @@ localization cell
 md5sum 4daa2f0023cb9e468b6be00aad2b048b
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4060
 view RawData
 
@@ -3281,8 +4112,10 @@ localization cell
 md5sum 8bdbad322d9ee8dc0467006ff1c02e1b
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4062
 view RawData
 
@@ -3307,11 +4140,38 @@ localization cytosol
 md5sum 09ddd4ebe294058bdee825d659c6e76d
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4114
 tableName wgEncodeCshlShortRnaSeqHepg2CytosolShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqHepg2CytosolShorttotalContigs
+objType table
+bioRep 013C,014C
+cell HepG2
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001743
+expId 1743
+fileName wgEncodeCshlShortRnaSeqHepg2CytosolShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID44464,LID44465
+labProtocolId 013Cs,014Cs
+labVersion iIDR
+localization cytosol
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4484
+tableName wgEncodeCshlShortRnaSeqHepg2CytosolShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqHepg2CytosolShorttotalExonsGencV3c
 objType file
@@ -3334,7 +4194,31 @@ localization cytosol
 project wgEncode
 rnaExtract shortTotal
 subId 4138
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqHepg2CytosolShorttotalExonsGencV7
+objType file
+bioRep 013C,014C
+cell HepG2
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001743
+expId 1743
+fileName wgEncodeCshlShortRnaSeqHepg2CytosolShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID44464,LID44465
+labProtocolId 013Cs,014Cs
+labVersion iIDR
+localization cytosol
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4484
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqHepg2CytosolShorttotalMinusRawRep2
 objType table
@@ -3357,8 +4241,10 @@ localization cytosol
 md5sum 1b54aac3b8151f98100163b6526520b7
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4114
 tableName wgEncodeCshlShortRnaSeqHepg2CytosolShorttotalMinusRawRep2
 view MinusRawSignal
@@ -3384,8 +4270,10 @@ localization cytosol
 md5sum 2feb41f0343a89875d9ee47cdca3bf24
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4114
 tableName wgEncodeCshlShortRnaSeqHepg2CytosolShorttotalPlusRawRep2
 view PlusRawSignal
@@ -3411,8 +4299,10 @@ localization cytosol
 md5sum 0372280ee4eb82e8bb753b44c4abba35
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4114
 view RawData
 
@@ -3437,8 +4327,10 @@ localization nucleus
 md5sum 2a8762293f390f29085bb94f0e159d49
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4112
 tableName wgEncodeCshlShortRnaSeqHepg2NucleusShorttotalAlnRep1
 view Alignments
@@ -3464,11 +4356,38 @@ localization nucleus
 md5sum d65830bc54ac0f261b7ec07a8e88c387
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4113
 tableName wgEncodeCshlShortRnaSeqHepg2NucleusShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqHepg2NucleusShorttotalContigs
+objType table
+bioRep 013N,014N
+cell HepG2
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001742
+expId 1742
+fileName wgEncodeCshlShortRnaSeqHepg2NucleusShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID44462,LID44463
+labProtocolId 013Ns,014Ns
+labVersion iIDR
+localization nucleus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4480
+tableName wgEncodeCshlShortRnaSeqHepg2NucleusShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqHepg2NucleusShorttotalExonsGencV3c
 objType file
@@ -3491,7 +4410,31 @@ localization nucleus
 project wgEncode
 rnaExtract shortTotal
 subId 4133
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqHepg2NucleusShorttotalExonsGencV7
+objType file
+bioRep 013N,014N
+cell HepG2
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001742
+expId 1742
+fileName wgEncodeCshlShortRnaSeqHepg2NucleusShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID44462,LID44463
+labProtocolId 013Ns,014Ns
+labVersion iIDR
+localization nucleus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4480
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqHepg2NucleusShorttotalMinusRawRep1
 objType table
@@ -3514,8 +4457,10 @@ localization nucleus
 md5sum 87689296b73fc06cd51a39ed3e13fb94
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4112
 tableName wgEncodeCshlShortRnaSeqHepg2NucleusShorttotalMinusRawRep1
 view MinusRawSignal
@@ -3541,8 +4486,10 @@ localization nucleus
 md5sum 1b5cbf9623e430913ce6c94db289678b
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4113
 tableName wgEncodeCshlShortRnaSeqHepg2NucleusShorttotalMinusRawRep2
 view MinusRawSignal
@@ -3568,8 +4515,10 @@ localization nucleus
 md5sum 632aac93ee1e44aecbabc12d776d26e8
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4112
 tableName wgEncodeCshlShortRnaSeqHepg2NucleusShorttotalPlusRawRep1
 view PlusRawSignal
@@ -3595,8 +4544,10 @@ localization nucleus
 md5sum e8ef9d3c0e235ab7a474942ea84a98fa
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4113
 tableName wgEncodeCshlShortRnaSeqHepg2NucleusShorttotalPlusRawRep2
 view PlusRawSignal
@@ -3622,8 +4573,10 @@ localization nucleus
 md5sum fd75364af617356e54ee4dbe7cba2538
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4112
 view RawData
 
@@ -3648,8 +4601,10 @@ localization nucleus
 md5sum ba8f88267ed0a03db07ffcd1b8f7d68c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 4113
 view RawData
 
@@ -3674,8 +4629,10 @@ localization cell
 md5sum 3683e07e823b4f3c1646fa916ed93d8f
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3358
 tableName wgEncodeCshlShortRnaSeqHuvecCellShorttotalAlnRep1
 view Alignments
@@ -3701,8 +4658,10 @@ localization cell
 md5sum b1c3673dab356ebf38c43261666cf884
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3359
 tableName wgEncodeCshlShortRnaSeqHuvecCellShorttotalAlnRep2
 view Alignments
@@ -3728,7 +4687,7 @@ localization cell
 project wgEncode
 rnaExtract shortTotal
 subId 4147
-view ExonGencV3c
+view ExonsGencV3c
 
 metaObject wgEncodeCshlShortRnaSeqHuvecCellShorttotalMinusRawRep1
 objType table
@@ -3751,8 +4710,10 @@ localization cell
 md5sum 1ad6e8e6db9bd8d4f3ec251d0c79c4f4
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3358
 tableName wgEncodeCshlShortRnaSeqHuvecCellShorttotalMinusRawRep1
 view MinusRawSignal
@@ -3778,8 +4739,10 @@ localization cell
 md5sum 1c5222f7e620786d3fd883c7841ff390
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3359
 tableName wgEncodeCshlShortRnaSeqHuvecCellShorttotalMinusRawRep2
 view MinusRawSignal
@@ -3805,8 +4768,10 @@ localization cell
 md5sum 04f72d0942aece7b810bb7a5fc10d3d9
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3358
 tableName wgEncodeCshlShortRnaSeqHuvecCellShorttotalPlusRawRep1
 view PlusRawSignal
@@ -3832,8 +4797,10 @@ localization cell
 md5sum 8fb3c2d39f7f52338680cc9641d780d4
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3359
 tableName wgEncodeCshlShortRnaSeqHuvecCellShorttotalPlusRawRep2
 view PlusRawSignal
@@ -3859,8 +4826,10 @@ localization cell
 md5sum 1c3c4f5b1ed2fef64902193e9081026b
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3358
 view RawData
 
@@ -3885,8 +4854,10 @@ localization cell
 md5sum 235592f6ea54d9885f1999a02a2fbe15
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3359
 view RawData
 
@@ -3911,8 +4882,10 @@ localization cytosol
 md5sum 9e86fc293a0ab65226e4ff713cf0fb0c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3360
 tableName wgEncodeCshlShortRnaSeqHuvecCytosolShorttotalAlnRep3
 view Alignments
@@ -3938,8 +4911,10 @@ localization cytosol
 md5sum b8c4ec58a3f9becee988537934a5a19c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3361
 tableName wgEncodeCshlShortRnaSeqHuvecCytosolShorttotalAlnRep4
 view Alignments
@@ -3965,7 +4940,7 @@ localization cytosol
 project wgEncode
 rnaExtract shortTotal
 subId 4123
-view ExonGencV3c
+view ExonsGencV3c
 
 metaObject wgEncodeCshlShortRnaSeqHuvecCytosolShorttotalMinusRawRep3
 objType table
@@ -3988,8 +4963,10 @@ localization cytosol
 md5sum 67bb9b812982a8180a18a607f781e4ab
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3360
 tableName wgEncodeCshlShortRnaSeqHuvecCytosolShorttotalMinusRawRep3
 view MinusRawSignal
@@ -4015,8 +4992,10 @@ localization cytosol
 md5sum ce66564f068dafe7dac26a5b2cb3f06c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3361
 tableName wgEncodeCshlShortRnaSeqHuvecCytosolShorttotalMinusRawRep4
 view MinusRawSignal
@@ -4042,8 +5021,10 @@ localization cytosol
 md5sum ca8642d017111b6e2f4efe8a608b1c58
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3360
 tableName wgEncodeCshlShortRnaSeqHuvecCytosolShorttotalPlusRawRep3
 view PlusRawSignal
@@ -4069,8 +5050,10 @@ localization cytosol
 md5sum 1de69ada96011c2ac42b9de10e703123
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3361
 tableName wgEncodeCshlShortRnaSeqHuvecCytosolShorttotalPlusRawRep4
 view PlusRawSignal
@@ -4096,8 +5079,10 @@ localization cytosol
 md5sum 41248dab1ab21c0a43c92d260bc1ba0c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3360
 view RawData
 
@@ -4122,8 +5107,10 @@ localization cytosol
 md5sum 13f6accfbf5b74802c7ce72f33e4d550
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3361
 view RawData
 
@@ -4148,8 +5135,10 @@ localization nucleus
 md5sum ff04ccf2cac390a81fc9f7c1275a96b8
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3362
 tableName wgEncodeCshlShortRnaSeqHuvecNucleusShorttotalAlnRep3
 view Alignments
@@ -4175,11 +5164,38 @@ localization nucleus
 md5sum b6a9fba1306499191fe7e562b833c210
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3295
 tableName wgEncodeCshlShortRnaSeqHuvecNucleusShorttotalAlnRep4
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqHuvecNucleusShorttotalContigs
+objType table
+bioRep 029N,030N
+cell HUVEC
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001080
+expId 1080
+fileName wgEncodeCshlShortRnaSeqHuvecNucleusShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID21056,LID21058
+labProtocolId 029Ns,030Ns
+labVersion iIDR
+localization nucleus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4475
+tableName wgEncodeCshlShortRnaSeqHuvecNucleusShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqHuvecNucleusShorttotalExonsGencV3c
 objType file
@@ -4202,7 +5218,31 @@ localization nucleus
 project wgEncode
 rnaExtract shortTotal
 subId 4128
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqHuvecNucleusShorttotalExonsGencV7
+objType file
+bioRep 029N,030N
+cell HUVEC
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001080
+expId 1080
+fileName wgEncodeCshlShortRnaSeqHuvecNucleusShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID21056,LID21058
+labProtocolId 029Ns,030Ns
+labVersion iIDR
+localization nucleus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4475
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqHuvecNucleusShorttotalMinusRawRep3
 objType table
@@ -4225,8 +5265,10 @@ localization nucleus
 md5sum 913765bad3c1e58374276d7d92df8b9d
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3362
 tableName wgEncodeCshlShortRnaSeqHuvecNucleusShorttotalMinusRawRep3
 view MinusRawSignal
@@ -4252,8 +5294,10 @@ localization nucleus
 md5sum 6f39e198619849b089e6b55c0148216d
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3295
 tableName wgEncodeCshlShortRnaSeqHuvecNucleusShorttotalMinusRawRep4
 view MinusRawSignal
@@ -4279,8 +5323,10 @@ localization nucleus
 md5sum d8f28309df9602dfc7ee609aab5cdeb8
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3362
 tableName wgEncodeCshlShortRnaSeqHuvecNucleusShorttotalPlusRawRep3
 view PlusRawSignal
@@ -4306,8 +5352,10 @@ localization nucleus
 md5sum c47a34ff4661284ee45b9251d607ba1b
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3295
 tableName wgEncodeCshlShortRnaSeqHuvecNucleusShorttotalPlusRawRep4
 view PlusRawSignal
@@ -4333,8 +5381,10 @@ localization nucleus
 md5sum 0d6d12b60fc88da597f8f014403b4305
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3362
 view RawData
 
@@ -4359,8 +5409,10 @@ localization nucleus
 md5sum 8b41b3ed8cc82e0b580024787b734b5b
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3295
 view RawData
 
@@ -4533,8 +5585,10 @@ localization cell
 md5sum d43bf7295915a91092026ad2c0a8c2d2
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3296
 tableName wgEncodeCshlShortRnaSeqK562CellShorttotalAlnRep1
 view Alignments
@@ -4560,11 +5614,39 @@ localization cell
 md5sum 5d4da451d8fc41bf2c806919caa4815d
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3363
 tableName wgEncodeCshlShortRnaSeqK562CellShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqK562CellShorttotalContigs
+objType table
+bioRep 001WC,002WC
+cell K562
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000213
+expId 213
+fileName wgEncodeCshlShortRnaSeqK562CellShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID10567,LID10568
+labProtocolId 001WCs,002WCs
+labVersion iIDR
+localization cell
+project wgEncode
+readType 1x36
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4468
+tableName wgEncodeCshlShortRnaSeqK562CellShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqK562CellShorttotalExonsGencV3c
 objType file
@@ -4587,7 +5669,32 @@ localization cell
 project wgEncode
 rnaExtract shortTotal
 subId 4121
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqK562CellShorttotalExonsGencV7
+objType file
+bioRep 001WC,002WC
+cell K562
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000213
+expId 213
+fileName wgEncodeCshlShortRnaSeqK562CellShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID10567,LID10568
+labProtocolId 001WCs,002WCs
+labVersion iIDR
+localization cell
+project wgEncode
+readType 1x36
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4468
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqK562CellShorttotalMinusRawRep1
 objType table
@@ -4610,8 +5717,10 @@ localization cell
 md5sum 18de869c0d45d10cf2be39b5736874d1
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3296
 tableName wgEncodeCshlShortRnaSeqK562CellShorttotalMinusRawRep1
 view MinusRawSignal
@@ -4637,8 +5746,10 @@ localization cell
 md5sum 7ac3602b798a6d75ae6d9d0c8769a58b
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3363
 tableName wgEncodeCshlShortRnaSeqK562CellShorttotalMinusRawRep2
 view MinusRawSignal
@@ -4664,8 +5775,10 @@ localization cell
 md5sum f27465fd0c8028c871e1fac627391a7c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3296
 tableName wgEncodeCshlShortRnaSeqK562CellShorttotalPlusRawRep1
 view PlusRawSignal
@@ -4691,8 +5804,10 @@ localization cell
 md5sum db0c5a6c5f60bc3125c55fa7bae88a13
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3363
 tableName wgEncodeCshlShortRnaSeqK562CellShorttotalPlusRawRep2
 view PlusRawSignal
@@ -4718,8 +5833,10 @@ localization cell
 md5sum 4b96def5b0732d53b7ff30e611e42a97
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3296
 view RawData
 
@@ -4744,8 +5861,10 @@ localization cell
 md5sum 49871ebb05bc2e786784ef8bd3062c9f
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3363
 view RawData
 
@@ -4918,8 +6037,10 @@ localization chromatin
 md5sum 44588996b7c1830a145ea17d8e3a52d1
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3364
 tableName wgEncodeCshlShortRnaSeqK562ChromatinShorttotalAlnRep3
 view Alignments
@@ -4945,11 +6066,38 @@ localization chromatin
 md5sum 1f818c6d6b7b4dbc36da9632d2635ec8
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3365
 tableName wgEncodeCshlShortRnaSeqK562ChromatinShorttotalAlnRep4
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqK562ChromatinShorttotalContigs
+objType table
+bioRep 025CH,026CH
+cell K562
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000205
+expId 205
+fileName wgEncodeCshlShortRnaSeqK562ChromatinShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID8930,LID18560
+labProtocolId 025CHs,026CHs
+labVersion iIDR
+localization chromatin
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4476
+tableName wgEncodeCshlShortRnaSeqK562ChromatinShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqK562ChromatinShorttotalExonsGencV3c
 objType file
@@ -4972,7 +6120,31 @@ localization chromatin
 project wgEncode
 rnaExtract shortTotal
 subId 4130
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqK562ChromatinShorttotalExonsGencV7
+objType file
+bioRep 025CH,026CH
+cell K562
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000205
+expId 205
+fileName wgEncodeCshlShortRnaSeqK562ChromatinShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID8930,LID18560
+labProtocolId 025CHs,026CHs
+labVersion iIDR
+localization chromatin
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4476
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqK562ChromatinShorttotalMinusRawRep3
 objType table
@@ -4995,8 +6167,10 @@ localization chromatin
 md5sum 8cfc54d326127c6e517d67231c6803a2
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3364
 tableName wgEncodeCshlShortRnaSeqK562ChromatinShorttotalMinusRawRep3
 view MinusRawSignal
@@ -5022,8 +6196,10 @@ localization chromatin
 md5sum 37de1632c73a3d657e1ab5838e50fa09
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3365
 tableName wgEncodeCshlShortRnaSeqK562ChromatinShorttotalMinusRawRep4
 view MinusRawSignal
@@ -5049,8 +6225,10 @@ localization chromatin
 md5sum 4bac393e86441779fcfd6445f57a113f
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3364
 tableName wgEncodeCshlShortRnaSeqK562ChromatinShorttotalPlusRawRep3
 view PlusRawSignal
@@ -5076,8 +6254,10 @@ localization chromatin
 md5sum 57b1b816a606f3435f415938d4340b6a
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3365
 tableName wgEncodeCshlShortRnaSeqK562ChromatinShorttotalPlusRawRep4
 view PlusRawSignal
@@ -5103,8 +6283,10 @@ localization chromatin
 md5sum 9b470a4c3577bd40a3afed33d5fbb089
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3364
 view RawData
 
@@ -5129,8 +6311,10 @@ localization chromatin
 md5sum 333136c9d2e699973dc704ee59e5eebc
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3365
 view RawData
 
@@ -5303,8 +6487,10 @@ localization cytosol
 md5sum 45fedb7b863fab34cc9a1864eefe58d0
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3297
 tableName wgEncodeCshlShortRnaSeqK562CytosolShorttotalAlnRep1
 view Alignments
@@ -5330,11 +6516,38 @@ localization cytosol
 md5sum 1dd42d818027c74149a30b341be8a9ea
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3298
 tableName wgEncodeCshlShortRnaSeqK562CytosolShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqK562CytosolShorttotalContigs
+objType table
+bioRep 001C,002C
+cell K562
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000206
+expId 206
+fileName wgEncodeCshlShortRnaSeqK562CytosolShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID10572,LID10571
+labProtocolId 001Cs,002Cs
+labVersion iIDR
+localization cytosol
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4493
+tableName wgEncodeCshlShortRnaSeqK562CytosolShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqK562CytosolShorttotalExonGencV3c
 objType file
@@ -5357,7 +6570,31 @@ localization cytosol
 project wgEncode
 rnaExtract shortTotal
 subId 4148
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqK562CytosolShorttotalExonsGencV7
+objType file
+bioRep 001C,002C
+cell K562
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000206
+expId 206
+fileName wgEncodeCshlShortRnaSeqK562CytosolShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID10572,LID10571
+labProtocolId 001Cs,002Cs
+labVersion iIDR
+localization cytosol
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4493
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqK562CytosolShorttotalMinusRawRep1
 objType table
@@ -5380,8 +6617,10 @@ localization cytosol
 md5sum 561d398f0b543ed94d5a9079cfd93f4f
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3297
 tableName wgEncodeCshlShortRnaSeqK562CytosolShorttotalMinusRawRep1
 view MinusRawSignal
@@ -5407,8 +6646,10 @@ localization cytosol
 md5sum 97f175810838a38fc4a9f6e7941a7c39
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3298
 tableName wgEncodeCshlShortRnaSeqK562CytosolShorttotalMinusRawRep2
 view MinusRawSignal
@@ -5434,8 +6675,10 @@ localization cytosol
 md5sum 7a403e4fc6c5bc7699d04a7ad01bb13d
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3297
 tableName wgEncodeCshlShortRnaSeqK562CytosolShorttotalPlusRawRep1
 view PlusRawSignal
@@ -5461,8 +6704,10 @@ localization cytosol
 md5sum a8a864882059a8bc5a8983fecae17da2
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3298
 tableName wgEncodeCshlShortRnaSeqK562CytosolShorttotalPlusRawRep2
 view PlusRawSignal
@@ -5488,8 +6733,10 @@ localization cytosol
 md5sum 9d48f1ef3da7b8ab1286b53bf350c064
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3297
 view RawData
 
@@ -5514,8 +6761,10 @@ localization cytosol
 md5sum d1975ef6efba87c8821f901af53eabc4
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3298
 view RawData
 
@@ -5688,8 +6937,10 @@ localization nucleolus
 md5sum 63fb0bb9ad9c1a7bbcb9cc2cd44be86d
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3366
 tableName wgEncodeCshlShortRnaSeqK562NucleolusShorttotalAlnRep3
 view Alignments
@@ -5715,11 +6966,38 @@ localization nucleolus
 md5sum 4166bbab0e923c0f407861b9d230cd63
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3367
 tableName wgEncodeCshlShortRnaSeqK562NucleolusShorttotalAlnRep4
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqK562NucleolusShorttotalContigs
+objType table
+bioRep 025NL,026NL
+cell K562
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000207
+expId 207
+fileName wgEncodeCshlShortRnaSeqK562NucleolusShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID8928,LID18558
+labProtocolId 025NLs,026NLs
+labVersion iIDR
+localization nucleolus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4481
+tableName wgEncodeCshlShortRnaSeqK562NucleolusShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqK562NucleolusShorttotalExonsGencV3c
 objType file
@@ -5742,7 +7020,31 @@ localization nucleolus
 project wgEncode
 rnaExtract shortTotal
 subId 4135
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqK562NucleolusShorttotalExonsGencV7
+objType file
+bioRep 025NL,026NL
+cell K562
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000207
+expId 207
+fileName wgEncodeCshlShortRnaSeqK562NucleolusShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID8928,LID18558
+labProtocolId 025NLs,026NLs
+labVersion iIDR
+localization nucleolus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4481
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqK562NucleolusShorttotalMinusRawRep3
 objType table
@@ -5765,8 +7067,10 @@ localization nucleolus
 md5sum 81ac50814794826209a74b836b8c0819
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3366
 tableName wgEncodeCshlShortRnaSeqK562NucleolusShorttotalMinusRawRep3
 view MinusRawSignal
@@ -5792,8 +7096,10 @@ localization nucleolus
 md5sum be54c86ef9b4b615a9ed0828537c0270
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3367
 tableName wgEncodeCshlShortRnaSeqK562NucleolusShorttotalMinusRawRep4
 view MinusRawSignal
@@ -5819,8 +7125,10 @@ localization nucleolus
 md5sum 5b4f8a64dcf8efb943c90e21570d2826
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3366
 tableName wgEncodeCshlShortRnaSeqK562NucleolusShorttotalPlusRawRep3
 view PlusRawSignal
@@ -5846,8 +7154,10 @@ localization nucleolus
 md5sum 91a25d4462f68dbe7c3dbaac3675e2c0
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3367
 tableName wgEncodeCshlShortRnaSeqK562NucleolusShorttotalPlusRawRep4
 view PlusRawSignal
@@ -5873,8 +7183,10 @@ localization nucleolus
 md5sum f96e4e47e52b37d978eef27adf7df636
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3366
 view RawData
 
@@ -5899,8 +7211,10 @@ localization nucleolus
 md5sum 1be1fa8860e592135bba9e01ee0c4b19
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3367
 view RawData
 
@@ -6073,8 +7387,10 @@ localization nucleoplasm
 md5sum 9810e20cb34749352426228fe22f2fe0
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3368
 tableName wgEncodeCshlShortRnaSeqK562NucleoplasmShorttotalAlnRep3
 view Alignments
@@ -6100,11 +7416,38 @@ localization nucleoplasm
 md5sum 4e180551cf0af4c72d4687e3a3f4a0be
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3369
 tableName wgEncodeCshlShortRnaSeqK562NucleoplasmShorttotalAlnRep4
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqK562NucleoplasmShorttotalContigs
+objType table
+bioRep 025NP,026NP
+cell K562
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000208
+expId 208
+fileName wgEncodeCshlShortRnaSeqK562NucleoplasmShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID8929,LID18559
+labProtocolId 025NPs,026NPs
+labVersion iIDR
+localization nucleoplasm
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4494
+tableName wgEncodeCshlShortRnaSeqK562NucleoplasmShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqK562NucleoplasmShorttotalExonsGencV3c
 objType file
@@ -6127,7 +7470,31 @@ localization nucleoplasm
 project wgEncode
 rnaExtract shortTotal
 subId 4149
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqK562NucleoplasmShorttotalExonsGencV7
+objType file
+bioRep 025NP,026NP
+cell K562
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000208
+expId 208
+fileName wgEncodeCshlShortRnaSeqK562NucleoplasmShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID8929,LID18559
+labProtocolId 025NPs,026NPs
+labVersion iIDR
+localization nucleoplasm
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4494
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqK562NucleoplasmShorttotalMinusRawRep3
 objType table
@@ -6150,8 +7517,10 @@ localization nucleoplasm
 md5sum e6054ab6e5ef0109e7e4d9031734c5e9
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3368
 tableName wgEncodeCshlShortRnaSeqK562NucleoplasmShorttotalMinusRawRep3
 view MinusRawSignal
@@ -6177,8 +7546,10 @@ localization nucleoplasm
 md5sum c22342750e8a7d444f17f756816aef1c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3369
 tableName wgEncodeCshlShortRnaSeqK562NucleoplasmShorttotalMinusRawRep4
 view MinusRawSignal
@@ -6204,8 +7575,10 @@ localization nucleoplasm
 md5sum 5e021cf32cf5d735d4ee1ece911d2491
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3368
 tableName wgEncodeCshlShortRnaSeqK562NucleoplasmShorttotalPlusRawRep3
 view PlusRawSignal
@@ -6231,8 +7604,10 @@ localization nucleoplasm
 md5sum 592a4196ebc8283f27f9d4b4c3364b2c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3369
 tableName wgEncodeCshlShortRnaSeqK562NucleoplasmShorttotalPlusRawRep4
 view PlusRawSignal
@@ -6258,8 +7633,10 @@ localization nucleoplasm
 md5sum 5d015dc471ccf8cd33abe038bdef4714
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3368
 view RawData
 
@@ -6284,8 +7661,10 @@ localization nucleoplasm
 md5sum 798b7bc9f941fadedc9d5027fc1f06f4
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3369
 view RawData
 
@@ -6458,8 +7837,10 @@ localization nucleus
 md5sum 938a80d561e144724d05d72faeee629a
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3299
 tableName wgEncodeCshlShortRnaSeqK562NucleusShorttotalAlnRep1
 view Alignments
@@ -6485,8 +7866,10 @@ localization nucleus
 md5sum 770d18aceac7c6dbce6c09fbd7169650
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3301
 tableName wgEncodeCshlShortRnaSeqK562NucleusShorttotalAlnRep2
 view Alignments
@@ -6496,10 +7879,12 @@ objType table
 bioRep 001N,002N
 cell K562
 composite wgEncodeCshlShortRnaSeq
-dataType ShortRnaSeq
+dataType RnaSeq
 dataVersion post ENCODE Jan 2011 Freeze
-dateSubmitted 2011-03-31
-dateUnrestricted 2011-12-31
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000209
+expId 209
 fileName wgEncodeCshlShortRnaSeqK562NucleusShorttotalContigs.bedRnaElements.gz
 grant Gingeras
 lab CSHL
@@ -6509,7 +7894,8 @@ labVersion iIDR
 localization nucleus
 project wgEncode
 rnaExtract shortTotal
-subId 3861
+seqPlatform Illumina_GA2x
+subId 4490
 tableName wgEncodeCshlShortRnaSeqK562NucleusShorttotalContigs
 view Contigs
 
@@ -6534,7 +7920,31 @@ localization nucleus
 project wgEncode
 rnaExtract shortTotal
 subId 4144
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqK562NucleusShorttotalExonsGencV7
+objType file
+bioRep 001N,002N
+cell K562
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH000209
+expId 209
+fileName wgEncodeCshlShortRnaSeqK562NucleusShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID10570,LID10569
+labProtocolId 001Ns,002Ns
+labVersion iIDR
+localization nucleus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4490
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqK562NucleusShorttotalMinusRawRep1
 objType table
@@ -6557,8 +7967,10 @@ localization nucleus
 md5sum 2ae269e5e5422a9dc7ddeb4de88526da
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3299
 tableName wgEncodeCshlShortRnaSeqK562NucleusShorttotalMinusRawRep1
 view MinusRawSignal
@@ -6584,8 +7996,10 @@ localization nucleus
 md5sum 1836a0ae8ee33ac6cb55508809dacbc1
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3301
 tableName wgEncodeCshlShortRnaSeqK562NucleusShorttotalMinusRawRep2
 view MinusRawSignal
@@ -6611,8 +8025,10 @@ localization nucleus
 md5sum d33b7dfb19f123ffbe91e909494cbdfa
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3299
 tableName wgEncodeCshlShortRnaSeqK562NucleusShorttotalPlusRawRep1
 view PlusRawSignal
@@ -6638,8 +8054,10 @@ localization nucleus
 md5sum 8b5ca5b6923b1f7175bb643a7c59572e
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3301
 tableName wgEncodeCshlShortRnaSeqK562NucleusShorttotalPlusRawRep2
 view PlusRawSignal
@@ -6665,8 +8083,10 @@ localization nucleus
 md5sum 7857ffa8cf4b9892b8dbc2522be6b89c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3299
 view RawData
 
@@ -6691,8 +8111,10 @@ localization nucleus
 md5sum 02685eb72683978c71ef658a35056631
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3301
 view RawData
 
@@ -6860,8 +8282,10 @@ localization cell
 md5sum 9d25c9ec6d8159c490ca1faa9e95b014
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3353
 tableName wgEncodeCshlShortRnaSeqMcf7CellShorttotalAlnRep1
 view Alignments
@@ -6887,11 +8311,38 @@ localization cell
 md5sum cf84774a08bbe3fa3cff37dbe8853645
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3370
 tableName wgEncodeCshlShortRnaSeqMcf7CellShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqMcf7CellShorttotalContigs
+objType table
+bioRep 015WC,016WC
+cell MCF-7
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001090
+expId 1090
+fileName wgEncodeCshlShortRnaSeqMcf7CellShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID20743,LID20744
+labProtocolId 015WCs,016WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4491
+tableName wgEncodeCshlShortRnaSeqMcf7CellShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqMcf7CellShorttotalExonsGencV3c
 objType file
@@ -6914,7 +8365,31 @@ localization cell
 project wgEncode
 rnaExtract shortTotal
 subId 4145
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqMcf7CellShorttotalExonsGencV7
+objType file
+bioRep 015WC,016WC
+cell MCF-7
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001090
+expId 1090
+fileName wgEncodeCshlShortRnaSeqMcf7CellShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID20743,LID20744
+labProtocolId 015WCs,016WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4491
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqMcf7CellShorttotalMinusRawRep1
 objType table
@@ -6937,8 +8412,10 @@ localization cell
 md5sum 8dba39a523ccab75ef08d696ca113371
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3353
 tableName wgEncodeCshlShortRnaSeqMcf7CellShorttotalMinusRawRep1
 view MinusRawSignal
@@ -6964,8 +8441,10 @@ localization cell
 md5sum 681fc49d3c18c1140b5e66c0a3109fba
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3370
 tableName wgEncodeCshlShortRnaSeqMcf7CellShorttotalMinusRawRep2
 view MinusRawSignal
@@ -6991,8 +8470,10 @@ localization cell
 md5sum dc70a86afe2d597bb52e5e6597e4f1e1
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3353
 tableName wgEncodeCshlShortRnaSeqMcf7CellShorttotalPlusRawRep1
 view PlusRawSignal
@@ -7018,8 +8499,10 @@ localization cell
 md5sum 0a2c85c2f554272619a85e7a665e69a2
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3370
 tableName wgEncodeCshlShortRnaSeqMcf7CellShorttotalPlusRawRep2
 view PlusRawSignal
@@ -7045,8 +8528,10 @@ localization cell
 md5sum edab552c9bd6494c8919c1d2012e1a68
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3353
 view RawData
 
@@ -7071,8 +8556,10 @@ localization cell
 md5sum 8fde5c5bcea9add127e8f6416b523577
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3370
 view RawData
 
@@ -7097,8 +8584,10 @@ localization cell
 md5sum 3f6f90b587214ce0e8a2bbafe80b025e
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3371
 tableName wgEncodeCshlShortRnaSeqNhekCellShorttotalAlnRep1
 view Alignments
@@ -7124,11 +8613,38 @@ localization cell
 md5sum ab6ac9d935ef9c2c9538512946c5f4ac
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3372
 tableName wgEncodeCshlShortRnaSeqNhekCellShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqNhekCellShorttotalContigs
+objType table
+bioRep 007WC,008WC
+cell NHEK
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001091
+expId 1091
+fileName wgEncodeCshlShortRnaSeqNhekCellShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID20999,LID21000
+labProtocolId 007WCs,008WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4472
+tableName wgEncodeCshlShortRnaSeqNhekCellShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqNhekCellShorttotalExonsGencV3c
 objType file
@@ -7151,7 +8667,31 @@ localization cell
 project wgEncode
 rnaExtract shortTotal
 subId 4126
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqNhekCellShorttotalExonsGencV7
+objType file
+bioRep 007WC,008WC
+cell NHEK
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001091
+expId 1091
+fileName wgEncodeCshlShortRnaSeqNhekCellShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID20999,LID21000
+labProtocolId 007WCs,008WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4472
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqNhekCellShorttotalMinusRawRep1
 objType table
@@ -7174,8 +8714,10 @@ localization cell
 md5sum 043440435b36ce61bd34fdfdb8d7662a
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3371
 tableName wgEncodeCshlShortRnaSeqNhekCellShorttotalMinusRawRep1
 view MinusRawSignal
@@ -7201,8 +8743,10 @@ localization cell
 md5sum ba9944c70d4a8de032b5657ef455273a
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3372
 tableName wgEncodeCshlShortRnaSeqNhekCellShorttotalMinusRawRep2
 view MinusRawSignal
@@ -7228,8 +8772,10 @@ localization cell
 md5sum 6cfbb025bc9c9a37094ce106b5f5421d
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3371
 tableName wgEncodeCshlShortRnaSeqNhekCellShorttotalPlusRawRep1
 view PlusRawSignal
@@ -7255,8 +8801,10 @@ localization cell
 md5sum 2f0ccdb07ccffc9addc89b7c5a42eb0a
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3372
 tableName wgEncodeCshlShortRnaSeqNhekCellShorttotalPlusRawRep2
 view PlusRawSignal
@@ -7282,8 +8830,10 @@ localization cell
 md5sum 254f04a88e62aecacf37f1de096a5979
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 1
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3371
 view RawData
 
@@ -7308,8 +8858,10 @@ localization cell
 md5sum e045eb3939932f6afaa7cb024f8f5758
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3372
 view RawData
 
@@ -7334,8 +8886,10 @@ localization cytosol
 md5sum 22df271f2e055ac3a6ba4f82f411bb29
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3373
 tableName wgEncodeCshlShortRnaSeqNhekCytosolShorttotalAlnRep3
 view Alignments
@@ -7361,11 +8915,38 @@ localization cytosol
 md5sum 72345303233f9f492d7b40a7ad3d8872
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3374
 tableName wgEncodeCshlShortRnaSeqNhekCytosolShorttotalAlnRep4
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqNhekCytosolShorttotalContigs
+objType table
+bioRep 027C,028C
+cell NHEK
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001092
+expId 1092
+fileName wgEncodeCshlShortRnaSeqNhekCytosolShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID21002,LID21004
+labProtocolId 027Cs,028Cs
+labVersion iIDR
+localization cytosol
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4469
+tableName wgEncodeCshlShortRnaSeqNhekCytosolShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqNhekCytosolShorttotalExonsGencV3c
 objType file
@@ -7388,7 +8969,31 @@ localization cytosol
 project wgEncode
 rnaExtract shortTotal
 subId 4122
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqNhekCytosolShorttotalExonsGencV7
+objType file
+bioRep 027C,028C
+cell NHEK
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001092
+expId 1092
+fileName wgEncodeCshlShortRnaSeqNhekCytosolShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID21002,LID21004
+labProtocolId 027Cs,028Cs
+labVersion iIDR
+localization cytosol
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4469
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqNhekCytosolShorttotalMinusRawRep3
 objType table
@@ -7411,8 +9016,10 @@ localization cytosol
 md5sum eff824d26e69a9053d8dddbb0684dd9c
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3373
 tableName wgEncodeCshlShortRnaSeqNhekCytosolShorttotalMinusRawRep3
 view MinusRawSignal
@@ -7438,8 +9045,10 @@ localization cytosol
 md5sum c1e524f323d185200277800248d1e1e5
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3374
 tableName wgEncodeCshlShortRnaSeqNhekCytosolShorttotalMinusRawRep4
 view MinusRawSignal
@@ -7465,8 +9074,10 @@ localization cytosol
 md5sum cc831581083bd473b41f7cd427fffb11
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3373
 tableName wgEncodeCshlShortRnaSeqNhekCytosolShorttotalPlusRawRep3
 view PlusRawSignal
@@ -7492,8 +9103,10 @@ localization cytosol
 md5sum b6ec92eb7fa88e200e046ab169ab0610
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3374
 tableName wgEncodeCshlShortRnaSeqNhekCytosolShorttotalPlusRawRep4
 view PlusRawSignal
@@ -7519,8 +9132,10 @@ localization cytosol
 md5sum 8815f0827d4783aa21a5dd280641b0a2
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3373
 view RawData
 
@@ -7545,8 +9160,10 @@ localization cytosol
 md5sum ead145e114537185482da76f2f6c2400
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3374
 view RawData
 
@@ -7571,8 +9188,10 @@ localization nucleus
 md5sum 86dfffadc9e67c5f19870f957198ce4d
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3380
 tableName wgEncodeCshlShortRnaSeqNhekNucleusShorttotalAlnRep3
 view Alignments
@@ -7598,11 +9217,38 @@ localization nucleus
 md5sum 055e5581e306819524a51f19749eaa58
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3375
 tableName wgEncodeCshlShortRnaSeqNhekNucleusShorttotalAlnRep4
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqNhekNucleusShorttotalContigs
+objType table
+bioRep 027N,028N
+cell NHEK
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001093
+expId 1093
+fileName wgEncodeCshlShortRnaSeqNhekNucleusShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID21001,LID21003
+labProtocolId 027Ns,028Ns
+labVersion iIDR
+localization nucleus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4492
+tableName wgEncodeCshlShortRnaSeqNhekNucleusShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqNhekNucleusShorttotalExonsGencV3c
 objType file
@@ -7625,7 +9271,31 @@ localization nucleus
 project wgEncode
 rnaExtract shortTotal
 subId 4146
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqNhekNucleusShorttotalExonsGencV7
+objType file
+bioRep 027N,028N
+cell NHEK
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001093
+expId 1093
+fileName wgEncodeCshlShortRnaSeqNhekNucleusShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID21001,LID21003
+labProtocolId 027Ns,028Ns
+labVersion iIDR
+localization nucleus
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4492
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqNhekNucleusShorttotalMinusRawRep3
 objType table
@@ -7648,8 +9318,10 @@ localization nucleus
 md5sum f1aed5ec40443beee05d7f80307ad2cb
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3380
 tableName wgEncodeCshlShortRnaSeqNhekNucleusShorttotalMinusRawRep3
 view MinusRawSignal
@@ -7675,8 +9347,10 @@ localization nucleus
 md5sum d0c13d4a419eee2a3390fea8f807bc11
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3375
 tableName wgEncodeCshlShortRnaSeqNhekNucleusShorttotalMinusRawRep4
 view MinusRawSignal
@@ -7702,8 +9376,10 @@ localization nucleus
 md5sum 8ed219b83cd0f36a4d0495e6642427c7
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3380
 tableName wgEncodeCshlShortRnaSeqNhekNucleusShorttotalPlusRawRep3
 view PlusRawSignal
@@ -7729,8 +9405,10 @@ localization nucleus
 md5sum 61e3ab67bd0e1f27649dbc901e419a22
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3375
 tableName wgEncodeCshlShortRnaSeqNhekNucleusShorttotalPlusRawRep4
 view PlusRawSignal
@@ -7756,8 +9434,10 @@ localization nucleus
 md5sum a32508dc782736896419d2939422c387
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 3
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3380
 view RawData
 
@@ -7782,8 +9462,10 @@ localization nucleus
 md5sum 5d296705dea53646051ca6e752bede15
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 4
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3375
 view RawData
 
@@ -7978,11 +9660,38 @@ localization cell
 md5sum 913ee61cd5a672cd3a549a233ae2b156
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3377
 tableName wgEncodeCshlShortRnaSeqSknshraCellShorttotalAlnRep2
 view Alignments
+
+metaObject wgEncodeCshlShortRnaSeqSknshraCellShorttotalContigs
+objType table
+bioRep 019WC,020WC
+cell SK-N-SH_RA
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001094
+expId 1094
+fileName wgEncodeCshlShortRnaSeqSknshraCellShorttotalContigs.bedRnaElements.gz
+grant Gingeras
+lab CSHL
+labExpId LID20747,LID20748
+labProtocolId 019WCs,020WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4471
+tableName wgEncodeCshlShortRnaSeqSknshraCellShorttotalContigs
+view Contigs
 
 metaObject wgEncodeCshlShortRnaSeqSknshraCellShorttotalExonsGencV3c
 objType file
@@ -8005,7 +9714,31 @@ localization cell
 project wgEncode
 rnaExtract shortTotal
 subId 4125
-view ExonGencV3c
+view ExonsGencV3c
+
+metaObject wgEncodeCshlShortRnaSeqSknshraCellShorttotalExonsGencV7
+objType file
+bioRep 019WC,020WC
+cell SK-N-SH_RA
+composite wgEncodeCshlShortRnaSeq
+dataType RnaSeq
+dataVersion post ENCODE Jan 2011 Freeze
+dateSubmitted 2011-07-12
+dateUnrestricted 2012-04-12
+dccAccession wgEncodeEH001094
+expId 1094
+fileName wgEncodeCshlShortRnaSeqSknshraCellShorttotalExonsGencV7.gtf.gz
+grant Gingeras
+lab CSHL
+labExpId LID20747,LID20748
+labProtocolId 019WCs,020WCs
+labVersion iIDR
+localization cell
+project wgEncode
+rnaExtract shortTotal
+seqPlatform Illumina_GA2x
+subId 4471
+view ExonsGencV7
 
 metaObject wgEncodeCshlShortRnaSeqSknshraCellShorttotalMinusRawRep1
 objType table
@@ -8055,8 +9788,10 @@ localization cell
 md5sum 5566d962153a68b78fb351c5d69aef13
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3377
 tableName wgEncodeCshlShortRnaSeqSknshraCellShorttotalMinusRawRep2
 view MinusRawSignal
@@ -8109,8 +9844,10 @@ localization cell
 md5sum 1c598500a448a72b8b514b855baaba7d
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3377
 tableName wgEncodeCshlShortRnaSeqSknshraCellShorttotalPlusRawRep2
 view PlusRawSignal
@@ -8162,9 +9899,11 @@ localization cell
 md5sum 9e4f1246736d063a896c3172acc04a09
 origAssembly hg19
 project wgEncode
+readType 1x36
 replicate 2
 rnaExtract shortTotal
+seqPlatform Illumina_GA2x
 subId 3377
 view RawData
 
-# MAGIC: 1685243287
+# MAGIC: 793072671

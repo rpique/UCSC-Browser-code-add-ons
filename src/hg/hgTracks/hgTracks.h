@@ -158,7 +158,7 @@ struct track
     float scaleRange;             /* What to scale samples by to get logical 0-1 */
     double graphUpperLimit, graphLowerLimit;	/* Limits of actual data in window for wigs. */
     struct preDrawContainer *preDrawContainer;  /* Numbers to graph in wig, one per pixel */
-    struct preDrawContainer *(*loadPreDraw)(struct track *tg, int seqStart, int seqEnd, int width);  
+    struct preDrawContainer *(*loadPreDraw)(struct track *tg, int seqStart, int seqEnd, int width);
     /* Do bits that load the predraw buffer.  Called to set preDrawContainer */
 
     struct bbiFile *bbiFile;	/* Associated bbiFile for bigWig or bigBed. */
@@ -245,6 +245,9 @@ struct track
     boolean customTrack; /* Need to explicitly declare this is a custom track */
     boolean syncChildVisToSelf;	/* If TRUE sync visibility to of children to self. */
     char *networkErrMsg;        /* Network layer error message */
+    boolean parallelLoading;    /* If loading in parallel, usually network resources. */
+    struct bbiSummaryElement *summary;  /* for bigBed */
+    struct bbiSummaryElement *sumAll;   /* for bigBid */
     };
 
 
@@ -349,6 +352,7 @@ struct gsidSeq
     };
 
 extern struct trackLayout tl;
+extern struct jsonHashElement *jsonForClient;
 
 extern struct cart *cart; /* The cart where we keep persistent variables. */
 extern struct hash *oldVars;       /* List of vars from previous cart. */
@@ -375,6 +379,7 @@ extern boolean withLeftLabels;		/* Display left labels? */
 extern boolean withCenterLabels;	/* Display center labels? */
 extern boolean withGuidelines;		/* Display guidelines? */
 extern boolean withNextExonArrows;	/* Display next exon navigation buttons near center labels? */
+extern struct hvGfx *hvgSide;    // An extra pointer to a side label image that can be built if needed
 
 extern int seqBaseCount;  /* Number of bases in sequence. */
 extern int winBaseCount;  /* Number of bases in window. */
@@ -1269,7 +1274,11 @@ enum trackVisibility limitedVisFromComposite(struct track *subtrack);
 char *getScoreFilterClause(struct cart *cart,struct trackDb *tdb,char *scoreColumn);
 // Returns "score >= ..." extra where clause if one is needed
 
+/* useful for declaring small arrays */
 #define SMALLBUF 128
+#define LARGEBUF 256
+/* and for dyStringNew */
+#define SMALLDYBUF 64
 
 char *trackUrl(char *mapName, char *chromName);
 /* Return hgTrackUi url; chromName is optional. */
@@ -1317,6 +1326,8 @@ int gCmpPriority(const void *va, const void *vb);
 
 int tgCmpPriority(const void *va, const void *vb);
 /* Compare to sort based on priority; use shortLabel as secondary sort key. */
+
+#define measureTime uglyTime
 
 #endif /* HGTRACKS_H */
 

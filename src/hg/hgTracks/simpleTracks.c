@@ -133,7 +133,6 @@
 static char const rcsid[] = "$Id: simpleTracks.c,v 1.149 2010/06/05 19:29:42 braney Exp $";
 
 #define CHROM_COLORS 26
-#define SMALLDYBUF 64
 
 int colorBin[MAXPIXELS][256]; /* count of colors for each pixel for each color */
 /* Declare our color gradients and the the number of colors in them */
@@ -2927,8 +2926,15 @@ else if (vis == tvFull)
     int geneMapBoxX = insideX;
     int geneMapBoxW = insideWidth;
     /* Draw the first gene mapbox, in the left margin. */
+#ifdef IMAGEv2_SHORT_MAPITEMS
+    char *name = tg->itemName(tg, item);
+    if (*name != '\0')
+        tg->mapItem(tg, hvg, item, name, tg->mapItemName(tg, item),
+            s, e, trackPastTabX, y, insideX - trackPastTabX, heightPer);
+#else///ndef IMAGEv2_SHORT_MAPITEMS
     tg->mapItem(tg, hvg, item, tg->itemName(tg, item), tg->mapItemName(tg, item),
         s, e, trackPastTabX, y, insideX - trackPastTabX, heightPer);
+#endif///ndef IMAGEv2_SHORT_MAPITEMS
     /* Make the button mapboxes. */
     if (lButton)
         tg->nextPrevExon(tg, hvg, item, insideX, y, buttonW, heightPer, FALSE);
@@ -2988,15 +2994,16 @@ if (withLeftLabels && firstOverflow)
     for (sn = tg->ss->nodeList; sn != NULL; sn = sn->next)
 	if (sn->row >= overflowRow)
 	    overflowCount++;
-    hvGfxUnclip(hvg);
-    hvGfxSetClip(hvg, leftLabelX, yOff, insideWidth, tg->height);
+    assert(hvgSide != NULL);
+    hvGfxUnclip(hvgSide);
+    hvGfxSetClip(hvgSide, leftLabelX, yOff, insideWidth, tg->height);
     char nameBuff[SMALLBUF];
     safef(nameBuff, sizeof(nameBuff), "Last Row: %d", overflowCount);
     mgFontStringWidth(font, nameBuff);
-    hvGfxTextRight(hvg, leftLabelX, y, leftLabelWidth-1, tg->lineHeight,
+    hvGfxTextRight(hvgSide, leftLabelX, y, leftLabelWidth-1, tg->lineHeight,
                    color, font, nameBuff);
-    hvGfxUnclip(hvg);
-    hvGfxSetClip(hvg, insideX, yOff, insideWidth, tg->height);
+    hvGfxUnclip(hvgSide);
+    hvGfxSetClip(hvgSide, insideX, yOff, insideWidth, tg->height);
     }
 /* restore state */
 tg->limitedVis = origVis;
@@ -3046,20 +3053,21 @@ if (withLabels)
     if (snapLeft)        /* Snap label to the left. */
         {
         textX = leftLabelX;
-        hvGfxUnclip(hvg);
-        hvGfxSetClip(hvg, leftLabelX, yOff, insideWidth, tg->height);
+        assert(hvgSide != NULL);
+        hvGfxUnclip(hvgSide);
+        hvGfxSetClip(hvgSide, leftLabelX, yOff, insideWidth, tg->height);
         if(drawNameInverted)
             {
             int boxStart = leftLabelX + leftLabelWidth - 2 - nameWidth;
-            hvGfxBox(hvg, boxStart, y, nameWidth+1, tg->heightPer - 1, color);
-            hvGfxTextRight(hvg, leftLabelX, y, leftLabelWidth-1, tg->heightPer,
+            hvGfxBox(hvgSide, boxStart, y, nameWidth+1, tg->heightPer - 1, color);
+            hvGfxTextRight(hvgSide, leftLabelX, y, leftLabelWidth-1, tg->heightPer,
                         MG_WHITE, font, name);
             }
         else
-            hvGfxTextRight(hvg, leftLabelX, y, leftLabelWidth-1, tg->heightPer,
+            hvGfxTextRight(hvgSide, leftLabelX, y, leftLabelWidth-1, tg->heightPer,
                         labelColor, font, name);
-        hvGfxUnclip(hvg);
-        hvGfxSetClip(hvg, insideX, yOff, insideWidth, tg->height);
+        hvGfxUnclip(hvgSide);
+        hvGfxSetClip(hvgSide, insideX, yOff, insideWidth, tg->height);
         }
     else
         {
@@ -3976,16 +3984,18 @@ static void bedPlusLabelDrawAt(struct track *tg, void *item, struct hvGfx *hvg, 
 struct bedPlusLabel *bpl = item;
 struct bed *bed = item;
 int heightPer = tg->heightPer;
-int x1 = round((double)((int)bed->chromStart-winStart)*scale) + xOff;
-int x2 = round((double)((int)bed->chromEnd-winStart)*scale) + xOff;
-int w;
+int s = max(bed->chromStart, winStart), e = min(bed->chromEnd, winEnd);
+if (s > e)
+    return;
+int x1 = round((s-winStart)*scale) + xOff;
+int x2 = round((e-winStart)*scale) + xOff;
+int w = x2 - x1;
+if (w < 1)
+    w = 1;
 
 if (tg->itemColor != NULL)
     color = tg->itemColor(tg, bed, hvg);
 
-w = x2-x1;
-if (w < 1)
-    w = 1;
 hvGfxBox(hvg, x1, y, w, heightPer, color);
 
 // In full mode, draw bpl->label to the left of item:
@@ -4299,7 +4309,8 @@ struct dyString *dyQuery = NULL;
 if (trackDbSetting(tg->tdb, "wgEncodeGencodeVersion") != NULL)
     {
     if (startsWith("wgEncodeGencodeBasic", tg->tdb->track)
-        || startsWith("wgEncodeGencodeFull", tg->tdb->track)
+        || startsWith("wgEncodeGencodeComp", tg->tdb->track)
+        || startsWith("wgEncodeGencode2wayConsPseudo", tg->tdb->track)
         || startsWith("wgEncodeGencodePseudoGene", tg->tdb->track))
         dyQuery = gencodeFilterBySetQuery(tg, filterBySet, lf);
     }
@@ -5154,9 +5165,12 @@ else if (tg->colorShades)
 if (color)
     {
     int heightPer = tg->heightPer;
-    int x1 = round((double)((int)bed->chromStart-winStart)*scale) + xOff;
-    int x2 = round((double)((int)bed->chromEnd-winStart)*scale) + xOff;
-    int w = x2-x1;
+    int s = max(bed->chromStart, winStart), e = min(bed->chromEnd, winEnd);
+    if (s > e)
+	return;
+    int x1 = round((s-winStart)*scale) + xOff;
+    int x2 = round((e-winStart)*scale) + xOff;
+    int w = x2 - x1;
     if (w < 1)
 	w = 1;
     hvGfxBox(hvg, x1, y, w, heightPer, color);
@@ -9427,17 +9441,21 @@ if (name == NULL)
 return name;
 }
 
-void pgSnpTextRight(char *display, struct hvGfx *hvg, int x1, int y, int width, int height, Color color, MgFont *font, char *allele, int trackY, int trackHeight)
+void pgSnpTextRight(char *display, struct hvGfx *hvg, int x1, int y, int width, int height, Color color, MgFont *font, char *allele, int itemY, int lineHeight)
 /* put text anchored on right upper corner, doing separate colors if needed */
 {
-boolean snapLeft = FALSE;
-int textX = x1 - width;
-snapLeft = (textX < insideX);
+int textX = x1 - width - 2;
+boolean snapLeft = (textX < insideX);
+int clipYBak = 0, clipHeightBak = 0;
+struct hvGfx *hvgWhich = hvg;    // There may be a separate image for sideLabel!
 if (snapLeft)        /* Snap label to the left. */
     {
-    hvGfxUnclip(hvg);
-    hvGfxSetClip(hvg, leftLabelX, trackY, insideWidth, trackHeight);
-    x1 = leftLabelX;
+    if (hvgSide != NULL)
+        hvgWhich = hvgSide;
+    hvGfxGetClip(hvgWhich, NULL, &clipYBak, NULL, &clipHeightBak);
+    hvGfxUnclip(hvgWhich);
+    hvGfxSetClip(hvgWhich, leftLabelX, itemY, insideWidth, lineHeight);
+    textX = leftLabelX;
     width = leftLabelWidth-1;
     }
 
@@ -9452,16 +9470,16 @@ if (sameString(display, "freq"))
        allC = darkGreenColor;
     else if (startsWith("T", allele))
        allC = MG_MAGENTA;
-    hvGfxTextRight(hvg, x1, y, width, height, allC, font, allele);
+    hvGfxTextRight(hvgWhich, textX, y, width, height, allC, font, allele);
     }
 else
     {
-    hvGfxTextRight(hvg, x1, y, width, height, color, font, allele);
+    hvGfxTextRight(hvgWhich, textX, y, width, height, color, font, allele);
     }
 if (snapLeft)
     {
-    hvGfxUnclip(hvg);
-    hvGfxSetClip(hvg, insideX, trackY, insideWidth, trackHeight);
+    hvGfxUnclip(hvgWhich);
+    hvGfxSetClip(hvgWhich, insideX, clipYBak, insideWidth, clipHeightBak);
     }
 }
 
@@ -9563,7 +9581,7 @@ if (sameString(display, "freq"))
         complement(allele[0], strlen(allele[0]));
     if (revCmplDisp)
         reverseComplement(allele[0], strlen(allele[0]));
-    pgSnpTextRight(display, hvg, x1-allWidth-2, yCopy, allWidth, allHeight, color, font, allele[0], y, tg->height);
+    pgSnpTextRight(display, hvg, x1, yCopy, allWidth, allHeight, color, font, allele[0], y, tg->lineHeight);
     }
 else
     {
@@ -9583,7 +9601,7 @@ if (cnt > 1)
             complement(allele[1], strlen(allele[1]));
         if (revCmplDisp)
             reverseComplement(allele[1], strlen(allele[1]));
-        pgSnpTextRight(display, hvg, x1-allWidth-2, yCopy, allWidth, allHeight, color, font, allele[1], y, tg->height);
+        pgSnpTextRight(display, hvg, x1, yCopy, allWidth, allHeight, color, font, allele[1], y, tg->lineHeight);
         }
     else
         {
@@ -10848,6 +10866,8 @@ hFreeConn(&conn);
 return(dy->string);
 }
 
+#include "omim.h"
+
 boolean isOmimOtherClass(char *omimId)
 /* check if this omimId belongs to the "Others" phenotype class */
 
@@ -10864,7 +10884,9 @@ char answer[255];
 struct sqlConnection *conn = hAllocConn(database);
 char query[256];
 safef(query,sizeof(query),
-      "select phenotypeClass from omimPhenotype where omimId =%s and (phenotypeClass=1 or phenotypeClass=2 or phenotypeClass=3 or phenotypeClass=4)", omimId);
+      "select %s from omimPhenotype where omimId =%s and (%s=1 or %s=2 or %s=3 or %s=4)",
+      omimPhenotypeClassColName, omimId, omimPhenotypeClassColName, omimPhenotypeClassColName, omimPhenotypeClassColName,
+      omimPhenotypeClassColName);
 char *ret = sqlQuickQuery(conn, query, answer, sizeof(answer));
 
 if (ret == NULL)
@@ -10887,8 +10909,8 @@ char answer[255];
 struct sqlConnection *conn = hAllocConn(database);
 char query[256];
 safef(query,sizeof(query),
-      "select phenotypeClass from omimPhenotype where omimId =%s and phenotypeClass=%d", omimId, 
-      targetClass);
+      "select %s from omimPhenotype where omimId =%s and %s=%d", omimPhenotypeClassColName,omimId,omimPhenotypeClassColName,targetClass);
+
 char *ret = sqlQuickQuery(conn, query, answer, sizeof(answer));
 
 if (ret == NULL)
@@ -10932,7 +10954,7 @@ for (label = omimLocationLabels; label != NULL; label = label->next)
 	if (strstr(label->name, "class") != NULL) gotClassLabel = TRUE;
 	}
 /* if user has not made selection(s) from the phenotype class filter, enable every item */
-if (!gotClassLabel) return(TRUE);	
+if (!gotClassLabel) return(TRUE);
 
 /* check which classes have been selected */
 for (label = omimLocationLabels; label != NULL; label = label->next)
@@ -11015,9 +11037,9 @@ struct rgbColor lightest;
 Color class1Clr, class2Clr, class3Clr, class4Clr, classOtherClr;
 
 /* color scheme:
-    
+
     Lighter Green:
-    	for Class 1 OMIM records 
+    	for Class 1 OMIM records
     Light Green:
     	for Class 2 OMIM records
     Dark Green:
@@ -11046,7 +11068,9 @@ class4Clr = hvGfxFindColorIx(hvg, 105,50,155);
 classOtherClr = hvGfxFindColorIx(hvg, 190, 190, 190);	// light gray
 
 safef(query, sizeof(query),
-      "select omimId, phenotypeClass from omimPhenotype where omimId=%s order by phenotypeClass desc", el->name);
+      "select omimId, %s from omimPhenotype where omimId=%s order by %s desc",
+      omimPhenotypeClassColName, el->name, omimPhenotypeClassColName);
+
 sr = sqlMustGetResult(conn, query);
 row = sqlNextRow(sr);
 
@@ -11085,13 +11109,13 @@ else
 	{
 	// set to the color for phenClass 4
         sqlFreeResult(&sr);
-	return class4Clr; 
+	return class4Clr;
 	}
     else
 	{
 	// set to the color for Others
         sqlFreeResult(&sr);
-	return classOtherClr; 
+	return classOtherClr;
 	}
     }
 }
@@ -11127,8 +11151,8 @@ else
     	else if (endsWith(label->name, "omimId") && differentString(label->val, "0"))
     	    {
             useOmimId = TRUE;
-	    }  
-    	}	
+	    }
+    	}
     }
 
 struct dyString *name = dyStringNew(SMALLDYBUF);
@@ -11146,21 +11170,121 @@ if (useOmimId)
 
 if (useGeneSymbol)
     {
-    if (labelStarted) 
+    if (labelStarted)
     	dyStringAppendC(name, '/');
-    else 
+    else
     	labelStarted = TRUE;
-    // get gene symbol(s) from omimGeneMap table.
-    // Note: some entries are not in omimGeneMap and/or does not have gene symbol(s)
+    // get appoved gene symbol from omim2gene table first, if not available then get it from omimGeneMap table.
     char query[256];
-    safef(query, sizeof(query), "select geneSymbol from omimGeneMap where omimId = %s", el->name);
+    safef(query, sizeof(query), "select approvedGeneSymbol from omim2gene where omimId = %s", el->name);
     geneSymbol = sqlQuickString(conn, query);
-    if (geneSymbol && differentString(geneSymbol, "0"))
+    if (geneSymbol && differentString(geneSymbol, "-"))
         dyStringAppend(name, geneSymbol);
+    else
+    	{
+	char *chp;
+    	safef(query, sizeof(query), "select geneSymbol from omimGeneMap where omimId = %s", el->name);
+    	geneSymbol = sqlQuickString(conn, query);
+	if (geneSymbol && differentString(geneSymbol, "0"))
+            {
+	    // pick the first one, if multiple gene symbols exist
+    	    chp = strstr(geneSymbol, ",");
+	    if (chp != NULL) *chp = '\0';
+	    dyStringAppend(name, geneSymbol);
+	    }
+	}
     }
 
 hFreeConn(&conn);
 return(name->string);
+}
+
+static char *cosmicTissueList(char *name)
+/* Return list of tumor tissues associated with a COSMIC entry.  Do not free result! */
+{
+static struct dyString *dy = NULL;
+struct sqlConnection *conn = hAllocConn(database);
+
+if (dy == NULL)
+    dy = dyStringNew(0);
+dyStringClear(dy);
+
+char query[256];
+safef(query,sizeof(query),
+        "select concat(gene_name,' ',mut_syntax_aa) from cosmicRaw where cosmic_mutation_id ='%s'", name);
+char buf[256];
+char *ret = sqlQuickQuery(conn, query, buf, sizeof(buf));
+
+if (isNotEmpty(ret))
+    dyStringAppend(dy, ret);
+
+safef(query, sizeof(query),
+      "select sum(mutated_samples) from cosmicRaw where cosmic_mutation_id='%s'",
+      name);
+ret = sqlQuickQuery(conn, query, buf, sizeof(buf));
+if (isNotEmpty(ret))
+    {
+    dyStringAppend(dy, " ");
+    dyStringAppend(dy, ret);
+    }
+
+safef(query, sizeof(query),
+      "select sum(examined_samples) from cosmicRaw where cosmic_mutation_id='%s'",
+      name);
+ret = sqlQuickQuery(conn, query, buf, sizeof(buf));
+    {
+    dyStringAppend(dy, "/");
+    dyStringAppend(dy, ret);
+    }
+
+safef(query, sizeof(query),
+      "select sum(mutated_samples)*100/sum(examined_samples) from cosmicRaw where cosmic_mutation_id='%s'",
+      name);
+ret = sqlQuickQuery(conn, query, buf, sizeof(buf));
+
+char *chp = strstr(ret, ".");
+
+if (isNotEmpty(ret))
+    {
+    // cut off digits after .xxx
+    if ((chp != NULL) && (strlen(chp) > 3))
+    	{
+    	chp++;
+    	chp++;
+    	chp++;
+    	chp++;
+    	*chp = '\0';
+    	}
+    dyStringAppend(dy, " (");
+    dyStringAppend(dy, ret);
+    dyStringAppend(dy, "\%)");
+    }
+
+safef(query,sizeof(query),
+        "select tumour_site from cosmicRaw where cosmic_mutation_id ='%s' order by tumour_site", name);
+char *disorders = collapseRowsFromQuery(query, ",", 4);
+if (isNotEmpty(disorders))
+    {
+    dyStringAppend(dy, " ");
+    dyStringAppend(dy, disorders);
+    }
+hFreeConn(&conn);
+return(dy->string);
+}
+
+static void cosmicLoad(struct track *tg)
+/* Load COSMIC items, storing long label from cosmicTissueList */
+{
+bedPlusLabelLoad(tg, cosmicTissueList);
+}
+
+void cosmicMethods (struct track *tg)
+/* Methods for COSMIC track. */
+{
+tg->loadItems	  = cosmicLoad;
+tg->drawItemAt    = bedPlusLabelDrawAt;
+tg->mapItem       = bedPlusLabelMapItem;
+tg->nextPrevExon  = simpleBedNextPrevEdge;
 }
 
 void omimGene2Methods (struct track *tg)
@@ -11252,9 +11376,9 @@ struct rgbColor lightest;
 Color class1Clr, class2Clr, class3Clr, class4Clr, classOtherClr;
 
 /* color scheme:
-    
+
     Lighter Green:
-    	for Class 1 OMIM records 
+    	for Class 1 OMIM records
     Light Green:
     	for Class 2 OMIM records
     Dark Green:
@@ -11282,7 +11406,7 @@ classOtherClr = hvGfxFindColorIx(hvg, 190, 190, 190);   // light gray
 struct sqlConnection *conn = hAllocConn(database);
 
 safef(query, sizeof(query),
-      "select omimId, phenotypeClass from omimPhenotype where omimId=%s", el->name);
+      "select omimId, %s from omimPhenotype where omimId=%s", omimPhenotypeClassColName, el->name);
 sr = sqlMustGetResult(conn, query);
 row = sqlNextRow(sr);
 
@@ -11311,7 +11435,7 @@ else
     	    {
 	    // set to light green for class 2
 	    sqlFreeResult(&sr);
-	    return class2Clr; 
+	    return class2Clr;
     	    }
 	else
 	    {
@@ -11322,16 +11446,16 @@ else
 	    	return class1Clr;
     	    	}
     	    else if (sameWord(phenClass, "4"))
-		{	
+		{
 		// set to the color for phenClass 4
         	sqlFreeResult(&sr);
-		return class4Clr; 
-		}	
+		return class4Clr;
+		}
     	    else
 		{
 		// set to the color for Others
         	sqlFreeResult(&sr);
-		return classOtherClr; 
+		return classOtherClr;
 		}
 	    }
 	}
@@ -12196,15 +12320,18 @@ for (subtrack = track->subtracks; subtrack != NULL; subtrack = subtrack->next)
     if (isSubtrackVisible(subtrack) &&
 	( limitedVisFromComposite(subtrack) != tvHide))
 	{
-	lastTime = clock1000();
-	if (!subtrack->loadItems) // This could happen if track type has no handler (eg, for new types)
-	    errAbort("Error: No loadItems() handler for subtrack (%s) of composite track (%s) (is this a new track 'type'?)\n", subtrack->track, track->track);
-        subtrack->loadItems(subtrack);
-	if (measureTiming)
+	if (!subtrack->parallelLoading)
 	    {
-	    thisTime = clock1000();
-	    subtrack->loadTime = thisTime - lastTime;
-	    lastTime = thisTime;
+	    lastTime = clock1000();
+	    if (!subtrack->loadItems) // This could happen if track type has no handler (eg, for new types)
+		errAbort("Error: No loadItems() handler for subtrack (%s) of composite track (%s) (is this a new track 'type'?)\n", subtrack->track, track->track);
+	    subtrack->loadItems(subtrack);
+	    if (measureTiming)
+		{
+		thisTime = clock1000();
+		subtrack->loadTime = thisTime - lastTime;
+		lastTime = thisTime;
+		}
 	    }
 	}
     else
@@ -12420,7 +12547,6 @@ if (tdb->useScore)
 	track->colorShades = shadesOfGray;
     }
 track->tdb = tdb;
-tdbExtrasAddOrUpdate(tdb,"track",track); // Be able to find track struct from tdb
 
 /* Handle remote database settings - just a JK experiment at the moment. */
 track->remoteSqlHost = trackDbSetting(tdb, "sqlHost");
@@ -12778,7 +12904,7 @@ registerTrackHandlerOnFamily("wgEncodeGencode", gencodeGeneMethods);
 registerTrackHandlerOnFamily("wgEncodeSangerGencode", gencodeGeneMethods);
 registerTrackHandler("wgEncodeGencodeV7", gencodeGeneMethods);
 registerTrackHandler("wgEncodeGencodeBasicV7", gencodeGeneMethods);
-registerTrackHandler("wgEncodeGencodeFullV7", gencodeGeneMethods);
+registerTrackHandler("wgEncodeGencodeCompV7", gencodeGeneMethods);
 registerTrackHandler("wgEncodeGencodePseudoGeneV7", gencodeGeneMethods);
 registerTrackHandler("wgEncodeGencode2wayConsPseudoV7", gencodeGeneMethods);
 registerTrackHandler("wgEncodeGencodePolyaV7", gencodeGeneMethods);
@@ -12816,6 +12942,7 @@ registerTrackHandler("omimGene2", omimGene2Methods);
 registerTrackHandler("omimAvSnp", omimAvSnpMethods);
 registerTrackHandler("omimLocation", omimLocationMethods);
 registerTrackHandler("omimComposite", omimGene2Methods);
+registerTrackHandler("cosmic", cosmicMethods);
 registerTrackHandler("rest", restMethods);
 #endif /* GBROWSE */
 }

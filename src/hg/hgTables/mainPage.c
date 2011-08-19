@@ -17,6 +17,7 @@
 #include "grp.h"
 #include "hgTables.h"
 #include "joiner.h"
+#include "hubConnect.h"
 
 static char const rcsid[] = "$Id: mainPage.c,v 1.154 2010/06/03 18:53:59 kent Exp $";
 
@@ -643,6 +644,9 @@ hPrintf("<TABLE BORDER=0>\n");
     hOnClickButton("document.customTrackForm.submit();return false;",
         hasCustomTracks ? CT_MANAGE_BUTTON_LABEL : CT_ADD_BUTTON_LABEL);
 
+    hPrintf(" ");
+    hOnClickButton("document.trackHubForm.submit();return false;", "track hubs");
+
     hPrintf("</TD></TR>\n");
     }
 
@@ -990,6 +994,12 @@ hPrintf("</FORM>\n");
 
 /* Hidden form for jumping to custom tracks CGI. */
 hPrintf("<FORM ACTION='%s' NAME='customTrackForm'>", hgCustomName());
+cartSaveSession(cart);
+hPrintf("</FORM>\n");
+
+/* Hidden form for jumping to track hub manager CGI. */
+hPrintf("<FORM ACTION='%s' NAME='trackHubForm'>", hgHubConnectName());
+cgiMakeHiddenVar(hgHubConnectCgiDestUrl, "../cgi-bin/hgTables");
 cartSaveSession(cart);
 hPrintf("</FORM>\n");
 

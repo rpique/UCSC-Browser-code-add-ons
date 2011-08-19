@@ -893,10 +893,28 @@ return (sameString(var, ENCODE_EXP_FIELD_LAB) ||
     sameString(var, ENCODE_EXP_FIELD_CELL_TYPE));
 }
 
+static boolean cvTermIsValid(char *type, char *val)
+/* Determine if term is valid for CV type of term
+ * TODO:  This really belongs in cv.ra, but this limited version used just by encodeExp
+ *  For now, addng special cases as needed -- e.g. allow control term for antibody type
+ */
+{
+if (cvOneTermHash(type, val))
+    return TRUE;
+if (sameString(type, CV_TERM_ANTIBODY))
+    {
+    if (cvOneTermHash(CV_TERM_CONTROL, val))
+        return TRUE;
+    }
+return FALSE;
+}
+
 void encodeExpUpdate(struct sqlConnection *conn, char *tableName,
                                 int id, char *var, char *newVal, char *oldVal)
 /* Update field in encodeExp or var in expVars, identified by id with value.
  * If oldVal is non-NULL, verify it matches experiment, as a safety check.
+ * OldVal of ENCODE_EXP_NO_VAR allows adding expVar.
+ * TODO: Setting newVal to ENCODE_EXP_NO_VAR will remove expVar.  
  * Abort if experiment is accessioned (must deaccession first) */
 {
 char *val = NULL;
@@ -906,9 +924,9 @@ struct dyString *dy = NULL;
 char *type = (char *)cvTermNormalized(var);
 if (type == NULL)
     errAbort("Attempt to update encodeExp experiment with unknown CV type %s", var);
-if (cvOneTermHash(type, newVal) == NULL)
-    errAbort("Attempt to update encodeExp experiment with unknown CV term %s of type %s", newVal, var);
-
+if (!cvTermIsValid(type, newVal))
+    errAbort("Attempt to update encodeExp experiment with unknown CV term %s of type %s", 
+                newVal, var);
 struct encodeExp *exp = encodeExpGetByIdFromTable(conn, tableName, id);
 if (exp == NULL)
     errAbort("Id %d not found in experiment table %s", id, tableName);
@@ -934,18 +952,32 @@ else
     /* must be an expVar -- extract all expVars for this experiment */
     struct slPair *varPairs = slPairListFromString(exp->expVars,FALSE);
     struct slPair *pair = slPairFind(varPairs, var);
-    if (pair == NULL)
-        errAbort("Attempt to change experiment %d with unknown expVar %s in table %s",
-                    id, var, tableName);
-    // TODO: allow adding a new expVar
-    if (oldVal)
+    if (pair != NULL)
         {
-        val = (char *)pair->val;
-        if (differentString(val, oldVal))
-            errAbort("Mismatch: id %d has %s=%s, not %s in table %s", id, var, val, oldVal, tableName);
+        /* change the designated var */
+        if (oldVal)
+            {
+            // TODO: remove expVar if newVal == None
+            val = (char *)pair->val;
+            if (differentString(val, oldVal))
+                errAbort("Mismatch: id %d has %s=%s, not %s in table %s", 
+                        id, var, val, oldVal, tableName);
+            }
+        pair->val = newVal;
         }
-    /* change the designated var */
-    pair->val = newVal;
+    else 
+        {
+        // this var not found in this experiment - add new var
+        if (oldVal && differentString(oldVal, ENCODE_EXP_NO_VAR))
+            {
+            errAbort("Attempt to change expVar %s from value %s not found in experiment %d",
+                    var, oldVal, id);
+            }
+        verbose(3, "Adding %s=%s to experiment %d\n", var, newVal, id);
+        slPairAdd(&varPairs, var, newVal);
+        slPairSortCase(&varPairs);
+        verbose(1, "WARNING: not verifying %s is valid expVar for this experiment\n", var);
+        }
     char *expVars = slPairListToString(varPairs, FALSE);
     dy = dyStringCreate("update %s set %s=\'%s\' ", tableName, ENCODE_EXP_FIELD_FACTORS, expVars);
     }
@@ -1010,7 +1042,7 @@ else
     dyStringAppend(dy, "=");
     dyStringQuoteString(dy, '\'', slPairListToString(varPairs, FALSE));
     }
-verbose(2, "query: %s\n", dy->string);
+verbose(4, "query: %s\n", dy->string);
 exps = encodeExpLoadByQuery(conn, dyStringCannibalize(&dy));
 sqlDisconnect(&conn);
 return exps;

@@ -27,9 +27,34 @@ static struct pgSnp *vcfFileToPgSnp(struct vcfFile *vcff)
 {
 struct pgSnp *pgsList = NULL;
 struct vcfRecord *rec;
+int maxLen = 33;
 for (rec = vcff->records;  rec != NULL;  rec = rec->next)
     {
     struct pgSnp *pgs = pgSnpFromVcfRecord(rec);
+    // Insertion sequences can be quite long; abbreviate here for display.
+    int len = strlen(pgs->name);
+    if (len > maxLen)
+	{
+	if (strchr(pgs->name, '/') != NULL)
+	    {
+	    char *copy = cloneString(pgs->name);
+	    char *allele[8];
+	    int cnt = chopByChar(copy, '/', allele, pgs->alleleCount);
+	    int maxAlLen = maxLen / pgs->alleleCount;
+	    pgs->name[0] = '\0';
+	    int i;
+	    for (i = 0;  i < cnt;  i++)
+		{
+		if (i > 0)
+		    safencat(pgs->name, len+1, "/", 1);
+		if (strlen(allele[i]) > maxAlLen-3)
+		    strcpy(allele[i]+maxAlLen-3, "...");
+		safencat(pgs->name, len+1, allele[i], maxAlLen);
+		}
+	    }
+	else
+	    strcpy(pgs->name+maxLen-3, "...");
+	}
     slAddHead(&pgsList, pgs);
     }
 slReverse(&pgsList);
@@ -357,6 +382,7 @@ for (i=0;  i < vcff->genotypeCount;  i++)
     else
 	gtOtherCount++;
     }
+// These are pooled strings! Restore when done.
 if (revCmplDisp)
     {
     reverseComplement(rec->ref, strlen(rec->ref));
@@ -369,15 +395,14 @@ dyStringPrintf(dy, "%s/%s:%d %s/%s:%d %s/%s:%d", rec->ref, rec->ref, gtRefRefCou
 	       altAlleles[0], altAlleles[0], gtAltAltCount);
 if (gtOtherCount > 0)
     dyStringPrintf(dy, " other:%d", gtOtherCount);
+// Restore original values of pooled strings.
+if (revCmplDisp)
+    {
+    reverseComplement(rec->ref, strlen(rec->ref));
+    for (i=0;  i < altCount;  i++)
+	reverseComplement(altAlleles[i], strlen(altAlleles[i]));
+    }
 return dy->string;
-}
-
-static char *centerPosCartVarName(struct trackDb *tdb)
-// Return track.centerVariantPos setting (may be NULL)
-{
-static char cartVar[512];
-safef(cartVar, sizeof(cartVar), "%s.centerVariantPos", tdb->track);
-return cartVar;
 }
 
 static void drawOneRec(struct vcfRecord *rec, unsigned short *gtHapOrder, int gtHapEnd,
@@ -421,7 +446,7 @@ if (isCenter)
     // Thick black lines to distinguish this variant:
     int yBot = yOff + tg->height - 2;
     hvGfxBox(hvg, x1-3, yOff, 3, tg->height, MG_BLACK);
-    hvGfxBox(hvg, x2+1, yOff, 3, tg->height, MG_BLACK);
+    hvGfxBox(hvg, x2, yOff, 3, tg->height, MG_BLACK);
     hvGfxLine(hvg, x1-2, yOff, x2+2, yOff, MG_BLACK);
     hvGfxLine(hvg, x1-2, yBot, x2+2, yBot, MG_BLACK);
     // Special mouseover instructions:
@@ -429,9 +454,10 @@ if (isCenter)
     if (dy == NULL)
 	dy = dyStringNew(0);
     dyStringPrintf(dy, "%s   Haplotypes sorted on ", mouseoverText);
-    char *cartVar = centerPosCartVarName(tg->tdb);
-    char *centerPos = cartOptionalString(cart, cartVar);
-    if (centerPos == NULL)
+    char cartVar[512];
+    safef(cartVar, sizeof(cartVar), "%s.centerVariantChrom", tg->tdb->track);
+    char *centerChrom = cartOptionalString(cart, cartVar);
+    if (centerChrom == NULL || !sameString(chromName, centerChrom))
 	dyStringAppend(dy, "middle variant by default. ");
     else
 	dyStringAppend(dy, "this variant. ");
@@ -449,28 +475,22 @@ static int getCenterVariantIx(struct track *tg, int seqStart, int seqEnd,
 // just use the median variant in window.
 {
 int defaultIx = (slCount(records)-1) / 2;
-char *cartVar = centerPosCartVarName(tg->tdb);
-char *centerPos = cartOptionalString(cart, cartVar);
-if (centerPos != NULL)
+char cartVar[512];
+safef(cartVar, sizeof(cartVar), "%s.centerVariantChrom", tg->tdb->track);
+char *centerChrom = cartOptionalString(cart, cartVar);
+if (centerChrom != NULL && sameString(chromName, centerChrom))
     {
-    char *words[3];
-    int wordCount = chopByChar(cloneString(centerPos), ':', words, sizeof(words));
-    if (wordCount != 2)
-	errAbort("Cart variable %s format error: expected 'chrom:pos', got %s",
-		 cartVar, centerPos);
-    if (sameString(chromName, words[0]))
+    safef(cartVar, sizeof(cartVar), "%s.centerVariantPos", tg->tdb->track);
+    int centerPos = cartInt(cart, cartVar);
+    int winSize = seqEnd - seqStart;
+    if (centerPos > (seqStart - winSize) && centerPos < (seqEnd + winSize))
 	{
-	int pos = sqlUnsigned(words[1]);
-	int winSize = seqEnd - seqStart;
-	if (pos > (seqStart - winSize) && pos < (seqEnd + winSize))
-	    {
-	    int i;
-	    struct vcfRecord *rec;
-	    for (rec = records, i = 0;  rec != NULL;  rec = rec->next, i++)
-		if (rec->chromStart >= pos)
-		    return i;
-	    return i-1;
-	    }
+	int i;
+	struct vcfRecord *rec;
+	for (rec = records, i = 0;  rec != NULL;  rec = rec->next, i++)
+	    if (rec->chromStart >= centerPos)
+		return i;
+	return i-1;
 	}
     }
 return defaultIx;
@@ -539,10 +559,20 @@ tg->extraUiData = vcff;
 static void vcfTabixLoadItems(struct track *tg)
 /* Load items in window from VCF file using its tabix index file. */
 {
-struct sqlConnection *conn = hAllocConnTrack(database, tg->tdb);
-// TODO: may need to handle per-chrom files like bam, maybe fold bamFileNameFromTable into this::
-char *fileOrUrl = bbiNameFromSettingOrTable(tg->tdb, conn, tg->table);
-hFreeConn(&conn);
+char *fileOrUrl = NULL;
+/* Figure out url or file name. */
+if (tg->parallelLoading)
+    {
+    /* do not use mysql uring parallel-fetch load */
+    fileOrUrl = trackDbSetting(tg->tdb, "bigDataUrl");
+    }
+else
+    {
+    // TODO: may need to handle per-chrom files like bam, maybe fold bamFileNameFromTable into this:
+    struct sqlConnection *conn = hAllocConnTrack(database, tg->tdb);
+    fileOrUrl = bbiNameFromSettingOrTable(tg->tdb, conn, tg->table);
+    hFreeConn(&conn);
+    }
 int vcfMaxErr = 100;
 struct vcfFile *vcff = NULL;
 /* protect against temporary network error */
@@ -550,9 +580,22 @@ struct errCatch *errCatch = errCatchNew();
 if (errCatchStart(errCatch))
     {
     vcff = vcfTabixFileMayOpen(fileOrUrl, chromName, winStart, winEnd, vcfMaxErr);
+    if (vcff != NULL)
+	{
+	if (doHapClusterDisplay && vcff->genotypeCount > 1 && vcff->genotypeCount < 3000 &&
+	    (tg->visibility == tvPack || tg->visibility == tvSquish))
+	    vcfHapClusterOverloadMethods(tg, vcff);
+	else
+	    {
+	    tg->items = vcfFileToPgSnp(vcff);
+	    // pgSnp bases coloring/display decision on count of items:
+	    tg->customInt = slCount(tg->items);
+	    }
+	// Don't vcfFileFree here -- we are using its string pointers!
+	}
     }
 errCatchEnd(errCatch);
-if (errCatch->gotError)
+if (errCatch->gotError || vcff == NULL)
     {
     if (isNotEmpty(errCatch->message->string))
 	tg->networkErrMsg = cloneString(errCatch->message->string);
@@ -560,19 +603,6 @@ if (errCatch->gotError)
     tg->totalHeight = bigWarnTotalHeight;
     }
 errCatchFree(&errCatch);
-if (vcff != NULL)
-    {
-    if (doHapClusterDisplay && vcff->genotypeCount > 0 && vcff->genotypeCount < 3000 &&
-	(tg->visibility == tvPack || tg->visibility == tvSquish))
-	vcfHapClusterOverloadMethods(tg, vcff);
-    else
-	{
-	tg->items = vcfFileToPgSnp(vcff);
-	// pgSnp bases coloring/display decision on count of items:
-	tg->customInt = slCount(tg->items);
-	}
-    // Don't vcfFileFree here -- we are using its string pointers!
-    }
 }
 
 void vcfTabixMethods(struct track *track)
