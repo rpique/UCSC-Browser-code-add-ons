@@ -575,8 +575,7 @@ int loadSnpFile(char *snpFile, khash_t(hashChr_t) *hChr,  snplist_t *snplistp, i
     //Loop if wordcount >4
     for(j=3;j<wordCount;j++){
       alt=row[j];
-      altlen=strlen(alt);
-      
+      altlen=strlen(alt);      
       if((reflen>1)||(altlen>1)){ // INDEL
 	indel_t aux;
 	aux.pos=pos;

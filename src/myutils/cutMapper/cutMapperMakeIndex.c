@@ -241,6 +241,32 @@ int scankmer(struct dnaSeq *seq,khash_t(hashPos_t) *h, replist_t *replistp,unsig
 /* ******************************************************************************************** */
 /* ******************************************************************************************** */
 
+
+//    scankmersnp(seq,h,&replist,kh_val(hChr , k), kv_A(snplist,k));   
+int checksnp(struct dnaSeq *seq,unsigned char chr,snpvec_t *snpvecp){
+  int j,err=0;
+  snp_t snpaux;  
+  for(j=0; j< kv_size(*snpvecp); j++){
+    snpaux=kv_A(*snpvecp,j);
+    //  assert(lastpos<snpaux.pos); //Asserting in order...  ACTUALLY NOT NECESSARY 
+    assert(snpaux.pos < seq->size); //SNP out of limits
+    if(((snpaux.alt) & 0xDF) == ((seq->dna[snpaux.pos]) & 0xDF)){ //Check which if one allele matches References
+      kv_A(*snpvecp,j).ref=snpaux.alt;
+      kv_A(*snpvecp,j).alt=snpaux.ref;
+      snpaux=kv_A(*snpvecp,j);
+    }
+    else if(!(((snpaux.ref) & 0xDF) == ((seq->dna[snpaux.pos]) & 0xDF))){
+      verbose(2,"Warning -- Skip SNP -- No match to REF:%d)\t%s\t%d\t%c\t%c\n",(int)chr,seq->name,snpaux.pos,snpaux.ref,snpaux.alt);
+      err++;
+    }
+  }
+  if(err>0)
+    verbose(1,"Warnining: %d SNPs skipped without ref match\n",err);
+  
+  return err;
+}
+/* ******************************************************************************************** */
+
 //    scankmersnp(seq,h,&replist,kh_val(hChr , k), kv_A(snplist,k));   
 int scankmersnp(struct dnaSeq *seq,khash_t(hashPos_t) *h, replist_t *replistp,unsigned char chr,snpvec_t *snpvecp){
   int i,j,Start,End;
@@ -264,8 +290,8 @@ int scankmersnp(struct dnaSeq *seq,khash_t(hashPos_t) *h, replist_t *replistp,un
     //  assert(lastpos<snpaux.pos); //Asserting in order...  ACTUALLY NOT NECESSARY 
     //  verbose(2,"%d,%d, %c %c\n",(int)chr,snpaux.pos,(seq->dna[snpaux.pos]),(snpaux.ref));
 
-    assert(((snpaux.ref) & 0xDF) == ((seq->dna[snpaux.pos]) & 0xDF)); //Asserting Reference matches SNP
-    assert(snpaux.pos < seq->size); //SNP out of limits
+    if(!(((snpaux.ref) & 0xDF) == ((seq->dna[snpaux.pos]) & 0xDF)))
+      continue;
 
     // handle if lastpos < pos-19 ?? double switch??
     Start = snpaux.pos - kmerSize + 1;
@@ -349,6 +375,7 @@ int scankmerindel(struct dnaSeq *seq,khash_t(hashPos_t) *h, replist_t *replistp,
     if(strncasecmp(&seq->dna[aux.pos],aux.ref,aux.reflen)!=0){
       verbose(1,"## %d) %d,%s\n",(int)chr,aux.pos,(aux.ref));
       errAbort("Indel not matching the reference\n");
+      //or use continue and issue a warning
     }
 
     //Check or skip
@@ -470,8 +497,12 @@ int scankmersnp2(struct dnaSeq *seq,khash_t(hashPos_t) *h, replist_t *replistp,u
       continue;  // 
     //assert(lastpos<snpaux.pos); //Asserting in order...
     //verbose(2,"%d,%d, %c %c\n",(int)chr,snpaux.pos,(seq->dna[snpaux.pos]),(snpaux.ref));
-    assert(((snpaux.ref) & 0xDF) == ((seq->dna[snpaux.pos]) & 0xDF)); //Asserting Reference matches SNP
-    assert(snpaux.pos < seq->size);    //SNP out of limits
+    //assert(((snpaux.ref) & 0xDF) == ((seq->dna[snpaux.pos]) & 0xDF)); //Asserting Reference matches SNP
+    //assert(snpaux.pos < seq->size);    //SNP out of limits
+    if(!(((snpaux.ref) & 0xDF) == ((seq->dna[snpaux.pos]) & 0xDF)))
+      continue;
+    if(snpaux.pos >= seq->size)
+      continue;
     seq->dna[snpaux.pos]=snpaux.alt;   // Changing to the alternate version.
     lastpos=snpaux.pos;
   }
@@ -628,6 +659,10 @@ void cutMapperMakeIndex(char *fileSeq, char *fileSNPs,char *outFolder)
     while ((seq = dnaLoadNext(dl)) != NULL){
       k = kh_get(hashChr_t, hChr , seq->name);
       j = kh_val(hChr, k);
+      verbose(1,"#%d) Checking %d SNPs in %s (1 single alt.), idx=%d\n",
+	      j, (int)kv_size(kv_A(snplist,j)), chrNames[j], idx);
+      checksnp(seq,j,&kv_A(snplist,j));
+      
       if(hashOneSnpOpt){
 	verbose(1,"#%d) Re-hashing %d SNPs in %s (1 single alt.), idx=%d\n",
 		j, (int)kv_size(kv_A(snplist,j)), chrNames[j], idx);

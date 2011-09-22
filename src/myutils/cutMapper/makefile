@@ -4,9 +4,13 @@ include ../../inc/common.mk
 
 ##BINDIR= .
 
-L += -lm 
+L += -lm ${SOCKETLIB} -lz
 MYLIBDIR = ../../lib/${MACHTYPE}
-MYLIBS =  ${MYLIBDIR}/jkweb.a
+MYLIBS = ${MYLIBDIR}/jkweb.a
+
+##L += -lm
+##MYLIBDIR = ../../lib/${MACHTYPE}
+##MYLIBS =  ${MYLIBDIR}/jkweb.a
 
 
 A = cutMapperMapReads  \
@@ -20,31 +24,31 @@ O = cutMapperCore.o \
 
 O_files=$(patsubst %.c,%.o,$(wildcard *.c))
 
-%.o:
+##%.o:
 
 cutMapperMap: cutMapperMap.o $O ${MYLIBS}
-	${CC} ${COPT} -o ${DESTDIR}${BINDIR}/$@${EXE} $^
+	${CC} ${COPT} ${CFLAGS} -o ${DESTDIR}${BINDIR}/$@${EXE} $^ ${L}
 ##	${STRIP} ${DESTDIR}${BINDIR}/${A}${EXE}
 
 cutMapperMakeIndex: cutMapperMakeIndex.o $O ${MYLIBS}
-	${CC} ${COPT} -o ${DESTDIR}${BINDIR}/$@${EXE} $^
+	${CC} ${COPT} ${CFLAGS} -o ${DESTDIR}${BINDIR}/$@${EXE} $^ ${L}
 ##	${STRIP} ${DESTDIR}${BINDIR}/${A}${EXE}
 
 cutMapperMakeMapp: cutMapperMakeMapp.o $O ${MYLIBS}
-	${CC} ${COPT} -o ${DESTDIR}${BINDIR}/$@${EXE} $^ 
+	${CC} ${COPT} ${CFLAGS} -o ${DESTDIR}${BINDIR}/$@${EXE} $^ ${L} 
 ##	${STRIP} ${DESTDIR}${BINDIR}/${A}${EXE}
 
 
 cutMapperMapReads: cutMapperMapReads.o $O ${MYLIBS}
-	${CC} ${COPT} -o ${DESTDIR}${BINDIR}/$@${EXE} $^ 
+	${CC} ${COPT} ${CFLAGS} -o ${DESTDIR}${BINDIR}/$@${EXE} $^ ${L} 
 ##	${STRIP} ${DESTDIR}${BINDIR}/${A}${EXE}
 
 cutMapperFastQtoJfd: cutMapperFastQtoJfd.o $O ${MYLIBS}
-	${CC} ${COPT} -o ${DESTDIR}${BINDIR}/$@${EXE} $^ 
+	${CC} ${COPT} ${CFLAGS} -o ${DESTDIR}${BINDIR}/$@${EXE} $^ ${L} 
 
 
 ##compile:: ${O}
-##	${CC} ${COPT} -o ${A}${EXE} ${O} ${MYLIBS} $L
+##	${CC} ${COPT} ${CFLAGS} -o ${A}${EXE} ${O} ${MYLIBS} $L
 
 all: $(O_files) $(A)
 
