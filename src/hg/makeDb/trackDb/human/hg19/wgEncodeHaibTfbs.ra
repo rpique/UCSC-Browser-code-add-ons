@@ -1419,7 +1419,8 @@ noInherit on
         color 46,0,184
         # subId=2214 dateSubmitted=2010-09-16
 
-        track wgEncodeHaibTfbsK562Bcl3Pcr1xPkRep2
+        #revoked
+	track wgEncodeHaibTfbsK562Bcl3Pcr1xPkRep2
         parent wgEncodeHaibTfbsViewPeaks off
         shortLabel K562 BCL3 PCR1 2
         longLabel K562 BCL3 PCR1x ChIP-seq Peaks Rep 2 from ENCODE/HAIB
@@ -1428,6 +1429,7 @@ noInherit on
         color 46,0,184
         # subId=2213 dateSubmitted=2010-09-21
 
+	#revoked
         track wgEncodeHaibTfbsK562Bcl3Pcr1xPkRep1
         parent wgEncodeHaibTfbsViewPeaks off
         shortLabel K562 BCL3 PCR1 1
@@ -3182,7 +3184,8 @@ noInherit on
         color 0,107,27
         # subId=3021 dateSubmitted=2010-11-29
 
-        track wgEncodeHaibTfbsK562Bcl3Pcr1xRawRep1
+        #revoked
+	track wgEncodeHaibTfbsK562Bcl3Pcr1xRawRep1
         parent wgEncodeHaibTfbsViewRawSignal off
         shortLabel K562 BCL3 PCR1 1
         longLabel K562 BCL3 PCR1x ChIP-seq Raw Signal Rep 1 from ENCODE/HAIB
@@ -3725,7 +3728,8 @@ noInherit on
         color 0,107,27
         # subId=3026 dateSubmitted=2011-01-21
 
-        track wgEncodeHaibTfbsK562Bcl3Pcr1xRawRep2
+	#revoked        
+	track wgEncodeHaibTfbsK562Bcl3Pcr1xRawRep2
         parent wgEncodeHaibTfbsViewRawSignal off
         shortLabel K562 BCL3 PCR1 2
         longLabel K562 BCL3 PCR1x ChIP-seq Raw Signal Rep 2 from ENCODE/HAIB
