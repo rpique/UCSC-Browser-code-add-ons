@@ -129,8 +129,10 @@ char *stripRegEx(char *str, char *regEx, int flags);
    flags is passed through to regcomp as the cflags argument.
    Returned string should be free'ed after use. */
 
-boolean advancedJavascriptFeaturesEnabled(struct cart *cart);
-// Returns TRUE if advanced javascript features are currently enabled
+char *replaceRegEx(char *str, char *replace, char *regEx, int flags);
+/* Replace text matching regEx in str with replace string.
+   flags is passed through to regcomp as the cflags argument.
+   Returned string should be free'ed after use. */
 
 void jsBeginCollapsibleSection(struct cart *cart, char *track, char *section, char *sectionTitle,
 			       boolean isOpenDefault);

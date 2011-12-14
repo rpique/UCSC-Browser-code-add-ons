@@ -16,7 +16,6 @@ canPack On
     superTrack wgEncodeReg hide
     shortLabel Transcription
     longLabel Transcription Levels Assayed by RNA-seq on 7 Cell Lines from ENCODE
-    visibility full
     maxHeightPixels 100:30:11
     showSubtrackColorOnUi on
     aggregate transparentOverlay
@@ -25,53 +24,62 @@ canPack On
     priority 1.1
     dragAndDrop subTracks
 
+
 	track wgEncodeRegTxnCaltechRnaSeqGm12878R2x75Il200SigPooled
 	shortLabel Gm12878
 	longLabel Transcription of Gm12878 cells from ENCODE
 	parent wgEncodeRegTxn
-        type bigWig 0 65534
+        type bigWig 0 65535
+	priority 1
 	color 255,128,128
+
 
 	track wgEncodeRegTxnCaltechRnaSeqH1hescR2x75Il200SigPooled
 	shortLabel H1-hESC
 	longLabel Transcription of H1-hESC cells from ENCODE
 	parent wgEncodeRegTxn
-        type bigWig 0 65177
+        type bigWig 0 65535
+	priority 2
 	color 255,212,128
 
 	track wgEncodeRegTxnCaltechRnaSeqHsmmR2x75Il200SigPooled
 	shortLabel HSMM
 	longLabel Transcription of HSMM cells from ENCODE
 	parent wgEncodeRegTxn
-        type bigWig 0 65503
-	color 120,235,204
+        type bigWig 0 65535
+	priority 5
+	color 128,255,242
 
 	track wgEncodeRegTxnCaltechRnaSeqHuvecR2x75Il200SigPooled
 	shortLabel HUVEC
 	longLabel Transcription of HUVEC cells from ENCODE
 	parent wgEncodeRegTxn
         type bigWig 0 65535
-	color 128,212,255
+	priority 6
+	color 128,199,255
 
 	track wgEncodeRegTxnCaltechRnaSeqK562R2x75Il200SigPooled
 	shortLabel K562
 	longLabel Transcription of K562 cells from ENCODE
 	parent wgEncodeRegTxn
-        type bigWig 0 65528
-	color 128,128,255
+        type bigWig 0 65535
+	priority 7
+	color 149,128,255
 
 	track wgEncodeRegTxnCaltechRnaSeqNhekR2x75Il200SigPooled
 	shortLabel NHEK
 	longLabel Transcription of NHEK cells from ENCODE
 	parent wgEncodeRegTxn
-	type bigWig 0 65534
-	color 212,128,255
+	type bigWig 0 65535
+	priority 8
+	color 227,128,255
 
 	track wgEncodeRegTxnCaltechRnaSeqNhlfR2x75Il200SigPooled
 	shortLabel NHLF
 	longLabel Transcription of NHLF cells from ENCODE
 	parent wgEncodeRegTxn
-	type bigWig 0 65534
+	type bigWig 0 65535
+	priority 9
 	color 255,128,212
 
     track wgEncodeRegMarkH3k4me1
@@ -81,7 +89,6 @@ canPack On
     superTrack wgEncodeReg hide
     shortLabel Layered H3K4Me1
     longLabel H3K4Me1 Mark (Often Found Near Regulatory Elements) on 7 cell lines from ENCODE
-    visibility hide
     viewLimits 0:50
     maxHeightPixels 100:30:11
     aggregate transparentOverlay
@@ -152,7 +159,6 @@ canPack On
     superTrack wgEncodeReg hide
     shortLabel Layered H3K4Me3
     longLabel H3K4Me3 Mark (Often Found Near Promoters) on 7 cell lines from ENCODE
-    visibility hide
     viewLimits 0:150
     maxHeightPixels 100:30:11
     aggregate transparentOverlay
@@ -223,7 +229,6 @@ canPack On
     superTrack wgEncodeReg full
     shortLabel Layered H3K27Ac
     longLabel H3K27Ac Mark (Often Found Near Active Regulatory Elements) on 7 cell lines from ENCODE
-    visibility full
     viewLimits 0:100
     maxHeightPixels 100:30:11
     aggregate transparentOverlay
@@ -297,7 +302,6 @@ canPack On
     #inputTracksSubgroupDisplay cellType treatment rep
     inputTableFieldDisplay cellType treatment replicate lab dateUnrestricted
     controlledVocabulary encode/cv.ra cellType=cell treatment=treatment lab=lab
-    visibility dense
     useScore 1
     scoreFilter 100
     scoreFilterLimits 100:1000
@@ -313,7 +317,6 @@ canPack On
     inputTableFieldDisplay cellType factor treatment lab
     controlledVocabulary encode/cv.ra cellType=cell treatment=treatment lab=lab
     # inputTracksSubgroupDisplay cellType factor treatment
-    visibility dense
     useScore 1
     priority 1.7
 

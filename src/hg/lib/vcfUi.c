@@ -6,6 +6,7 @@
 #include "errCatch.h"
 #include "hCommon.h"
 #include "hui.h"
+#include "jsHelper.h"
 #include "vcf.h"
 #include "vcfUi.h"
 #if (defined USE_TABIX && defined KNETFILE_HOOKS)
@@ -38,7 +39,8 @@ safef(cartVar, sizeof(cartVar), "%s.centerVariantName", track);
 cgiMakeHiddenVar(cartVar, ctrName);
 }
 
-void vcfCfgHaplotypeCenter(struct cart *cart, struct trackDb *tdb, struct vcfFile *vcff,
+void vcfCfgHaplotypeCenter(struct cart *cart, struct trackDb *tdb, char *track,
+			   boolean compositeLevel, struct vcfFile *vcff,
 			   char *thisName, char *thisChrom, int thisPos, char *formName)
 /* If vcff has genotype data, show status and controls for choosing the center variant
  * for haplotype clustering/sorting in hgTracks. */
@@ -47,9 +49,8 @@ if (vcff != NULL && vcff->genotypeCount > 1)
     {
     printf("<TABLE cellpadding=0><TR><TD>"
 	   "<B>Haplotype sorting order:</B> using ");
-    char cartVar[1024];
-    safef(cartVar, sizeof(cartVar), "%s.centerVariantChrom", tdb->track);
-    char *centerChrom = cartOptionalString(cart, cartVar);
+    char *centerChrom = cartOptionalStringClosestToHome(cart, tdb, compositeLevel,
+							"centerVariantChrom");
     if (isEmpty(centerChrom))
 	{
 	// Unspecified in cart -- describe the default action
@@ -58,7 +59,7 @@ if (vcff != NULL && vcff->genotypeCount > 1)
 	    {
 	    // but we do have a candidate, so offer to make it the center:
 	    puts("<TR><TD>");
-	    vcfCfgHaplotypeCenterHiddens(tdb->track, thisName, thisChrom, thisPos);
+	    vcfCfgHaplotypeCenterHiddens(track, thisName, thisChrom, thisPos);
 	    char label[256];
 	    safef(label, sizeof(label), "Use %s", nameOrDefault(thisName, "this variant"));
 	    cgiMakeButton("submit", label);
@@ -73,15 +74,13 @@ if (vcff != NULL && vcff->genotypeCount > 1)
     else
 	{
 	// Describe the one specified in cart.
-	cgiMakeHiddenVar(cartVar, "");
-	safef(cartVar, sizeof(cartVar), "%s.centerVariantPos", tdb->track);
-	int centerPos = cartInt(cart, cartVar);
-	safef(cartVar, sizeof(cartVar), "%s.centerVariantName", tdb->track);
-	char *centerName = cartString(cart, cartVar);
+	int centerPos = cartUsualIntClosestToHome(cart, tdb, compositeLevel, "centerVariantPos",
+						  -1);
+	char *centerName = cartStringClosestToHome(cart, tdb, compositeLevel, "centerVariantName");
 	if (isNotEmpty(thisChrom))
 	    {
 	    // These form inputs are for either "use me" or clear:
-	    vcfCfgHaplotypeCenterHiddens(tdb->track, thisName, thisChrom, thisPos);
+	    vcfCfgHaplotypeCenterHiddens(track, thisName, thisChrom, thisPos);
 	    // Is this variant the same as the center variant specified in cart?
 	    if (sameString(thisChrom, centerChrom) && sameString(thisName, centerName) &&
 		thisPos == centerPos)
@@ -100,7 +99,7 @@ if (vcff != NULL && vcff->genotypeCount > 1)
 	else
 	    {
 	    // Form inputs (in case the clear button is clicked)
-	    vcfCfgHaplotypeCenterHiddens(tdb->track, centerName, centerChrom, centerPos);
+	    vcfCfgHaplotypeCenterHiddens(track, centerName, centerChrom, centerPos);
 	    printf("%s at %s:%d as anchor.</TD></TR>\n",
 		   nameOrDefault(centerName, "variant"), centerChrom, centerPos+1);
 	    }
@@ -108,11 +107,11 @@ if (vcff != NULL && vcff->genotypeCount > 1)
 	puts("<TR><TD>");
 	struct dyString *onClick = dyStringNew(0);
 	dyStringPrintf(onClick, "updateOrMakeNamedVariable(%s, '%s.centerVariantChrom', ''); ",
-		       formName, tdb->track);
+		       formName, track);
 	dyStringPrintf(onClick, "updateOrMakeNamedVariable(%s, '%s.centerVariantName', ''); ",
-		       formName, tdb->track);
+		       formName, track);
 	dyStringPrintf(onClick, "updateOrMakeNamedVariable(%s, '%s.centerVariantPos', 0);",
-		       formName, tdb->track);
+		       formName, track);
 	dyStringPrintf(onClick, "document.%s.submit(); return false;", formName);
 	cgiMakeButtonWithOnClick("submit", "Clear selection", NULL, onClick->string);
 	printf(" (use " VCF_HAPLOSORT_DEFAULT_DESC ")</TD></TR>\n");
@@ -159,9 +158,9 @@ static void vcfCfgHapClusterEnable(struct cart *cart, struct trackDb *tdb, char 
 printf("<B>Enable Haplotype sorting display: </B>");
 boolean hapClustEnabled = cartUsualBooleanClosestToHome(cart, tdb, compositeLevel,
 							VCF_HAP_ENABLED_VAR, TRUE);
-char varName[1024];
-safef(varName, sizeof(varName), "%s." VCF_HAP_ENABLED_VAR, name);
-cgiMakeCheckBox(varName, hapClustEnabled);
+char cartVar[1024];
+safef(cartVar, sizeof(cartVar), "%s." VCF_HAP_ENABLED_VAR, name);
+cgiMakeCheckBox(cartVar, hapClustEnabled);
 printf("<BR>\n");
 }
 
@@ -193,22 +192,85 @@ if (vcff != NULL && vcff->genotypeCount > 1)
     char varName[1024];
     safef(varName, sizeof(varName), "%s." VCF_HAP_HEIGHT_VAR, name);
     cgiMakeIntVarInRange(varName, cartHeight, "Height (in pixels) of track", 5, "10", "2500");
+    puts("<BR>");
     }
 }
 
 static void vcfCfgHapCluster(struct cart *cart, struct trackDb *tdb, struct vcfFile *vcff,
-			     char *name)
+			     char *name, boolean compositeLevel)
 /* Show controls for haplotype-sorting display, which only makes sense to do when
  * the VCF file describes multiple genotypes. */
 {
-boolean compositeLevel = isNameAtCompositeLevel(tdb, name);
 vcfCfgHapClusterEnable(cart, tdb, name, compositeLevel);
-vcfCfgHaplotypeCenter(cart, tdb, vcff, NULL, NULL, 0, "mainForm");
+vcfCfgHaplotypeCenter(cart, tdb, name, compositeLevel, vcff, NULL, NULL, 0, "mainForm");
 vcfCfgHapClusterColor(cart, tdb, name, compositeLevel);
 vcfCfgHapClusterHeight(cart, tdb, vcff, name, compositeLevel);
 //      thicken lines?
 //      outline center variant?
-//      color haplotypes by red/blue or allele bases?
+}
+
+static void vcfCfgMinQual(struct cart *cart, struct trackDb *tdb, struct vcfFile *vcff,
+			  char *name, boolean compositeLevel)
+/* If checkbox is checked, apply minimum value filter to QUAL column. */
+{
+char cartVar[1024];
+safef(cartVar, sizeof(cartVar), "%s." VCF_APPLY_MIN_QUAL_VAR, name);
+boolean applyFilter = cartUsualBooleanClosestToHome(cart, tdb, compositeLevel,
+					VCF_APPLY_MIN_QUAL_VAR, VCF_DEFAULT_APPLY_MIN_QUAL);
+cgiMakeCheckBox(cartVar, applyFilter);
+printf("<B>Exclude items with QUAL score less than &nbsp;</B>\n");
+double minQual = cartUsualDoubleClosestToHome(cart, tdb, compositeLevel, VCF_MIN_QUAL_VAR,
+					      VCF_DEFAULT_MIN_QUAL);
+safef(cartVar, sizeof(cartVar), "%s." VCF_MIN_QUAL_VAR, name);
+cgiMakeDoubleVar(cartVar, minQual, 10);
+printf("<BR>\n");
+}
+
+static void vcfCfgFilterColumn(struct cart *cart, struct trackDb *tdb, struct vcfFile *vcff,
+			       char *name, boolean compositeLevel)
+/* Show controls for filtering by value of VCF's FILTER column, which uses values defined
+ * in the header. */
+{
+int filterCount = slCount(vcff->filterDefs);
+if (filterCount < 1)
+    return;
+printf("<B>Exclude items with these FILTER values:</B><BR>\n");
+char cartVar[1024];
+safef(cartVar, sizeof(cartVar), "%s."VCF_EXCLUDE_FILTER_VAR, name);
+jsMakeCheckboxGroupSetClearButton(cartVar, TRUE);
+puts("&nbsp;");
+jsMakeCheckboxGroupSetClearButton(cartVar, FALSE);
+char *values[filterCount];
+char *labels[filterCount];
+int i;
+struct vcfInfoDef *filt;
+for (i=0, filt=vcff->filterDefs;  filt != NULL;  i++, filt = filt->next)
+    {
+    values[i] = filt->key;
+    struct dyString *dy = dyStringNew(0);
+    dyStringAppend(dy, filt->key);
+    if (isNotEmpty(filt->description))
+	dyStringPrintf(dy, " (%s)", filt->description);
+    labels[i] = dyStringCannibalize(&dy);
+    }
+struct slName *selectedValues = NULL;
+if (cartListVarExistsAnyLevel(cart, tdb, FALSE, VCF_EXCLUDE_FILTER_VAR))
+    selectedValues = cartOptionalSlNameListClosestToHome(cart, tdb, FALSE, VCF_EXCLUDE_FILTER_VAR);
+cgiMakeCheckboxGroupWithVals(cartVar, labels, values, filterCount, selectedValues, 1);
+}
+
+static void vcfCfgMinAlleleFreq(struct cart *cart, struct trackDb *tdb, struct vcfFile *vcff,
+				char *name, boolean compositeLevel)
+/* Show input for minimum allele frequency, if we can extract it from the VCF INFO column. */
+{
+printf("<B>Minimum minor allele frequency (if INFO column includes AF or AC+AN):</B>\n");
+double cartMinFreq = cartUsualDoubleClosestToHome(cart, tdb, compositeLevel,
+					   VCF_MIN_ALLELE_FREQ_VAR, VCF_DEFAULT_MIN_ALLELE_FREQ);
+char varName[1024];
+safef(varName, sizeof(varName), "%s." VCF_MIN_ALLELE_FREQ_VAR, name);
+cgiMakeDoubleVarInRange(varName, cartMinFreq, "minor allele frequency between 0.0 and 0.5", 5,
+			"0.0", "0.5");
+puts("<BR>");
 }
 
 void vcfCfgUi(struct cart *cart, struct trackDb *tdb, char *name, char *title, boolean boxed)
@@ -219,21 +281,24 @@ printf("<TABLE%s><TR><TD>", boxed ? " width='100%'" : "");
 struct vcfFile *vcff = vcfHopefullyOpenHeader(cart, tdb);
 if (vcff != NULL)
     {
+    boolean compositeLevel = isNameAtCompositeLevel(tdb, name);
     if (vcff->genotypeCount > 1)
-	vcfCfgHapCluster(cart, tdb, vcff, name);
+	vcfCfgHapCluster(cart, tdb, vcff, name, compositeLevel);
+    vcfCfgMinQual(cart, tdb, vcff, name, compositeLevel);
+    vcfCfgFilterColumn(cart, tdb, vcff, name, compositeLevel);
+    vcfCfgMinAlleleFreq(cart, tdb, vcff, name, compositeLevel);
     }
 else
     {
     printf("Sorry, couldn't access VCF file.<BR>\n");
     }
 
-// filter:
-//   by qual column
-//   by filter column
-// color bases like pgSnp or some better palette?
+puts("</TD>");
+if (boxed && fileExists(hHelpFile("hgVcfTrackHelp")))
+    printf("<TD style='text-align:right'><A HREF=\"../goldenPath/help/hgVcfTrackHelp.html\" "
+           "TARGET=_BLANK>VCF configuration help</A></TD>");
 
-
-printf("</TD></TR></TABLE>");
+printf("</TR></TABLE>");
 
 if (!boxed && fileExists(hHelpFile("hgVcfTrackHelp")))
     printf("<P><A HREF=\"../goldenPath/help/hgVcfTrackHelp.html\" TARGET=_BLANK>VCF "

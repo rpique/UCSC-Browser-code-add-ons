@@ -1398,67 +1398,46 @@ int extraFieldsPrint(struct trackDb *tdb,struct sqlResult *sr,char **row)
 // Any extra fields defined in trackDb.  Retruns number of extra fields actually printed
 {
 // Additional fields requested in trackDb?
-char *fields = trackDbSetting(tdb, "extraFields"); // showFileds pValue=P_Value qValue=qValue
-if (fields == NULL)
+struct extraField *extras = extraFieldsGet(tdb);
+if (extras == NULL)
     return 0;
 
-char *historicalRecord = fields;
 int count = 0;
-char *field = cloneNextWord(&fields); // fields not harmed but pointer advanced
-while(field != NULL)
+struct extraField *extra = extras;
+for(;extra != NULL;extra=extra->next)
     {
-    // parse field as "pValue=[f]P_Value" inot field="pValue" and label="[f]P_Value"
-    char *label = field;
-    char *equal = strchr(field,'=');
-    if (equal != NULL)
+    int ix = sqlFieldColumn(sr, extra->name); // Name must match sql columnn name!
+    if (ix == -1)                             // so extraField really just provides a label
         {
-        *equal = '\0';
-        label = equal + 1;
-        assert(*label!='\0');
+        char *setting = trackDbSetting(tdb, "extraFields"); // showFileds pValue=P_Value qValue=qValue
+        warn("trackDb setting [extraFields %s] could not find %s in %s.\n", setting, extra->name,tdb->table);
         }
-
-    // We have a field requested but is it in the table?
-    int ix = sqlFieldColumn(sr, field);
-    if (ix == -1)
-        warn("trackDb setting [extraFields %s] could not find %s in %s.\n", historicalRecord, field,tdb->table);
     else
         {
-        // parse label "[f]P_Value" into label="P Value" and type=float
-        char *type  = "string";
-        if (*label == '[')
-            {
-            if (startsWith("[i",label))
-                type = "integer";
-            else if (startsWith("[f",label))
-                type = "float";
-            label = strchr(label,']');
-            assert(label != NULL);
-            label += 1;
-            }
-
         // Print as table rows
         if(count == 0)
             printf("<br><table>");
-        printf("<tr><td><B>%s:</B></td>", strSwapChar(label,'_',' ')); // No '_' in label
-        if (sameString(type,"integer"))
-            {
-            long long val = sqlLongLong(row[ix]);
-            printf("<td>%lld</td></tr>\n", val);
-            }
-        else if (sameString(type,"float"))
-            {
-            double val = sqlDouble(row[ix]);
-            printf("<td>%g</td></tr>\n", val);
-            }
-        else
-            printf("<td>%s</td></tr>\n", row[ix]);
         count++;
+        printf("<tr><td><B>%s:</B></td>", extra->label);
+        switch (extra->type)
+            {
+            case ftInteger: {
+                            long long valInt = sqlLongLong(row[ix]);
+                            printf("<td>%lld</td></tr>\n", valInt);
+                            }
+                            break;
+            case ftFloat:   {
+                            double valDouble = sqlDouble(row[ix]);
+                            printf("<td>%g</td></tr>\n", valDouble);
+                            }
+                            break;
+            default:
+                            printf("<td>%s</td></tr>\n", row[ix]);
+                            break;
+            }
         }
-
-    // free mem and move to next field
-    freeMem(field);
-    field = cloneNextWord(&fields); // around we go
     }
+extraFieldsFree(&extras);
 if(count > 0)
     printf("</table>\n");
 
@@ -2589,7 +2568,8 @@ if (!foundPep)
 	{
 	puts("<LI>\n");
 	/* put out correct message to describe translated mRNA */
-        if ((sameString(geneTable, "ensGene")) || (sameString(geneTable, "vegaGene")) || (sameString(geneTable, "vegaPseudoGene")))
+        if ((sameString(geneTable, "ensGene")) || (sameString(geneTable, "vegaGene")) || (sameString(geneTable, "vegaPseudoGene"))
+      || (sameString(geneTable, "lincRNAsTranscripts")) )
 	    {
 	    printf("Non-protein coding gene or gene fragment, no protein prediction available.");
 	    }
@@ -4363,7 +4343,7 @@ printf("<H3>Coloring Information and Examples</H3>\n");
 puts("The color values range from 0 (darkest) to 255 (lightest) and are additive.\n");
 puts("The examples below show a few ways to highlight individual tracks, "
      "and their interplay. It's good to keep it simple at first. It's easy "
-     "to make pretty but completely cryptic displays with this feature.");
+     "to make pretty, but completely cryptic, displays with this feature.");
 puts(
      "<UL>"
      "<LI>To put Genes in upper case red text, check the "
@@ -4385,7 +4365,7 @@ puts(
      "</UL>");
 puts("<H3>Further Details and Ideas</H3>");
 puts("<P>Copying and pasting the web page output to a text editor such as Word "
-     "will retain upper case but lose colors and other formatting. That's still "
+     "will retain upper case but lose colors and other formatting. That is still "
      "useful because other web tools such as "
      "<A HREF=\"http://www.ncbi.nlm.nih.gov/blast\" TARGET=_BLANK>NCBI Blast</A> "
      "can be set to ignore lower case.  To fully capture formatting such as color "
@@ -4402,7 +4382,7 @@ printf("<H3>Coloring Information and Examples</H3>\n");
 puts("The color values range from 0 (darkest) to 255 (lightest) and are additive.\n");
 puts("The examples below show a few ways to highlight individual tracks, "
      "and their interplay. It's good to keep it simple at first.  It's easy "
-     "to make pretty but completely cryptic displays with this feature.");
+     "to make pretty, but completely cryptic, displays with this feature.");
 puts(
      "<UL>"
      "<LI>To put exons from RefSeq Genes in upper case red text, check the "
@@ -4425,7 +4405,7 @@ puts(
      "</UL>");
 puts("<H3>Further Details and Ideas</H3>");
 puts("<P>Copying and pasting the web page output to a text editor such as Word "
-     "will retain upper case but lose colors and other formatting. That's still "
+     "will retain upper case but lose colors and other formatting. That is still "
      "useful because other web tools such as "
      "<A HREF=\"http://www.ncbi.nlm.nih.gov/blast\" TARGET=_BLANK>NCBI Blast</A> "
      "can be set to ignore lower case.  To fully capture formatting such as color "
@@ -4438,7 +4418,7 @@ puts("<P>The default line width of 60 characters is standard, but if you have "
 puts("<P>Be careful about requesting complex formatting for a very large "
      "chromosomal region.  After all the html tags are added to the output page, "
      "the file size may exceed size limits that your browser, clipboard, and "
-     "other software can safely display.  The tool will format 10Mbp and more though.</P>");
+     "other software can safely display.  The tool will format 10 Mb and more, however.</P>");
 }
 trackDbFreeList(&tdbList);
 }
@@ -8861,15 +8841,15 @@ lf = lineFileOpen("/gbdb/hg17/omim/omim.txt", TRUE);
 lineFileSeek(lf,(size_t)(iAvDescStartPos), 0);
 lineFileNext(lf, &line, &lineSize);
 printf("<h4>");
-printf(".%s %s ", avSubFdId, line);fflush(stdout);
+printf(".%s %s ", avSubFdId, line);
 lineFileNext(lf, &line, &lineSize);
-printf("[%s]\n", line);fflush(stdout);
+printf("[%s]\n", line);
 printf("</h4>");
 
 while ((lf->lineStart + lf->bufOffsetInFile) < (iAvDescStartPos + iAvDescLen))
     {
     lineFileNext(lf, &line, &lineSize);
-    printf("%s\n", line);fflush(stdout);
+    printf("%s\n", line);
     }
 
 htmlHorizontalLine();
@@ -9170,7 +9150,7 @@ chrom      = cartOptionalString(cart, "c");
 chromStart = cartOptionalString(cart, "o");
 chromEnd   = cartOptionalString(cart, "t");
 
-safef(query, sizeof(query), 
+safef(query, sizeof(query),
       "select %s,%s from cosmicRaw where cosmic_mutation_id='%s'",
       "source,cosmic_mutation_id,gene_name,accession_number,mut_description,mut_syntax_cds,mut_syntax_aa",
       "chromosome,grch37_start,grch37_stop,mut_nt,mut_aa,tumour_site,mutated_samples,examined_samples,mut_freq",
@@ -9185,7 +9165,7 @@ if (row != NULL)
     char *indentString;
 
     ii=0;
-    
+
     source 		= row[ii];ii++;
     cosmic_mutation_id  = row[ii];ii++;
     gene_name 		= row[ii];ii++;
@@ -9206,13 +9186,13 @@ if (row != NULL)
 
     chp = strstr(itemName, "COSM")+strlen("COSM");
     printf("<B>COSMIC ID:</B> %s", chp);
-    
+
     printf(" (click <A HREF=\"%s&id=%s\" TARGET=_BLANK>here</A> for more details at COSMIC site)\n", url, chp);
 
     // Embed URL to COSMIC site per COSMICT request.
     printf("<BR><B>Source:</B> ");
     printf("<A HREF=\"http://www.sanger.ac.uk/cosmic/\" TARGET=_BLANK>%s</A>\n", source);
-    
+
     printf("<BR><B>Gene Name:</B> %s\n", gene_name);
     printf("<BR><B>Accession Number:</B> %s\n", accession_number);
     printf("<BR><B>Genomic Position:</B> %s:%s-%s", chromosome, grch37_start, grch37_stop);
@@ -9222,12 +9202,12 @@ if (row != NULL)
     printf("<BR><B>Mutation NT:</B> %s\n", mut_nt);
     printf("<BR><B>Mutation AA:</B> %s\n", mut_aa);
 
-    safef(query2, sizeof(query2), 
+    safef(query2, sizeof(query2),
       "select count(tumour_site) from cosmicRaw where cosmic_mutation_id='%s'", itemName);
 
     sr2 = sqlMustGetResult(conn2, query2);
     row2 = sqlNextRow(sr2);
-    if ((atoi(row2[0])) > 1) 
+    if ((atoi(row2[0])) > 1)
     	{
 	multipleTumorSites = TRUE;
         indentString = indent1;
@@ -9238,8 +9218,8 @@ if (row != NULL)
 	indentString = indent2;
 	}
     sqlFreeResult(&sr2);
-    
-    safef(query2, sizeof(query2), 
+
+    safef(query2, sizeof(query2),
       "select %s from cosmicRaw where cosmic_mutation_id='%s' order by tumour_site",
       "tumour_site,mutated_samples,examined_samples,mut_freq ",
       itemName);
@@ -9254,7 +9234,7 @@ if (row != NULL)
     	mutated_samples  	= row2[ii];ii++;
     	examined_samples  	= row2[ii];ii++;
     	mut_freq  		= row2[ii];ii++;
-        
+
 	if (multipleTumorSites) printf("<BR>");
     	printf("<BR><B>%sTumour Site:</B> %s\n", 	indentString, tumour_site);
     	printf("<BR><B>%sMutated Samples:</B> %s\n", 	indentString, mutated_samples);
@@ -9263,8 +9243,8 @@ if (row != NULL)
     	row2 = sqlNextRow(sr2);
 	}
     sqlFreeResult(&sr2);
-    
-    safef(query2, sizeof(query2), 
+
+    safef(query2, sizeof(query2),
       "select sum(mutated_samples) from cosmicRaw where cosmic_mutation_id='%s'",
       itemName);
 
@@ -9276,21 +9256,18 @@ if (row != NULL)
 	//printf("<br>%s ", row2[0]);
 	}
     sqlFreeResult(&sr2);
-    
-    safef(query2, sizeof(query2), 
+
+    safef(query2, sizeof(query2),
       "select sum(examined_samples) from cosmicRaw where cosmic_mutation_id='%s'",
       itemName);
-//printf("<br>%s\n", query2);fflush(stdout);
     sr2 = sqlMustGetResult(conn2, query2);
     row2 = sqlNextRow(sr2);
     if (row2 != NULL)
     	{
     	printf("<BR><B>Total Examined Samples:</B> %s\n", row2[0]);
-	//printf("%s", row2[0]);
-	//fflush(stdout);
 	}
     sqlFreeResult(&sr2);
-    safef(query2, sizeof(query2), 
+    safef(query2, sizeof(query2),
       "select sum(mutated_samples)*100/sum(examined_samples) from cosmicRaw where cosmic_mutation_id='%s'",
       itemName);
     sr2 = sqlMustGetResult(conn2, query2);
@@ -9316,7 +9293,7 @@ if (row != NULL)
 
 sqlFreeResult(&sr);
 hFreeConn(&conn);
-   
+
 printf("<HR>");
 printPosOnChrom(chrom, atoi(chromStart), atoi(chromEnd), NULL, FALSE, itemName);
 }
@@ -9394,7 +9371,7 @@ if (row != NULL)
 	    printf("<LI>");
             printf("<A HREF=\"%s%s\" target=_blank>","./hgGene\?hgg_chrom=none&hgg_gene=", row2[1]);
             printf("%s (%s)</A> ", row2[0], row2[1]);
-	    printf(" %s", row2[2]);fflush(stdout);
+	    printf(" %s", row2[2]);
 	    }
         sqlFreeResult(&sr2);
 	row = sqlNextRow(sr);
@@ -9515,7 +9492,7 @@ if (url != NULL && url[0] != 0)
     	    sqlFreeResult(&sr);
     	    }
 	}
-    printf("<B>OMIM Database ");fflush(stdout);
+    printf("<B>OMIM Database ");
     printf("<A HREF=\"%s%s\" target=_blank>", url, itemName);
     printf("%s</A></B>", itemName);
 
@@ -9625,7 +9602,7 @@ chromEnd   = cartOptionalString(cart, "t");
 
 if (url != NULL && url[0] != 0)
     {
-    printf("<B>OMIM: ");fflush(stdout);
+    printf("<B>OMIM: ");
     printf("<A HREF=\"%s%s\" target=_blank>", url, itemName);
     printf("%s</A></B>", itemName);
     safef(query, sizeof(query),
@@ -9718,12 +9695,12 @@ if (url != NULL && url[0] != 0)
           "select distinct locusLinkId from refLink l, omim2gene g, refGene r where l.omimId=%s and g.geneId=l.locusLinkId and g.entryType='gene' and chrom='%s' and txStart = %s and txEnd= %s",
 	  itemName, chrom, chromStart, chromEnd);
     sr = sqlMustGetResult(conn, query);
-    if (sr != NULL)
+    row = sqlNextRow(sr);
+    if (row != NULL)
     	{
     	char *geneId;
-    	row = sqlNextRow(sr);
     	geneId = strdup(row[0]);
-    	sqlFreeResult(&sr);
+        sqlFreeResult(&sr);
 
     	safef(query, sizeof(query),
               "select distinct l.mrnaAcc from refLink l where locusLinkId = '%s' order by mrnaAcc asc", geneId);
@@ -9744,12 +9721,8 @@ if (url != NULL && url[0] != 0)
 	        }
             if (printedCnt >= 1) printf("<BR>\n");
 	    }
+        sqlFreeResult(&sr);
         }
-    else
-    	{
-	// skip if no RefSeq found
-    	sqlFreeResult(&sr);
-    	}
 
     // show Related UCSC Gene links
     safef(query, sizeof(query),
@@ -9773,6 +9746,24 @@ if (url != NULL && url[0] != 0)
         if (printedCnt >= 1) printf("<BR>\n");
 	}
     sqlFreeResult(&sr);
+
+    // show GeneReviews  link(s)
+    if (sqlTablesExist(conn, "geneReviewsRefGene"))
+        {
+        safef(query, sizeof(query),
+          "select distinct r.name2 from refLink l, omim2gene g, refGene r where l.omimId=%s and g.geneId=l.locusLinkId and g.entryType='gene' and chrom='%s' and txStart = %s and txEnd= %s",
+        itemName, chrom, chromStart, chromEnd);
+        sr = sqlMustGetResult(conn, query);
+        if (sr != NULL)
+            {
+            while ((row = sqlNextRow(sr)) != NULL)
+                {
+                prGRShortRefGene(row[0]);
+                }
+            }
+        sqlFreeResult(&sr);
+        }
+
     }
 
 printf("<HR>");
@@ -9805,7 +9796,7 @@ omimId = itemName;
 
 if (url != NULL && url[0] != 0)
     {
-    printf("<B>OMIM: ");fflush(stdout);
+    printf("<B>OMIM: ");
     printf("<A HREF=\"%s%s\" target=_blank>", url, itemName);
     printf("%s</A></B>", itemName);
     safef(query, sizeof(query),
@@ -10093,7 +10084,7 @@ if (url != NULL && url[0] != 0)
     	    // just take the first AA replacement if there are multiple
 	    chp = strstr(replStr, ",");
 	    if (chp != NULL) *chp = '\0';
-	    
+
 	    printf("<BR><B>Amino Acid Replacement:</B> %s\n", replStr);
 	    }
 	}
@@ -10126,7 +10117,6 @@ if (url != NULL && url[0] != 0)
 	       "../cgi-bin/hgc?g=snp132&i=", dbSnpId);
 	    }
     	printf("%s</A></B>", dbSnpId);
-	fflush(stdout);
 	}
     }
 
@@ -10320,7 +10310,7 @@ cartWebStart(cart, database, "%s", tdb->longLabel);
 safef(query, sizeof(query), "select * from refLink where mrnaAcc = '%s'", sqlRnaName);
 sr = sqlGetResult(conn, query);
 if ((row = sqlNextRow(sr)) == NULL)
-    errAbort("Couldn't find %s in refLink table - database inconsistency.", rnaName);
+    errAbort("Couldn't find %s in refLink table - this accession may no longer be available.", rnaName);
 rl = refLinkLoad(row);
 sqlFreeResult(&sr);
 printf("<H2>Gene %s</H2>\n", rl->name);
@@ -10797,6 +10787,8 @@ if (startsWith("hg", database))
     printf("%s</A><BR>\n", rl->name);
     }
 printStanSource(rl->mrnaAcc, "mrna");
+prGRShortRefGene(rl->name);
+
 }
 
 void prKnownGeneInfo(struct sqlConnection *conn, char *rnaName,
@@ -10903,7 +10895,7 @@ if (strstr(rnaName, "NM_") != NULL)
     safef(query, sizeof(query), "select * from refLink where mrnaAcc = '%s'", sqlRnaName);
     sr = sqlGetResult(conn, query);
     if ((row = sqlNextRow(sr)) == NULL)
-    	errAbort("Couldn't find %s in refLink table - database inconsistency.", rnaName);
+    	errAbort("Couldn't find %s in refLink table - this accession may no longer be available.", rnaName);
     rl = refLinkLoad(row);
     sqlFreeResult(&sr);
     }
@@ -10993,7 +10985,7 @@ if (strchr(rnaName, '\''))
 safef(query, sizeof(query), "select * from refLink where mrnaAcc = '%s'", sqlRnaName);
 sr = sqlGetResult(conn, query);
 if ((row = sqlNextRow(sr)) == NULL)
-    errAbort("Couldn't find %s in refLink table - database inconsistency.", rnaName);
+    errAbort("Couldn't find %s in refLink table - this accession may no longer be available.", rnaName);
 rl = refLinkLoad(row);
 sqlFreeResult(&sr);
 
@@ -23770,7 +23762,7 @@ if (sameString("hg18", database))
           " (ABS((chromEnd - chromStart)-%d) <= %d ))) ",
       itemName, itemNameDash, itemNameTrimmed, sSize, sDiff);
       clickMsg = openMsg1;
-      } 
+      }
     else if (sameString("numtSMitochondrionChrPlacement", table))
       {
       safef(query, sizeof(query),
@@ -23829,7 +23821,108 @@ if (sameString("hg18", database))
  printTrackHtml(tdb);
  hFreeConn(&conn);
 }
+void doGeneReviews(struct trackDb *tdb, char *itemName)
+/* generate the detail page for geneReviews */
+{
+struct sqlConnection *conn = hAllocConn(database);
+//char *table = tdb->table;
+int start = cartInt(cart, "o");
+int num = 4;
 
+ genericHeader(tdb, itemName);
+ genericBedClick(conn, tdb, itemName, start, num);
+ prGeneReviews(conn, itemName);
+ printf("<BR>");
+ printTrackHtml(tdb);
+ hFreeConn(&conn);
+}
+
+void prGeneReviews(struct sqlConnection *conn, char *itemName)
+/* print GeneReviews associated to this item
+   Note: this print function has been replaced by addGeneReviewToBed.pl
+         which print the same information to the field 5 of bigBed file
+*/
+{
+struct sqlResult *sr;
+char **row;
+char query[512];
+int i;
+char *clickMsg = "Click link(s) below to search GeneReviews and GeneTests";
+boolean firstTime = TRUE;
+
+if (!sqlTablesExist(conn, "geneReviewsRefGene")) return;
+
+safef(query, sizeof(query), "select  grShort, diseaseID, diseaseName from geneReviewsRefGene where geneSymbol='%s'", itemName);
+sr = sqlGetResult(conn, query);
+while ((row = sqlNextRow(sr)) != NULL)
+    {
+        char *grShort = *row++;
+        char *diseaseID = *row++;
+        char *diseaseName = *row++;
+
+
+        if (firstTime)
+        {
+          printf("<BR><B> GeneReview(s) available for %s:</B> (%s)<BR>",itemName,clickMsg);
+          firstTime = FALSE;
+          printf("<PRE><TT>");
+              // #1234567890123456789012345678901234567890
+          printf("Short name    Disease ID     GeneTests disease name<BR>");
+          printf("-----------------------------------------------------------");
+          printf("-----------------------------------------------------------");
+          printf("----------------------------------<BR>");
+        }
+        printf("<A HREF=\"http://www.ncbi.nlm.nih.gov/books/n/gene/%s\" TARGET=_blank><B>%s</B></A>", grShort, grShort);
+        if (strlen(grShort) <= 15) {
+          for (i = 0; i <  15-strlen(grShort); i ++ )
+             {
+                printf("%s", " " );
+             }
+           }
+         printf("%-10s    ", diseaseID);
+        printf("<A HREF=\"http://www.ncbi.nlm.nih.gov/sites/GeneTests/review/disease/%s?db=genetests&search_param==begins_with\" TARGET=_blank><B>%s</B></A><BR>", diseaseName, diseaseName);
+
+    }  /* end while */
+ printf("</TT></PRE>");
+ sqlFreeResult(&sr);
+} /* end of prGeneReviews */
+
+void prGRShortRefGene(char *itemName)
+/* print GeneReviews short label associated to this refGene item */
+{
+struct sqlConnection *conn  = hAllocConn(database);
+struct sqlResult *sr;
+char **row;
+char query[512];
+boolean firstTime = TRUE;
+
+if (!sqlTablesExist(conn, "geneReviewsRefGene")) return;
+
+safef(query, sizeof(query), "select grShort, diseaseName from geneReviewsRefGene where geneSymbol='%s'", itemName);
+sr = sqlGetResult(conn, query);
+while ((row = sqlNextRow(sr)) != NULL)
+    {
+        char *grShort = *row++;
+        char *diseaseName = *row++;
+        if (firstTime)
+        {
+          printf("<B>Related GeneReview(s) and GeneTests disease(s): </B>");
+          firstTime = FALSE;
+       printf("<A HREF=\"http://www.ncbi.nlm.nih.gov/books/n/gene/%s\" TARGET=_blank><B>%s</B></A>", grShort, grShort);
+       printf(" (");
+       printf("<A HREF=\"http://www.ncbi.nlm.nih.gov/sites/GeneTests/review/disease/%s?db=genetests&search_param==begins_with\" TARGET=_blank>%s</A>", diseaseName, diseaseName);
+       printf(")");
+        } else {
+          printf(", ");
+       printf("<A HREF=\"http://www.ncbi.nlm.nih.gov/books/n/gene/%s\" TARGET=_blank><B>%s</B></A>", grShort, grShort);
+       printf(" (");
+       printf("<A HREF=\"http://www.ncbi.nlm.nih.gov/sites/GeneTests/review/disease/%s?db=genetests&search_param==begins_with\" TARGET=_blank>%s</A>", diseaseName, diseaseName);
+       printf(")");
+        }
+     }
+     printf("<BR>");
+     sqlFreeResult(&sr);
+} /* end of prGRShortRefGene */
 
 void doMiddle()
 /* Generate body of HTML. */
@@ -23925,7 +24018,7 @@ if ((!isCustomTrack(track) && dbIsFound)  ||
         tdb = hashFindVal(trackHash, track);
 	if (tdb == NULL)
 	    {
-	    if (startsWith("all_mrna", track))       
+	    if (startsWith("all_mrna", track))
 		tdb = hashFindVal(trackHash, "mrna");
                   /* Oh what a tangled web we weave. */
 	    }
@@ -25043,6 +25136,10 @@ else if (startsWith("numtS", table))
 else if (startsWith("cosmic", table))
     {
     doCosmic(tdb, item);
+    }
+else if (sameString("geneReviews", table))
+    {
+    doGeneReviews(tdb, item);
     }
 else if (tdb != NULL)
     {

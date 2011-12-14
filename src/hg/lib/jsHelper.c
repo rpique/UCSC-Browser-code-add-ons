@@ -376,10 +376,18 @@ cgiMakeOnClickSubmitButton(jsCheckAllOnClickHandler(idPrefix, state), name, valu
 }
 
 char *stripRegEx(char *str, char *regEx, int flags)
+{
 /* Strip out text matching regEx from str.
    flags is passed through to regcomp as the cflags argument.
    Returned string should be free'ed after use. */
+return replaceRegEx(str, NULL, regEx, flags);
+}
+
+char *replaceRegEx(char *str, char *replace, char *regEx, int flags)
 {
+/* Replace text matching regEx in str with replace string.
+   flags is passed through to regcomp as the cflags argument.
+   Returned string should be free'ed after use. */
 regex_t re;
 regmatch_t match[1];
 int err = regcomp(&re, regEx, flags);
@@ -391,6 +399,8 @@ size_t offset = 0;
 while(offset < len && !regexec(&re, str + offset, 1, match, 0))
     {
     dyStringAppendN(dy, str + offset, match[0].rm_so);
+    if(replace != NULL)
+        dyStringAppend(dy, replace);
     offset += match[0].rm_eo;
     }
 if(offset < len)
@@ -420,40 +430,6 @@ for(i=0;i<ArraySize(regExs);i++)
     freeMem(tmp);
     }
 return str;
-}
-
-boolean advancedJavascriptFeaturesEnabled(struct cart *cart)
-// Returns TRUE if advanced javascript features are currently enabled
-{
-static boolean alreadyLookedForadvancedJs = FALSE;
-static boolean advancedJsEnabled = FALSE;
-if(!alreadyLookedForadvancedJs)
-    {
-    char *ua = cgiUserAgent();
-    boolean defaultVal = TRUE;
-
-    // dragZooming was broken in version 530.4 of AppleWebKit browsers (used by Safari, Chrome and some other browsers).
-    // This was explicitly fixed by the WebKit team in version 531.0.1 (see http://trac.webkit.org/changeset/45143).
-    // The AppleWebKit version provided by the browser in user agent doesn't always include the minor version number, so to
-    // be overly conservative we default drag-and-drop to off when AppleWebKit major version == 530
-
-    if(ua != NULL)
-        {
-        char *needle = "AppleWebKit/";
-        char *ptr = strstr(ua, needle);
-        if(ptr != NULL)
-            {
-            int version = 0;
-            sscanf(ptr + strlen(needle), "%d", &version);
-            defaultVal = (version != 530);
-            }
-        }
-    advancedJsEnabled = cartUsualBoolean(cart, "enableAdvancedJavascript", defaultVal);
-    alreadyLookedForadvancedJs = TRUE;
-    }
-//else
-//    warn("already looked up advancedJsEnabled");  // got msg 41 times in one page!
-return advancedJsEnabled;
 }
 
 void jsBeginCollapsibleSection(struct cart *cart, char *track, char *section, char *sectionTitle,
