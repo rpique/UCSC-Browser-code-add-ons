@@ -40,15 +40,16 @@ void initialise_pssm(struct pssm *pwm,char *fileMotif,double addPseudoCounts, bo
   //Matrix is converted to probabilities to ...
 
   if(addPseudoCounts<=0){
-    if(NumZeros>0)
-      if(FirstRowCounts<1.1)
-	addPseudoCounts=MinNonZeroCount/2; //FirstRowCounts/100; 
+    if(NumZeros>0) // if(FirstRowCounts<1.1)
+	addPseudoCounts=(MinNonZeroCount/2.0); //FirstRowCounts/100;
     if(NumZeros==0)
       addPseudoCounts=0.0;  //Not necessary to add pseudo counts...
   }
 
   // printMatrix(pwm);  
-  fprintf(stderr,"#Adding pseudocounts %f\n",addPseudoCounts);
+  verbose(1,"# Num zeros = %d, Min Non Zero = %g\n",NumZeros,MinNonZeroCount);
+  verbose(1,"# Adding pseudocounts %f\n",addPseudoCounts);
+
   for(n=0;n<pwm->w;n++){
     RowCounts=0.0;
     for(b=0;b<4;b++)
@@ -57,11 +58,6 @@ void initialise_pssm(struct pssm *pwm,char *fileMotif,double addPseudoCounts, bo
       RowCounts=RowCounts+pwm->matrix[n][b];
     for(b=0;b<4;b++)
       pwm->matrix[n][b]=(pwm->matrix[n][b])/RowCounts;
-  }
-  if(verboseLevel()==2){
-    printMatrix(pwm);  
-    convertPSSMToLogs(pwm);
-    printMatrix(pwm); 
   }
 }
 
@@ -225,11 +221,20 @@ void reversePWM(struct pssm *op,const struct pssm *p){
 
 void printMatrix (struct pssm *pm) {  
   int i;
-  fprintf(stderr,"# N\tA\tC\tG\tT\n");
+  verbose(2,"# N\tA\tC\tG\tT\n");
   for(i = 0;i < pm->w;i++) {
-    fprintf(stderr,"# %d\t%1.3f\t%1.3f\t%1.3f\t%1.3f\n",i,pm->matrix[i][0],pm->matrix[i][1],pm->matrix[i][2],pm->matrix[i][3]);
+    verbose(2,"# %d\t%1.3f\t%1.3f\t%1.3f\t%1.3f\n",i,pm->matrix[i][0],pm->matrix[i][1],pm->matrix[i][2],pm->matrix[i][3]);
   }
 }
+
+void fprintMatrix (FILE *fd,struct pssm *pm) {  
+  int i;
+  fprintf(fd,"A\tC\tG\tT\n");
+  for(i = 0;i < pm->w;i++) {
+    fprintf(fd,"%f\t%f\t%f\t%f\n",pm->matrix[i][0],pm->matrix[i][1],pm->matrix[i][2],pm->matrix[i][3]);
+  }
+}
+
 
 /// Returns 1 if non ATGC letter...
 int ATGCbase(char b, boolean maskRep) {
@@ -291,5 +296,5 @@ double compare_subseq_to_pssm (char *seq, struct pssm *p, boolean useSnpRobust) 
   else
     score = score - p->w*log(0.25);
 
-  return score; ///log(base);  // 
+  return score; /* \log(base);   */
 }

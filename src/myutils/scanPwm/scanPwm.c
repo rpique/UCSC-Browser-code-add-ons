@@ -99,8 +99,6 @@ int scanPwmOneSeq(struct dnaSeq *seq,struct pssm *pwm)
 }
 
 
-
-
 /* ******************************************************************************** */
 
 void scanPwm(char *fileMotif, char *fileSeq)
@@ -112,6 +110,9 @@ void scanPwm(char *fileMotif, char *fileSeq)
   struct pssm pwm;
 
   initialise_pssm(&pwm,fileMotif,addPseudoCounts,useJaspar);
+  printMatrix(&pwm);
+  convertPSSMToLogs(&pwm);  
+  printMatrix(&pwm);
  
   //motifList = fixMotifs(dnaMotifLoadAll(motifFile));
 

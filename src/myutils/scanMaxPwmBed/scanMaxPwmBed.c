@@ -26,6 +26,7 @@ errAbort(
   "   -j - use Jaspar *.pfm format (the default is Dan's TRANSFAC matrix)\n"
   "   -snp - discount most negative base in the pwm aligment if unkown snp hits the score \n"
   "   -window=X - expand the bed region by X base pairs (default 0) \n"
+  "   -useBedStrand - Scan only in the strand indicated by the 6th bed field"
   //  "   -t=6.91 - use threshold cut-off \n"
   "   -base=2.71828183  - use log in that base (default natural log) \n"
   "   -p=0.0 - add p pseudo-counts to frequencies (0.0  automatic) \n"
@@ -37,6 +38,7 @@ errAbort(
 
 static struct optionSpec options[] = {
    {"j", OPTION_BOOLEAN},
+   {"useBedStrand", OPTION_BOOLEAN},
    {"mask", OPTION_BOOLEAN},
    {"snp", OPTION_BOOLEAN},
    //   {"t", OPTION_DOUBLE},
@@ -53,6 +55,7 @@ double addPseudoCounts = 0.0;
 double base = 2.71828183 ;
 boolean useJaspar = TRUE;
 boolean useSnpRobust = FALSE;
+boolean useBedStrand = FALSE;
 boolean maskRep = FALSE;
 int ompNumThreads= 1;
 int window = 0;
@@ -110,6 +113,48 @@ int scanMaxPwmOneSeq(struct dnaSeq *seq,struct pssm *pwm,struct pssm *rpwm, doub
 }
 
 /* ******************************************************************************** */
+
+int scanMaxPwmOneSeqOneStrand(struct dnaSeq *seq,struct pssm *pwm, double *pMaxScore,int *piMaxScore)
+{
+  int i,j,Start,End,count;
+  char nonATGCbase;
+  double score;
+  double MaxScore=-1E100;
+  int iMaxScore=-1;
+  
+  count=0;
+  
+  Start=0;
+  End=seq->size-pwm->w+1;
+  //if((End-Start+1) < pwm->w)
+  //  return 0; //Region too small to fit the motif..
+  //#pragma omp parallel for private(nonATGCbase,j,score) reduction(+:count)
+  for(i=Start;i<=End;i++){
+    nonATGCbase=0;
+    for(j=i;j<=(i+pwm->w-1);j++)
+      if(ATGCbase(seq->dna[j],maskRep)){
+	nonATGCbase++;
+	//shift i to skip??
+      }
+    if(nonATGCbase==0){
+      score=compare_subseq_to_pssm(seq->dna+i,pwm,useSnpRobust)/log(base); //Forward strand
+      if(score >= MaxScore){
+	MaxScore=score;
+	iMaxScore=i;
+      }
+      count++;
+    }
+  }
+  //	fprintf(out,"%s\t%d\t%d\t-\t%f\n", seq->name,i,i+pwm->w-1,scoreF);
+  // fprintf(out,"%f\t%d\t%c\n",MaxScore,iMaxScore,MaxStrand);      
+  //return count;
+  *pMaxScore=MaxScore;
+  *piMaxScore=iMaxScore;
+  return iMaxScore;
+}
+
+
+
 /* ******************************************************************************** */
 
 void scanMaxPwmBed(char *fileMotif, char *fileSeq, char *fileBed, char *fileOut)
@@ -126,6 +171,7 @@ void scanMaxPwmBed(char *fileMotif, char *fileSeq, char *fileBed, char *fileOut)
   char *chr_str;
   int left,right;
   bits32 seqSize;
+  char cStrand='.';
   // int j;
   
   struct pssm pwm;
@@ -133,6 +179,9 @@ void scanMaxPwmBed(char *fileMotif, char *fileSeq, char *fileBed, char *fileOut)
 
 
   initialise_pssm(&pwm,fileMotif,addPseudoCounts,useJaspar);
+  printMatrix(&pwm);
+  convertPSSMToLogs(&pwm);  
+  printMatrix(&pwm);
 
   allocateMemoryToMatrix(&rpwm); // Where I do the free!!!
   rpwm.w=pwm.w;
@@ -150,7 +199,10 @@ void scanMaxPwmBed(char *fileMotif, char *fileSeq, char *fileBed, char *fileOut)
     chr_str = row[0];
     left = lineFileNeedNum(lf, row, 1)-0;
     right = lineFileNeedNum(lf, row, 2)+1;
-    //cStrand = row[5][0];
+    if(useBedStrand)
+      assert(wordCount>=5); 
+    if(wordCount>=5)
+      cStrand = row[5][0];
 
     //fprintf(outFile,"%s\t%d\t%d\t",chr_str,left,right);
     //for(j=0;j<wordCount;j++)
@@ -170,16 +222,30 @@ void scanMaxPwmBed(char *fileMotif, char *fileSeq, char *fileBed, char *fileOut)
       //if (noMask) Already taken care of inside scan???
       //toUpperN(seq->dna, seq->size);
       
-      scanMaxPwmOneSeq(seq,&pwm,&rpwm,&MaxScore,&MaxStrand,&iMaxScore);
-      if (iMaxScore < 0 ){// Not valid region...
-	//fprintf(outFile,"NA");
-	//fprintf(outFile,"\n");      
-	fprintf(outFile,"%s\t%d\t%d\t%s\tNA\tNA\tNA\n",chr_str,left+iMaxScore,left+iMaxScore+pwm.w-1,row[3]);      
+      if(!useBedStrand){
+	scanMaxPwmOneSeq(seq,&pwm,&rpwm,&MaxScore,&MaxStrand,&iMaxScore);
+	if (iMaxScore < 0 ){// Not valid region...
+	  //fprintf(outFile,"NA");
+	  //fprintf(outFile,"\n");      
+	  fprintf(outFile,"%s\t%d\t%d\t%s\tNA\tNA\tNA\n",chr_str,left+iMaxScore,left+iMaxScore+pwm.w-1,row[3]);      
+	}else{
+	  fprintf(outFile,"%s\t%d\t%d\t%s\t%f\t%c\t%d\n",chr_str,left+iMaxScore,left+iMaxScore+pwm.w-1,row[3],MaxScore,MaxStrand,iMaxScore-window);      
+	}
       }else{
-	fprintf(outFile,"%s\t%d\t%d\t%s\t%f\t%c\t%d\n",chr_str,left+iMaxScore,left+iMaxScore+pwm.w-1,row[3],MaxScore,MaxStrand,iMaxScore-window);      
-      }
-
-      
+	if(cStrand=='+'){
+	  scanMaxPwmOneSeqOneStrand(seq,&pwm,&MaxScore,&iMaxScore);
+	}else if(cStrand=='-'){
+	  scanMaxPwmOneSeqOneStrand(seq,&rpwm,&MaxScore,&iMaxScore);
+	}else{
+	  iMaxScore=-1;
+	}
+	
+	if (iMaxScore < 0 ){
+	  fprintf(outFile,"%s\t%d\t%d\t%s\tNA\tNA\tNA\n",chr_str,left+iMaxScore,left+iMaxScore+pwm.w-1,row[3]);      
+	}else{
+	  fprintf(outFile,"%s\t%d\t%d\t%s\t%s\t%f\t%c\t%d\n",chr_str,left+iMaxScore,left+iMaxScore+pwm.w-1,row[3],row[5],MaxScore,cStrand,iMaxScore-window);      
+	}
+      }	
       dnaSeqFree(&seq);
     }
   }
@@ -203,6 +269,7 @@ int main(int argc, char *argv[])
   useJaspar = optionExists("j");
   useSnpRobust = optionExists("snp");
   maskRep = optionExists("mask");
+  useBedStrand = optionExists("useBedStrand");
 
   //thresh= optionDouble("t",thresh);
   base= optionDouble("base",base);

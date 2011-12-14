@@ -202,53 +202,6 @@ int loadSnpFile(char *snpFile, khash_t(hashChr_t) *hChr,  snplist_t *snplistp, i
 
 
 /* ******************************************************************************************** */
-
-/*
-int scanPwmOneSeq(struct dnaSeq *seq,struct pssm *pwm)
-{
-  int i,j,Start,End,count;
-  char nonATGCbase;
-  double score;
-  struct pssm revp,*rpwm;
-
-  rpwm=&revp;
-  allocateMemoryToMatrix(rpwm);
-  rpwm->w=pwm->w;
-  reversePWM(rpwm,pwm);
-  
-  count=-1;
-  
-  Start=0;
-  End=seq->size-pwm->w+1;
-  if((End-Start+1) < pwm->w)
-    return 0; //Region too small to fit the motif..
-  //#pragma omp parallel for private(nonATGCbase,j,score) reduction(+:count)
-  for(i=Start;i<=End;i++){
-    nonATGCbase=0;
-    for(j=i;j<=(i+pwm->w-1);j++)
-      if(ATGCbase(seq->dna[j])){
-	nonATGCbase++;
-	//shift i to skip??
-      }
-    if(nonATGCbase==0){
-      score=compare_subseq_to_pssm(seq->dna+i,pwm); //Forward strand
-      if(score >= thresh){
-	fprintf(stdout,"%s\t%d\t%d\t+\t%f\n", seq->name,i,i+pwm->w-1,score);
-	count++;
-      }
-      score=compare_subseq_to_pssm(seq->dna+i,rpwm);  //Reverse strand
-      if(score >= thresh){
-	fprintf(stdout,"%s\t%d\t%d\t-\t%f\n", seq->name,i,i+pwm->w-1,score);
-	count++;
-      }   	
-    }  
-  }
-
-  return count;
-}
-
-*/
-
 /* ******************************************************************************************** */
 
 
@@ -361,11 +314,18 @@ int scanPwmSeqSNP(struct dnaSeq *seq, struct pssm *pwm, snpvec_t *snpvecp){
 	      "%s\t%d\t%d\tR"
 	      "\t%f\t%c\t%d"
 	      "\t%f\t%c\t%d"
-	      "\t%d\t%c\t%c\n"
+	      "\t%d\t%c\t%c"
 	      , seq->name,iMaxRef,iMaxRef+pwm->w-1
 	      ,MaxRefScore,MaxRefStrand,n
 	      ,MaxAltScore,MaxAltStrand,k
 	      ,snpaux.pos,snpaux.ref,snpaux.alt);
+      fprintf(stdout,"\t");
+      for(i = (Start - 2); i < snpaux.pos; i++) // First section...
+	fprintf(stdout,"%c",seq->dna[i]);
+      fprintf(stdout,"-?-");
+      for(i = (snpaux.pos+1); i <= (End + pwm->w + 1); i++)
+	fprintf(stdout,"%c",seq->dna[i]);      
+      fprintf(stdout,"\n");
       count++;
     }
     
@@ -465,9 +425,9 @@ int scanPwmSeqInDel(struct dnaSeq *seq, struct pssm *pwm, indelvec_t *indelvecp)
     for(k=0;k<indel.altlen;k++)
       buff[i++]=indel.alt[k];
     //buff[i++]='_';
-    for(k=indel.pos+indel.reflen;k<=End;k++)
+    for(k=indel.pos+indel.reflen;k <= (End + pwm->w + 1);k++)
       buff[i++]=seq->dna[k];
-    k=i;
+    k= i - (pwm->w + 1);
 
 
     //#pragma omp parallel for private(nonATGCbase,j,score) reduction(+:count)
@@ -506,11 +466,18 @@ int scanPwmSeqInDel(struct dnaSeq *seq, struct pssm *pwm, indelvec_t *indelvecp)
 	      "%s\t%d\t%d\tR"
 	      "\t%f\t%c\t%d"
 	      "\t%f\t%c\t%d"
-	      "\t%d\t%s\t%s\n"
+	      "\t%d\t%s\t%s"
 	      , seq->name,iMaxRef,iMaxRef+pwm->w-1
 	      ,MaxRefScore,MaxRefStrand,n
 	      ,MaxAltScore,MaxAltStrand,k
 	      ,indel.pos,indel.ref,indel.alt);
+      fprintf(stdout,"\t");
+      for(i = (Start - 2); i < indel.pos; i++) // First section...
+	fprintf(stdout,"%c",seq->dna[i]);
+      fprintf(stdout,"-?-");
+      for(i = (indel.pos+indel.reflen); i <= (End + pwm->w + 1); i++)
+	fprintf(stdout,"%c",seq->dna[i]);      
+      fprintf(stdout,"\n");
       count++;
     }
     
@@ -521,19 +488,6 @@ int scanPwmSeqInDel(struct dnaSeq *seq, struct pssm *pwm, indelvec_t *indelvecp)
 }
 
 
-
-
-/*
-  //DNA buff[kmerSize+1];
-  //unsigned long int ForKmer2=0,RevKmer2=0;
-  unsigned long int ForKmer=0,RevKmer=0;
-  
-  unsigned int mask=0xFFFFFFFF;  //0x000FFFFF
-  char Base;
-  unsigned long int b;
-
-  int lastpos=-1000; // to check snps ordered... 
-*/
 
 
 /* ******************************************************************************************** */
@@ -553,6 +507,9 @@ void scanPwm(char *fileMotif, char *fileSeq)
   struct pssm pwm;
 
   initialise_pssm(&pwm,fileMotif,addPseudoCounts,useJaspar);
+  printMatrix(pwm);
+  convertPSSMToLogs(pwm);  
+  printMatrix(pwm);
   
   //motifList = fixMotifs(dnaMotifLoadAll(motifFile));
 
@@ -598,7 +555,11 @@ void scanPwmVar(char *fileMotif, char *fileSeq, char *fileSNPs)
   // snp_t snpaux;
 
   struct pssm pwm;
+
   initialise_pssm(&pwm,fileMotif,addPseudoCounts,useJaspar);
+  printMatrix(&pwm);
+  convertPSSMToLogs(&pwm);  
+  printMatrix(&pwm);
 
   while ((seq = dnaLoadNext(dl)) != NULL){
     k = kh_put(hashChr_t, hChr , cloneString(seq->name), &hret);

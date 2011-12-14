@@ -127,12 +127,11 @@ void processLinesFromBed(struct twoBitFile *tbf, char *bedFileName, FILE *oF)
       seq = twoBitReadSeqFrag(tbf, chr_str, left, right);
       if (cStrand == '-')
 	reverseComplement(seq->dna, seq->size);
-      
+   
       toUpperN(seq->dna, seq->size);
 
       kmer=packKmer(seq->dna,kmerSize);
-	
-      
+
       // kmer=packKmer(seq->dna+hks,readSize);
       //fprintf(oF,"\t%d",cStrand,(int)kmer);
 

@@ -46,7 +46,7 @@ for (i=0, slPt=slList; i<lineCount; ++i, slPt = slPt->next)
 
 /* Avoid an infinite, or very long loop by not letting them ask for all
  * the lines except in the small case. */
-int maxCount = lineCount/2;
+ int maxCount = (int)((double)lineCount * 0.75);
 if (maxCount < 1000)
     maxCount = lineCount;
 if (count > maxCount)

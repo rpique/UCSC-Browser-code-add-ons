@@ -57,6 +57,37 @@ typedef struct
 }xbList_t;
 
 
+KHASH_MAP_INIT_STR(hashChr_t, unsigned char)
+
+
+khash_t(hashChr_t) *xbChrNamesKhash(xbList_t *xbl){
+  khash_t(hashChr_t) *hChr= kh_init(hashChr_t); 
+  int iChr=0;
+  khiter_t k;
+  //  khiter_t khit;
+  int hret;
+
+  //Hash chromosome names
+  for(iChr=0;iChr<xbl->count;iChr++){
+    k = kh_put(hashChr_t, hChr , cloneString(xbl->names[iChr]), &hret);
+    assert(hret==1);
+    kh_val(hChr, k) = iChr;
+  }
+  return hChr;
+}
+
+int getChrNumber(khash_t(hashChr_t) *hChr,char *chr_str){
+  khiter_t khit;
+  int iChr;
+  khit = kh_get(hashChr_t, hChr , chr_str);
+  if(kh_exist(hChr,khit)){
+    iChr=kh_val(hChr,khit);
+  }else{
+    iChr=-1;
+  }
+  return iChr;
+}
+
 
 // Add type size??, so we don't need that 
 xbList_t *xbInit(boolean isStranded, bits16 count,char **names, unsigned *sizes){

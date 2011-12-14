@@ -22,8 +22,8 @@ void reversePWM(struct pssm *op,const struct pssm *p);
 //void initialise_pssm(struct pssm *pm,char *fileName);
 void initialise_pssm(struct pssm *pwm,char *fileMotif,double addPseudoCounts, boolean useJaspar);
 
-
 void printMatrix (struct pssm *pm);  
+void fprintMatrix (FILE *fd,struct pssm *pm);
 //void read_seq_fasta(struct parameters *p, struct sequence *s);
 //void print_seq_fasta(FILE *f, struct sequence s);
 int ATGCbase(char b, boolean maskRep);
