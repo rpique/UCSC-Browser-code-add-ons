@@ -43,7 +43,7 @@ SCRIPT_FILES = \
 # List of directories to build
 USE_DIRS = $(DIRS)
 
-DIRS = `find ./ -mindepth 1 -maxdepth 1 -type d`
+DIRS = `find ./ -mindepth 1 -maxdepth 1 -type d | grep -v 'inc'`
 
 BAD_DIRS= \
 	ccCpLock \

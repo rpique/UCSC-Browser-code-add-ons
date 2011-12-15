@@ -56,6 +56,7 @@ typedef struct
   int fd;  /* File descriptor index */
 }xbList_t;
 
+#include "khash.h"
 
 KHASH_MAP_INIT_STR(hashChr_t, unsigned char)
 

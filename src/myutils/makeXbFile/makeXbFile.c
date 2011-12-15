@@ -11,7 +11,7 @@ static char const rcsid[] = "$Id: newProg.c,v 1.30 2010/03/24 21:18:33 hiram Exp
 
 #include "xbfiles.h"
 
-KHASH_MAP_INIT_STR(hashChr_t, unsigned char)
+//KHASH_MAP_INIT_STR(hashChr_t, unsigned char)
 
 
 void usage()
