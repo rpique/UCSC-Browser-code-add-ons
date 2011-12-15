@@ -33,16 +33,14 @@ use Cwd;
 use IO::File;
 use File::Basename;
 
-BEGIN{
+use FindBin qw($Bin);
+use lib "$Bin";
+use Encode;
+use HgAutomate;
+use HgDb;
+use RAFile;
+use SafePipe;
 
-unshift(@INC, ".");
-require Encode; Encode->import;
-require HgAutomate; HgAutomate->import;
-require HgDb; HgDb->import;
-require RAFile; RAFile->import;
-require SafePipe; SafePipe->import;
-
-}
 use vars qw/
     $opt_allowReloads
     $opt_configDir
@@ -75,15 +73,22 @@ our $timeStart = time;
 our %chromInfo;         # chromInfo from assembly for chrom validation
 our $maxBedRows=80_000_000; # number of rows to allow in a bed-type file
 our %tableNamesUsed;
-our ($grants, $fields, $daf);
+our ($fields, $daf);
 our $SORT_BUF = " -S 5G ";
 our $assembly;
 
 sub usage {
     print STDERR <<END;
-usage: encodeValidate.pl submission-type project-submission-dir
+usage: encodeValidate.pl pipeline-instance project-submission-dir
 
-submission-type is currently ignored.
+The pipeline instance variable is a switch that changes the behavior of doEncodeValidate.
+The changes if the instance is:
+
+standard
+    allows use of hg19 and mm9 databases only
+
+anything else
+    allows use of the encodeTest database only
 
 Current dafVersion is: $Encode::dafVersion
 
@@ -137,7 +142,7 @@ sub doTime
 sub dieTellWrangler
 {
     my ($msg) = @_;
-    $msg .= "Please contact the encode staff at encode-staff\@soe.ucsc.edu\n";
+    $msg .= "Please contact the ENCODE staff at encode-staff\@soe.ucsc.edu\n";
     die $msg;
 }
 
@@ -236,15 +241,14 @@ sub validateFiles {
     }
     $files = \@newFiles;
     doTime("done validateFiles") if $opt_timing;
-    if (@errors) {
-        my $errorstr = "";
-        for my $line (@errors) {
-            $errorstr = $errorstr . "$line\n";
-        }
-        return $errorstr;
-    }
-    else {
+    unless (@errors) {
         return ();
+    } else {
+        my $errstr = "";
+        for my $error (@errors) {
+            $errstr = $errstr . "$error\n";
+        }
+        return $errstr;
     }
 }
 
@@ -1458,7 +1462,7 @@ if($opt_metaDataOnly) {
 usage() if (scalar(@ARGV) < 2);
 
 # Get command-line args
-my $submitType = $ARGV[0];     # currently not used
+my $pipelineInstance = $ARGV[0];     # currently not used
 my $submitDir = $ARGV[1];
 
 $ENV{TMPDIR} = $Encode::tempDir;
@@ -1529,19 +1533,20 @@ $fields = Encode::getFields($configPath);
 
 if($opt_validateDaf) {
     if(-f $submitDir) {
-        Encode::parseDaf($submitDir, $fields);
+        Encode::parseDaf($submitDir,  $fields, $pipelineInstance);
     } else {
-        Encode::getDaf($submitDir, $fields);
+        Encode::getDaf($submitDir, $fields, $pipelineInstance);
     }
     print STDERR "DAF is valid\n";
     exit(0);
 }
 
-$daf = Encode::getDaf($submitDir, $fields);
+$daf = Encode::getDaf($submitDir, $fields, $pipelineInstance);
 $assembly = $daf->{assembly};
 
 my $db = HgDb->new(DB => $daf->{assembly});
 $db->getChromInfo(\%chromInfo);
+
 
 # Add the variables in the DAF file to the required fields list
 if (defined($daf->{variables})) {
@@ -2229,6 +2234,12 @@ foreach my $ddfLine (@ddfLines) {
         if ($db->tableExist( $tableName)) {
             die "view '$view' has already been loaded as track '$tableName'\nPlease contact your wrangler if you need to reload this data\n";
         }
+    }
+
+    $submitDir = `pwd`;
+    chomp $submitDir;
+    unless ($pipelineInstance eq "beta" or $pipelineInstance eq "standard") {
+        $tableName = $tableName . "_$pipelineInstance" . "_" . basename($submitDir);
     }
 
     my $targetFile = makeDownloadTargetFileName($tableName, $type, \@{$ddfLine->{files}} );

@@ -58,7 +58,6 @@
 #include "search.h"
 #include "errCatch.h"
 
-static char const rcsid[] = "$Id: doMiddle.c,v 1.1651 2010/06/11 17:53:06 larrym Exp $";
 
 /* Other than submit and Submit all these vars should start with hgt.
  * to avoid weeding things out of other program's namespaces.
@@ -77,8 +76,11 @@ char *excludeVars[] = { "submit", "Submit", "dirty", "hgt.reset",
 	    "hgt.jump", "hgt.refresh", "hgt.setWidth",
             "hgt.trackImgOnly", "hgt.ideogramToo", "hgt.trackNameFilter", "hgt.imageV1", "hgt.suggestTrack", "hgt.setWidth",
              TRACK_SEARCH,         TRACK_SEARCH_ADD_ROW,     TRACK_SEARCH_DEL_ROW, TRACK_SEARCH_PAGER,
-            "hgt.contentType",
+            "hgt.contentType", "hgt.positionInput",
             NULL };
+
+// MERGE_GENE_SUGGEST is used for work on redmine #5933
+// #define MERGE_GENE_SUGGEST
 
 /* These variables persist from one incarnation of this program to the
  * next - living mostly in the cart. */
@@ -187,7 +189,6 @@ const struct track *b = *((struct track **)vb);
 float dif = 0;
 if (a->group && b->group)
     dif = a->group->priority - b->group->priority;
-
 if (dif == 0)
     dif = a->priority - b->priority;
 if (dif < 0)
@@ -3844,6 +3845,17 @@ const struct trackHub *b = *((struct trackHub **)vb);
 return strcmp(a->shortLabel, b->shortLabel);
 }
 
+static void rPropagateGroup(struct track *track, struct group *group)
+// group should spread to multiple levels of children.
+{
+struct track *subtrack = track->subtracks;
+for ( ;subtrack != NULL;subtrack = subtrack->next)
+    {
+    subtrack->group = group;
+    rPropagateGroup(subtrack, group);
+    }
+}
+
 static void groupTracks(struct trackHub *hubList, struct track **pTrackList,
 	struct group **pGroupList, int vis)
 /* Make up groups and assign tracks to groups.
@@ -3989,6 +4001,7 @@ for (track = *pTrackList; track != NULL; track = track->next)
 	group = unknown;
 	}
     track->group = group;
+    rPropagateGroup(track, group);
     }
 
 /* Sort tracks by combined group/track priority, and
@@ -4129,22 +4142,16 @@ return NULL;
 }
 
 static void setSearchedTrackToPackOrFull(struct track *trackList)
-/* Open track associated with search position if any.   Also open its parents
- * if any.  At the moment parents include composites but not supertracks. */
+// Open track associated with search position if any. Also open its parents if any.
 {
 if (NULL != hgp && NULL != hgp->tableList && NULL != hgp->tableList->name)
     {
     char *tableName = hgp->tableList->name;
     struct track *matchTrack = rFindTrackWithTable(tableName, trackList);
     if (matchTrack != NULL)
-	{
-	struct track *track;
-	for (track = matchTrack; track != NULL; track = track->parent)
-	    cartSetString(cart, track->track, hCarefulTrackOpenVis(database, track->track));
-	}
+        tdbSetCartVisibility(matchTrack->tdb, cart, hCarefulTrackOpenVis(database, matchTrack->track));
     }
 }
-
 
 struct track *getTrackList( struct group **pGroupList, int vis)
 /* Return list of all tracks, organizing by groups.
@@ -4302,7 +4309,7 @@ for (track = trackList; track != NULL; track = track->next)
     {
     char *cartVis = cartOptionalString(cart, track->track);
     if (cartVis != NULL && hTvFromString(cartVis) == track->tdb->visibility)
-    cartRemove(cart, track->track);
+        cartRemove(cart, track->track);
     }
 }
 
@@ -4990,6 +4997,18 @@ if (!hideControls)
 
 	sprintf(buf, "%s:%d-%d", chromName, winStart+1, winEnd);
 	position = cloneString(buf);
+#ifdef MERGE_GENE_SUGGEST
+	hPrintf("<span class='positionDisplay' id='positionDisplay' style='font-weight:bold;'>%s</span>", addCommasToPos(database, position));
+	hPrintf("<input type='hidden' name='position' id='position' value='%s'>\n", buf);
+	sprintLongWithCommas(buf, winEnd - winStart);
+	hPrintf(" <span id='size'>%s</span> bp. ", buf);
+	hPrintf("<input class='positionInput' type='text' name='hgt.positionInput' id='positionInput' size='60'>\n");
+	hWrites(" ");
+	hButtonWithOnClick("hgt.jump", "go", NULL, "imageV2.jumpButtonOnClick()");
+	jsonHashAddBoolean(jsonForClient, "assemblySupportsGeneSuggest", assemblySupportsGeneSuggest(database));
+	if(assemblySupportsGeneSuggest(database))
+	    hPrintf("<input type='hidden' name='hgt.suggestTrack' id='suggestTrack' value='%s'>\n", assemblyGeneSuggestTrack(database));
+#else
 	hWrites("position/search ");
 	hTextVar("position", addCommasToPos(database, position), 30);
 	sprintLongWithCommas(buf, winEnd - winStart);
@@ -5004,6 +5023,7 @@ if (!hideControls)
 	hPrintf(" size <span id='size'>%s</span> bp. ", buf);
 	hWrites(" ");
 	hButton("hgTracksConfigPage", "configure");
+#endif
 	if (survey && differentWord(survey, "off"))
             hPrintf("&nbsp;&nbsp;<span style='background-color:yellow;'><A HREF='%s' TARGET=_BLANK><EM><B>%s</EM></B></A></span>\n", survey, surveyLabel ? surveyLabel : "Take survey");
 	hPutc('\n');
@@ -5123,9 +5143,12 @@ if (!hideControls)
         hasCustomTracks ? "Manage your custom tracks" : "Add your own custom tracks");
 
     hPrintf(" ");
-    hPrintf("<INPUT TYPE='button' VALUE='track hubs' onClick='document.trackHubForm.submit();return false;' title='Import tracks from hubs'>");
+    if (hubConnectTableExists())
+	{
+	hPrintf("<INPUT TYPE='button' VALUE='track hubs' onClick='document.trackHubForm.submit();return false;' title='Import tracks from hubs'>");
+	hPrintf(" ");
+	}
 
-    hPrintf(" ");
     hButtonWithMsg("hgTracksConfigPage", "configure","Configure image and track selection");
     hPrintf(" ");
 
@@ -5202,8 +5225,14 @@ if (!hideControls)
 
             hPrintf("<table style='width:100%%;'><tr><td style='text-align:left;'>");
             hPrintf("\n<A NAME=\"%sGroup\"></A>",group->name);
+        //#define BUTTONS_BY_CSS_NOT_HERE
+        #ifdef BUTTONS_BY_CSS_NOT_HERE
+            hPrintf("<span class='pmButton toggleButton' onclick=\"vis.toggleForGroup(this,'%s')\" id='%s_button' title='%s this group'>%s</span>&nbsp;&nbsp;",
+                group->name, group->name, isOpen?"Collapse":"Expand", indicator);
+        #else///ifndef BUTTONS_BY_CSS_NOT_HERE
             hPrintf("<IMG class='toggleButton' onclick=\"return vis.toggleForGroup(this, '%s');\" id=\"%s_button\" src=\"%s\" alt=\"%s\" title='%s this group'>&nbsp;&nbsp;",
                     group->name, group->name, indicatorImg, indicator,isOpen?"Collapse":"Expand");
+        #endif///ndef BUTTONS_BY_CSS_NOT_HERE
             hPrintf("</td><td style='text-align:center; width:90%%;'>\n<B>%s</B>", group->label);
             hPrintf("</td><td style='text-align:right;'>\n");
             hPrintf("<input type='submit' name='hgt.refresh' value='refresh' title='Update image with your changes'>\n");
@@ -5959,6 +5988,9 @@ if(!trackImgOnly)
     jsIncludeFile("jquery-ui.js", NULL);
     jsIncludeFile("utils.js", NULL);
     jsIncludeFile("ajax.js", NULL);
+#ifdef MERGE_GENE_SUGGEST
+    jsIncludeFile("jquery.watermarkinput.js", NULL);
+#endif
     if(!searching)
         {
         jsIncludeFile("jquery.imgareaselect.js", NULL);

@@ -10,7 +10,7 @@
 
 # Directories
 set genomes = /hive/data/genomes
-set dir = $genomes/hg19/bed/ucsc.13.2
+set dir = $genomes/hg19/bed/ucsc.13.3
 set scratchDir = /hive/scratch
 set testingDir = $scratchDir/ucscGenes
 
@@ -26,8 +26,8 @@ set ratDb = rn4
 set RatDb = Rn4
 set fishDb = danRer7
 set flyDb = dm3
-set wormDb = ce9
-set yeastDb = sacCer2
+set wormDb = ce6
+set yeastDb = sacCer3
 
 # The net alignment for the closely-related species indicated in $xdb
 set xdbNetDir = $genomes/$db/bed/lastz.${xdb}/axtChain
@@ -76,7 +76,7 @@ set yeastFa = $genomes/$yeastDb/bed/hgNearBlastp/100806/sgdPep.faa
   # mm9.txt
 set bioCycPathways = /hive/data/outside/bioCyc/100514/download/14.0/data/pathways.col
 set bioCycGenes = /hive/data/outside/bioCyc/100514/download/14.0/data/genes.col
-set rfam = /hive/data/outside/Rfam/111005
+set rfam = /hive/data/outside/Rfam/111130
 
 
 # Tracks
@@ -104,8 +104,6 @@ cd $dir
 if (0) then  # BRACKET
 #	this section is completed, look for the corresponding endif
 #	to find the next section that is running.
-
-
 
 
 # Get Genbank info
@@ -164,11 +162,8 @@ netToBed -maxGap=0 ${db}.${xdb}.syn.net ${db}.${xdb}.syn.bed
 # probably should be revisited later, but affects only a few sequences 
 # at this time (10/09/11).
 mkdir -p rfam
-pslToBed ${rfam}/${db}/Rfam.human.bestHits.psl rfam/rfam.all.bed
-bedIntersect -aHitAny ${rfam}/${db}/Rfam.human.bestHits.bed ${db}.${xdb}.syn.bed rfam.syntenic.bed
+bedIntersect -aHitAny ${rfam}/${db}/Rfam.bed ${db}.${xdb}.syn.bed rfam.syntenic.bed
 bedToPsl $genomes/$db/chrom.sizes rfam.syntenic.bed rfam.syntenic.psl
-pslCDnaFilter -uniqueMapped rfam.syntenic.psl rfam.syntenic.uniq.psl
-pslToBed rfam.syntenic.uniq.psl rfam.syntenic.uniq.bed
  
 # Create directories full of alignments split by chromosome.
 mkdir -p est refSeq mrna 
@@ -594,6 +589,8 @@ pslCat -nohead protein/raw/uni*.psl | sort -k 10 | \
 	pslReps -noIntrons -nohead -nearTop=0.02  -minAli=0.85 stdin protein/uniProt.psl /dev/null
 rm -r protein/raw
 
+# move this endif statement past business that has successfully been completed
+endif # BRACKET		
 
 
 
@@ -638,11 +635,11 @@ cat cdsEvidence/*.tce | sort  > unweighted.tce
 
 # Merge back in antibodies, and add the small, noncoding genes that are not well-represented
 # in GenBank (Rfam, tRNA)
-cat txWalk.bed antibody.bed trna.bed rfam.syntenic.uniq.bed > abWalk.bed
+cat txWalk.bed antibody.bed trna.bed rfam.syntenic.bed > abWalk.bed
 sequenceForBed -db=$db -bedIn=antibody.bed -fastaOut=stdout -upCase -keepName > antibody.fa
 sequenceForBed -db=$db -bedIn=trna.bed -fastaOut=stdout -upCase -keepName > trna.fa
-sequenceForBed -db=$db -bedIn=rfam.syntenic.uniq.bed -fastaOut=stdout -upCase -keepName > rfam.syntenic.uniq.fa
-cat txWalk.fa antibody.fa trna.fa rfam.syntenic.uniq.fa > abWalk.fa
+sequenceForBed -db=$db -bedIn=rfam.syntenic.bed -fastaOut=stdout -upCase -keepName > rfam.syntenic.fa
+cat txWalk.fa antibody.fa trna.fa rfam.syntenic.fa > abWalk.fa
 
 # Pick ORFs, make genes
 cat refToPep.tab refToCcds.tab | \
@@ -661,7 +658,6 @@ cat mrna/*.psl refSeq/*.psl trna.psl rfam.syntenic.uniq.psl \
 txCdsCluster pick.bed pick.cluster
 
 
-
 # Flag suspicious CDS regions, and add this to info file. Weed out bad CDS.
 # Map CDS to gene set.  Takes 10 seconds.  Might want to reconsider using
 # txCdsWeed here.
@@ -670,6 +666,11 @@ txCdsWeed pick.tce pick.info weededCds.tce weededCds.info
 txCdsToGene abWalk.bed abWalk.fa weededCds.tce weededCds.gtf weededCds.faa \
 	-bedOut=weededCds.bed -exceptions=abWalk.exceptions \
 	-tweaked=weededCds.tweaked
+
+# After txCdsToGene, the transcripts in weeded.bed might be slightly different from
+# those in abWalk.bed.  Make a new sequence file, weeded.fa, to replace abWalk.fa.
+sequenceForBed -db=$db -bedIn=weeded.bed -fastaOut=weeded.fa -upCase -keepName
+
 
 # Separate out transcripts into coding and 4 uncoding categories.
 # Generate new gene set that weeds out the junkiest. Takes 9 seconds.
@@ -722,10 +723,13 @@ cat txWalk/*.ev | weedLines weeds.lst stdin stdout | subColumn 1 stdin txToAcc.t
 # The reresentative proteins and mrnas will be taken from RefSeq for the RefSeq ones, 
 # and derived from our transcripts for the rest.
 # Load these sequences into database. Takes 17 seconds.
-txGeneProtAndRna weeded.bed weeded.info abWalk.fa weededCds.faa \
+txGeneProtAndRna weeded.bed weeded.info weeded.fa weededCds.faa \
     refSeq.fa refToPep.tab refPep.fa txToAcc.tab ucscGenes.fa ucscGenes.faa \
     ucscGenesTx.fa ucscGenesTx.faa
 
+
+# move this exit statement to the end of the section to be done next
+exit $status # BRACKET
 
 
 # Generate ucscGene/uniprot blat run.
@@ -888,19 +892,17 @@ hgMapToGene $db -tempDb=$tempDb gnfAtlas2 knownGene knownToGnfAtlas2 '-type=bed 
 # the treefam database..  Takes ~5 hours.  Can and should run it in the background really.
 # Nothing else depends on the result.
 cd $dir
-hgMapToGene $db ensGene knownGene knownToEnsembl -noLoad
+hgMapToGene $db -tempDb=$tempDb ensGene knownGene knownToEnsembl -noLoad
 ~/kent/src/hg/protein/ensembl2treefam.pl < knownToEnsembl.tab > knownToTreefam.temp
 
 grep -v ^# knownToTreefam.temp | cut -f 1,2 > knownToTreefam.tab
 hgLoadSqlTab $tempDb knownToTreefam ~/kent/src/hg/lib/knownTo.sql knownToTreefam.tab
 
 if ($db =~ hg*) then
-    hgMapToGene $db -tempDb=$tempDb affyGnf1h knownGene knownToGnf1h
     hgMapToGene $db -tempDb=$tempDb HInvGeneMrna knownGene knownToHInv
     hgMapToGene $db -tempDb=$tempDb affyU133Plus2 knownGene knownToU133Plus2
     hgMapToGene $db -tempDb=$tempDb affyU133 knownGene knownToU133
     hgMapToGene $db -tempDb=$tempDb affyU95 knownGene knownToU95
-    hgMapToGene $db -tempDb=$tempDb $snpTable knownGene knownToCdsSnp -all -cds -ignoreStrand
     knownToHprd $tempDb $genomes/$db/p2p/hprd/FLAT_FILES/HPRD_ID_MAPPINGS.txt
 endif
 
@@ -1090,7 +1092,6 @@ ssh $cpuFarm "cd $dir/rnaStruct/utr5; para make jobList"
     cd ../utr5
     rm -r split fold err batch.bak
 
-
 # Make pfam run.  Actual cluster run is about 6 hours.
 # First get pfam global HMMs into /hive/data/outside/pfam/current/Pfam_fs somehow.
 # Did this with
@@ -1221,7 +1222,7 @@ hgLoadSqlTab $tempDb kgSpAlias ~/kent/src/hg/lib/kgSpAlias.sql kgSpAlias.tab
     cd $dir/bioCyc
     grep -v '^#' $bioCycPathways > pathways.tab
     grep -v '^#' $bioCycGenes > genes.tab
-    kgBioCyc1 genes.tab pathways.tab $db bioCycPathway.tab bioCycMapDesc.tab
+    kgBioCyc1 genes.tab pathways.tab $tempDb bioCycPathway.tab bioCycMapDesc.tab
     hgLoadSqlTab $tempDb bioCycPathway ~/kent/src/hg/lib/bioCycPathway.sql ./bioCycPathway.tab
     hgLoadSqlTab $tempDb bioCycMapDesc ~/kent/src/hg/lib/bioCycMapDesc.sql ./bioCycMapDesc.tab
 
@@ -1245,12 +1246,12 @@ hgLoadSqlTab $tempDb kgSpAlias ~/kent/src/hg/lib/kgSpAlias.sql kgSpAlias.tab
     # in the keggPathway table, overloading the schema.
     wget --timestamping ftp://ftp.genome.jp/pub/kegg/genes/organisms/hsa/hsa_pathway.list
     cat hsa_pathway.list| sed -e 's/path://'|sed -e 's/:/\t/' > j.tmp
-    hgLoadSqlTab $tempDb keggPathway $kent/src/hg/lib/keggPathway.sql keggPathway.tab
+    hgLoadSqlTab $tempDb keggPathway $kent/src/hg/lib/keggPathway.sql j.tmp
 
     # Next, use the temporary contents of the keggPathway table to join with
     # knownToLocusLink, creating the real content of the keggPathway table.
     # Load this data, erasing the old temporary content
-    hgsql hg19 -N -e \
+    hgsql $tempDb -N -e \
     'select name, locusID, mapID from keggPathway p, knownToLocusLink l where p.locusID=l.value' \
     >keggPathway.tab
     hgLoadSqlTab $tempDb keggPathway $kent/src/hg/lib/keggPathway.sql keggPathway.tab
@@ -1297,6 +1298,7 @@ subColumn 4 ucscGenes.bed idSub.txt ucscGenesIdSubbed.bed
 sequenceForBed -keepName -db=hg19 -bedIn=ucscGenesIdSubbed.bed -fastaOut=stdout \
     | faToTwoBit stdin kgTargetSeq.2bit 
 mkdir -p /gbdb/hg19/targetDb/
+rm -f /gbdb/hg19/targetDb/kgTargetSeq.2bit
 ln -s $dir/kgTargetSeq.2bit /gbdb/hg19/targetDb/
 # Load the table kgTargetAli, which shows where in the genome these targets are.
 cut -f 1-10 ucscGenes.gp \                        
@@ -1315,9 +1317,6 @@ hgsql hgcentraltest -e \
          "/gbdb/hg19/targetDb/kgTargetSeq.2bit", 1, now(), "");'
 
 		
-# move this endif statement past business that has successfully been completed
-endif # BRACKET		
-
 # NOW SWAP IN TABLES FROM TEMP DATABASE TO MAIN DATABASE.
 # You'll need superuser powers for this step.....
 
@@ -1328,8 +1327,9 @@ sudo ~kent/bin/copyMysqlTable $db kgXref $tempDb kgXrefOld$lastVer
 # Create backup database
 hgsqladmin create ${db}Backup
 
-# Drop tempDb history table, we don't want to swap it in!
+# Drop tempDb chromInfo and history tables, we don't want to swap them in!
 hgsql -e "drop table history" $tempDb
+hgsql -e "drop table chromInfo" $tempDb
 
 # Swap in new tables, moving old tables to backup database.
 sudo ~kent/bin/swapInMysqlTempDb $tempDb $db ${db}Backup
@@ -1340,9 +1340,6 @@ sudo ln -s /var/lib/mysql/$spDb /var/lib/mysql/uniProt
 sudo rm /var/lib/mysql/proteome
 sudo ln -s /var/lib/mysql/$pbDb /var/lib/mysql/proteome
 hgsqladmin flush-tables
-
-# move this exit statement to the end of the section to be done next
-exit $status # BRACKET
 
 
 # Make full text index.  Takes a minute or so.  After this the genome browser

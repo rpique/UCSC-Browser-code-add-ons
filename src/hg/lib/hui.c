@@ -29,8 +29,13 @@
 #include "bigBed.h"
 #include "bigWig.h"
 #include "vcfUi.h"
-
-static char const rcsid[] = "$Id: hui.c,v 1.297 2010/06/02 19:27:51 tdreszer Exp $";
+#include "vcf.h"
+#include "errCatch.h"
+#include "samAlignment.h"
+#include "makeItemsItem.h"
+#include "bedDetail.h"
+#include "pgSnp.h"
+#include "memgfx.h"
 
 #define SMALLBUF 128
 #define MAX_SUBGROUP 9
@@ -38,16 +43,20 @@ static char const rcsid[] = "$Id: hui.c,v 1.297 2010/06/02 19:27:51 tdreszer Exp
 #define CLEAR_BUTTON_LABEL      "clear"
 #define JBUFSIZE 2048
 
-//#define PM_BUTTON "<A NAME=\"%s\"></A><A HREF=\"#%s\"><IMG height=18 width=18 onclick=\"return (setCheckBoxesThatContain('%s',%s,true,'%s','','%s') == false);\" id=\"btn_%s\" src=\"../images/%s\" alt=\"%s\"></A>\n"
-//#define DEF_BUTTON "<A NAME=\"%s\"></A><A HREF=\"#%s\"><IMG onclick=\"setCheckBoxesThatContain('%s',true,false,'%s','','%s'); return (setCheckBoxesThatContain('%s',false,false,'%s','_defOff','%s') == false);\" id=\"btn_%s\" src=\"../images/%s\" alt=\"%s\"></A>\n"
-//#define DEFAULT_BUTTON(nameOrId,anc,beg,contains) printf(DEF_BUTTON,(anc),(anc),(nameOrId),        (beg),(contains),(nameOrId),(beg),(contains),(anc),"defaults_sm.png","default")
-//#define    PLUS_BUTTON(nameOrId,anc,beg,contains) printf(PM_BUTTON, (anc),(anc),(nameOrId),"true", (beg),(contains),(anc),"add_sm.gif",   "+")
-//#define   MINUS_BUTTON(nameOrId,anc,beg,contains) printf(PM_BUTTON, (anc),(anc),(nameOrId),"false",(beg),(contains),(anc),"remove_sm.gif","-")
+#ifdef BUTTONS_BY_CSS
+#define BUTTON_PM  "<span class='pmButton' onclick=\"setCheckBoxesThatContain('%s',%s,true,'%s','','%s')\">%c</span>"
+#define BUTTON_DEF "<span class='pmButton' onclick=\"setCheckBoxesThatContain('%s',true,false,'%s','','%s'); " \
+                                                    "setCheckBoxesThatContain('%s',false,false,'%s','_defOff','%s');\" style='width:56px;font-weight:normal; font-family:default;'>default</span>"
+#define DEFAULT_BUTTON(nameOrId,anc,beg,contains) printf(BUTTON_DEF,(nameOrId),        (beg),(contains),(nameOrId),(beg),(contains))
+#define    PLUS_BUTTON(nameOrId,anc,beg,contains) printf(BUTTON_PM, (nameOrId),"true", (beg),(contains),'+')
+#define   MINUS_BUTTON(nameOrId,anc,beg,contains) printf(BUTTON_PM, (nameOrId),"false",(beg),(contains),'-')
+#else///ifndef BUTTONS_BY_CSS
 #define PM_BUTTON  "<IMG height=18 width=18 onclick=\"setCheckBoxesThatContain('%s',%s,true,'%s','','%s');\" id=\"btn_%s\" src=\"../images/%s\" alt=\"%s\">\n"
 #define DEF_BUTTON "<IMG onclick=\"setCheckBoxesThatContain('%s',true,false,'%s','','%s'); setCheckBoxesThatContain('%s',false,false,'%s','_defOff','%s');\" id=\"btn_%s\" src=\"../images/%s\" alt=\"%s\">\n"
 #define DEFAULT_BUTTON(nameOrId,anc,beg,contains) printf(DEF_BUTTON,(nameOrId),        (beg),(contains),(nameOrId),(beg),(contains),(anc),"defaults_sm.png","default")
 #define    PLUS_BUTTON(nameOrId,anc,beg,contains) printf(PM_BUTTON, (nameOrId),"true", (beg),(contains),(anc),"add_sm.gif",   "+")
 #define   MINUS_BUTTON(nameOrId,anc,beg,contains) printf(PM_BUTTON, (nameOrId),"false",(beg),(contains),(anc),"remove_sm.gif","-")
+#endif///ndef BUTTONS_BY_CSS
 
 //#define SUBTRACK_CFG_POPUP
 
@@ -2465,11 +2474,11 @@ for (subtrackRef = subtrackRefList; subtrackRef != NULL; subtrackRef = subtrackR
         for(ixIn=0;ixIn<members->count;ixIn++)
             {
             if(sameString(members->tags[ixIn],belongsTo))
-                {
-                members->subtrackCount[ixIn]++;
-                if(cart && fourStateVisible(subtrackFourStateChecked(subtrack,cart)))
-                    members->currentlyVisible[ixIn]++;
-                refAdd(&(members->subtrackList[ixIn]), subtrack);
+            {
+            members->subtrackCount[ixIn]++;
+            if(cart && fourStateVisible(subtrackFourStateChecked(subtrack,cart)))
+                members->currentlyVisible[ixIn]++;
+            refAdd(&(members->subtrackList[ixIn]), subtrack);
                 break;
                 }
             }
@@ -2633,7 +2642,7 @@ if(membersForAll != NULL)
 
 int ix;
 membersForAll = needMem(sizeof(membersForAll_t));
-membersForAll->members[dimV]=subgroupMembersGet(parentTdb,"view");
+    membersForAll->members[dimV]=subgroupMembersGet(parentTdb,"view");
 membersForAll->letters[dimV]='V';
 membersForAll->dimMax=dimA;  // This can expand, depending upon ABC dimensions
 membersForAll->dimensions = dimensionSettingsGet(parentTdb);
@@ -3472,10 +3481,10 @@ else
     printf("<B>Filter items by:</B> (select multiple categories and items - %s)<TABLE cellpadding=3><TR valign='top'>\n",FILTERBY_HELP_LINK);
 
 filterBy_t *filterBy = NULL;
-webIncludeResourceFile("ui.dropdownchecklist.css");
-jsIncludeFile("ui.dropdownchecklist.js",NULL);
+    webIncludeResourceFile("ui.dropdownchecklist.css");
+    jsIncludeFile("ui.dropdownchecklist.js",NULL);
 #ifdef NEW_JQUERY
-jsIncludeFile("ddcl.js",NULL);
+    jsIncludeFile("ddcl.js",NULL);
 #endif///def NEW_JQUERY
 
 int ix=0;
@@ -3490,11 +3499,11 @@ for(filterBy = filterBySet;filterBy != NULL; filterBy = filterBy->next)
 
     // TODO: columnCount (Number of filterBoxes per row) should be configurable through tdb setting
     #ifdef NEW_JQUERY
-        #define FILTER_BY_FORMAT "<SELECT id='fbc%d' name='%s.filterBy.%s' multiple style='display: none; font-size:.9em;' class='filterBy'><BR>\n"
+    #define FILTER_BY_FORMAT "<SELECT id='fbc%d' name='%s' multiple style='display: none; font-size:.9em;' class='filterBy'><BR>\n"
     #else///ifndef NEW_JQUERY
-        #define FILTER_BY_FORMAT "<SELECT id='fbc%d' name='%s.filterBy.%s' multiple style='display: none;' class='filterBy'><BR>\n"
+        #define FILTER_BY_FORMAT "<SELECT id='fbc%d' name='%s' multiple style='display: none;' class='filterBy'><BR>\n"
     #endif///ndef NEW_JQUERY
-    printf(FILTER_BY_FORMAT,ix,tdb->track,filterBy->column);
+    printf(FILTER_BY_FORMAT,ix,filterBy->htmlName);
     ix++;
     printf("<OPTION%s>All</OPTION>\n",(filterBy->slChoices == NULL || slNameInList(filterBy->slChoices,"All")?" SELECTED":""));
     struct slName *slValue;
@@ -3694,15 +3703,19 @@ return cartPriorities;
 void cfgByCfgType(eCfgType cType,char *db, struct cart *cart, struct trackDb *tdb,char *prefix, char *title, boolean boxed)
 // Methods for putting up type specific cfgs used by composites/subtracks in hui.c and exported for common use
 {
+// NOTE: This is fixed on tdreszer_subCfg branch already!
+if (tdbIsComposite(tdb) && tdbIsSubtrack(tdb->subtracks))
+    tdb = tdb->subtracks;// composite without view should pass in subtrack as example track!
+
 switch(cType)
     {
     case cfgBedScore:
-	{
-	char *scoreMax = trackDbSettingClosestToHome(tdb, SCORE_FILTER _MAX);
-	int maxScore = (scoreMax ? sqlUnsigned(scoreMax):1000);
-	scoreCfgUi(db, cart,tdb,prefix,title,maxScore,boxed);
-	}
-	break;
+                        {
+                        char *scoreMax = trackDbSettingClosestToHome(tdb, SCORE_FILTER _MAX);
+                        int maxScore = (scoreMax ? sqlUnsigned(scoreMax):1000);
+                        scoreCfgUi(db, cart,tdb,prefix,title,maxScore,boxed);
+                        }
+                        break;
     case cfgPeak:
                         encodePeakCfgUi(cart,tdb,prefix,title,boxed);
                         break;
@@ -3714,17 +3727,17 @@ switch(cType)
                         break;
     case cfgChain:      chainCfgUi(db,cart,tdb,prefix,title,boxed, NULL);
                         break;
-    case cfgNetAlign:	netAlignCfgUi(db,cart,tdb,prefix,title,boxed);
+    case cfgNetAlign:   netAlignCfgUi(db,cart,tdb,prefix,title,boxed);
                         break;
     case cfgBedFilt:    bedUi(tdb,cart,title, boxed);
-                 	break;
+                        break;
 #ifdef USE_BAM
     case cfgBam:        bamCfgUi(cart, tdb, prefix, title, boxed);
-			break;
+                        break;
 #endif
-    case cfgVcf:	vcfCfgUi(cart, tdb, prefix, title, boxed);
-			break;
-    case cfgPsl:	pslCfgUi(db,cart,tdb,prefix,title,boxed);
+    case cfgVcf:        vcfCfgUi(cart, tdb, prefix, title, boxed);
+                        break;
+    case cfgPsl:        pslCfgUi(db,cart,tdb,prefix,title,boxed);
                         break;
     default:            warn("Track type is not known to multi-view composites. type is: %d ", cType);
                         break;
@@ -3970,9 +3983,9 @@ for (subtrackRef = subtrackRefList; subtrackRef != NULL; subtrackRef = subtrackR
     // Turn this off only if configurable explicitly set to off
     if (trackDbSettingClosestToHome(subtrack, "configurable") && trackDbSettingClosestToHomeOn(subtrack, "configurable") == FALSE)
 #else///ifndef SUBTRACK_CFG_POPUP
-    if (trackDbSettingClosestToHomeOn(subtrack, "configurable") == FALSE)
+        if (trackDbSettingClosestToHomeOn(subtrack, "configurable") == FALSE)
 #endif///ndef SUBTRACK_CFG_POPUP
-        cType = cfgNone;
+            cType = cfgNone;
     membership_t *membership = subgroupMembershipGet(subtrack);
 
     if (sortOrder == NULL && !useDragAndDrop)
@@ -4101,8 +4114,8 @@ for (subtrackRef = subtrackRefList; subtrackRef != NULL; subtrackRef = subtrackR
     if (cType != cfgNone)
         {
         dependentCfgsNeedBinding = TRUE; // configurable subtrack needs to be bound to composite settings
-    #define CFG_SUBTRACK_DIV "<DIV id='div_%s_cfg'%s><INPUT TYPE=HIDDEN NAME='%s' value='%s'>\n"
-    #define MAKE_CFG_SUBTRACK_DIV(table,cfgVar,open) printf(CFG_SUBTRACK_DIV,(table),((open)?"":" style='display:none'"),(cfgVar),((open)?"on":"off"))
+        #define CFG_SUBTRACK_DIV "<DIV id='div_%s_cfg'%s><INPUT TYPE=HIDDEN NAME='%s' value='%s'>\n"
+        #define MAKE_CFG_SUBTRACK_DIV(table,cfgVar,open) printf(CFG_SUBTRACK_DIV,(table),((open)?"":" style='display:none'"),(cfgVar),((open)?"on":"off"))
         safef(htmlIdentifier,sizeof(htmlIdentifier),"%s.childShowCfg",subtrack->track);
         boolean open = cartUsualBoolean(cart, htmlIdentifier,FALSE);
         MAKE_CFG_SUBTRACK_DIV(subtrack->track,htmlIdentifier,open);
@@ -4747,7 +4760,7 @@ return FALSE;
 
 
 #ifdef ALL_SCORE_FILTERS_LOGIC
-static int numericFiltersShowAll(struct cart *cart, struct trackDb *tdb, boolean *opened, boolean boxed,
+static int numericFiltersShowAll(char *db, struct cart *cart, struct trackDb *tdb, boolean *opened, boolean boxed,
                                boolean compositeLevel,char *name, char *title)
 // Shows all *Filter style filters.  Note that these are in random order and have no graceful title
 {
@@ -4757,7 +4770,13 @@ if (filterSettings)
     {
     puts("<BR>");
     struct slName *filter = NULL;
-    struct extraField *extras = extraFieldsGet(tdb);
+#ifdef EXTRA_FIELDS_SUPPORT
+    struct extraField *extras = extraFieldsGet(db,tdb);
+#else///ifndef EXTRA_FIELDS_SUPPORT
+    struct sqlConnection *conn = hAllocConnTrack(db, tdb);
+    struct asObject *as = asForTdb(conn, tdb);
+    hFreeConn(&conn);
+#endif///ndef EXTRA_FIELDS_SUPPORT
 
     while ((filter = slPopHead(&filterSettings)) != NULL)
         {
@@ -4773,6 +4792,7 @@ if (filterSettings)
             assert(ix > 0);
             field[ix] = '\0';
 
+        #ifdef EXTRA_FIELDS_SUPPORT
             if (extras != NULL)
                 {
                 struct extraField *extra = extraFieldsFind(extras, field);
@@ -4783,6 +4803,18 @@ if (filterSettings)
                         isFloat = (extra->type == ftFloat);
                     }
                 }
+        #else///ifndef EXTRA_FIELDS_SUPPORT
+            if (as != NULL)
+                {
+                struct asColumn *asCol = asColumnFind(as, field);
+                if (asCol != NULL)
+                    { // Found label so replace field
+                    field = asCol->comment;
+                    if (!isFloat)
+                        isFloat = asTypesIsFloating(asCol->lowType->type);
+                    }
+                }
+        #endif///ndef EXTRA_FIELDS_SUPPORT
             char label[128];
             safef(label,sizeof(label),"Minimum %s",field);
             showScoreFilter(cart,tdb,opened,boxed,compositeLevel,name,title,label,scoreName,isFloat);
@@ -4791,8 +4823,13 @@ if (filterSettings)
             }
         slNameFree(&filter);
         }
+#ifdef EXTRA_FIELDS_SUPPORT
     if (extras != NULL)
         extraFieldsFree(&extras);
+#else///ifndef EXTRA_FIELDS_SUPPORT
+    if (as != NULL)
+        asObjectFree(&as);
+#endif///ndef EXTRA_FIELDS_SUPPORT
     }
 if (count > 0)
     puts("</TABLE>");
@@ -4811,16 +4848,15 @@ boolean bigBed = startsWith("bigBed",tdb->type);
 
 if (!bigBed)  // bigBed filters are limited!
     {
-    filterBy_t *filterBySet = filterBySetGet(tdb,cart,name);
-
     #ifdef ALL_SCORE_FILTERS_LOGIC
     // Numeric filters are first
     boolean isBoxOpened = FALSE;
-    if (numericFiltersShowAll(cart, tdb, &isBoxOpened, boxed, compositeLevel, name, title) > 0)
+    if (numericFiltersShowAll(db, cart, tdb, &isBoxOpened, boxed, compositeLevel, name, title) > 0)
         skipScoreFilter = TRUE;
     #endif///def ALL_SCORE_FILTERS_LOGIC
 
     // Add any multi-selects next
+    filterBy_t *filterBySet = filterBySetGet(tdb,cart,name);
     if(filterBySet != NULL)
         {
         if(!tdbIsComposite(tdb) && cartOptionalString(cart, "ajax") == NULL)
@@ -5311,13 +5347,13 @@ if(!sameString(tdb->track, "tigrGeneIndex")
 
 if (cartOptionalString(cart, "ajax") == NULL)
     {
-    filterBy_t *filterBySet = filterBySetGet(tdb,cart,name);
-    if(filterBySet != NULL)
-        {
-        printf("<BR>");
+filterBy_t *filterBySet = filterBySetGet(tdb,cart,name);
+if(filterBySet != NULL)
+    {
+    printf("<BR>");
         filterBySetCfgUi(tdb,filterBySet,FALSE);
-        filterBySetFree(&filterBySet);
-        }
+    filterBySetFree(&filterBySet);
+    }
     }
 cfgEndBox(boxed);
 }
@@ -5326,7 +5362,7 @@ static boolean isSpeciesOn(struct cart *cart, struct trackDb *tdb, char *species
 /* check the cart to see if species is turned off or on (default is defaultState) */
 {
 boolean ret = defaultState;
-safef(option, optionSize, "%s.%s", tdb->track, species);
+    safef(option, optionSize, "%s.%s", tdb->track, species);
 
 /* see if this is a simple multiz (not composite track) */
 char *s = cartOptionalString(cart, option);
@@ -5344,8 +5380,8 @@ else
 		tdb->parent->track, viewString,  species);
 	    ret = cartUsualBoolean(cart, option, ret);
 	    }
-	}
     }
+}
 
 return ret;
 }
@@ -5675,7 +5711,7 @@ else
 if (viewString != NULL)
     safef(option, sizeof option, "%s.%s.%s", name, viewString, MAF_DOT_VAR);
 else
-    safef(option, sizeof option, "%s.%s", name, MAF_DOT_VAR);
+safef(option, sizeof option, "%s.%s", name, MAF_DOT_VAR);
 cgiMakeCheckBox(option, cartCgiUsualBoolean(cart, option, FALSE));
 
 if (isWigMafProt)
@@ -5686,7 +5722,7 @@ else
 if (viewString != NULL)
     safef(option, sizeof option, "%s.%s.%s", name, viewString, MAF_CHAIN_VAR);
 else
-    safef(option, sizeof option, "%s.%s", name, MAF_CHAIN_VAR);
+safef(option, sizeof option, "%s.%s", name, MAF_CHAIN_VAR);
 cgiMakeCheckBox(option, cartCgiUsualBoolean(cart, option, TRUE));
 
 char *irowStr = trackDbSetting(tdb, "irows");
@@ -5721,7 +5757,7 @@ if (framesTable)
     if (viewString != NULL)
 	safef(buffer, sizeof(buffer), "%s.%s.codons",name, viewString);
     else
-	safef(buffer, sizeof(buffer), "%s.codons",name);
+    safef(buffer, sizeof(buffer), "%s.codons",name);
     cartMakeRadioButton(cart, buffer,"codonNone", "codonDefault");
     printf("No codon translation<BR>");
     cartMakeRadioButton(cart, buffer,"codonDefault", "codonDefault");
@@ -5891,7 +5927,7 @@ cfgEndBox(boxed);
 }
 #endif//def USE_BAM
 
-struct trackDb *rFindViewInList(struct trackDb *tdbList, char *view)
+static struct trackDb *rFindViewInList(struct trackDb *tdbList, char *view)
 /* Return the trackDb on the list (or on any children of the list) that has matching view tag. */
 {
 struct trackDb *tdb;
@@ -5938,22 +5974,6 @@ freeMem(visibility);
 return vis;
 }
 
-struct trackDb *rFindView(struct trackDb *forest, char *viewName)
-/* Find a descendent with given view. */
-{
-struct trackDb *tdb;
-for (tdb = forest; tdb != NULL; tdb = tdb->next)
-    {
-    char *viewSetting = trackDbSetting(tdb, "view");
-    if (sameOk(viewSetting, viewName))
-        return tdb;
-    struct trackDb *view = rFindView(tdb->subtracks, viewName);
-    if (view)
-        return view;
-    }
-return NULL;
-}
-
 static boolean hCompositeDisplayViewDropDowns(char *db, struct cart *cart, struct trackDb *parentTdb)
 /* UI for composite view drop down selections. */
 {
@@ -5977,7 +5997,7 @@ struct trackDb **matchedSubtracks = needMem(sizeof(struct trackDb *)*membersOfVi
 for (ix = 0; ix < membersOfView->count; ix++)
     {
     char *viewName = membersOfView->tags[ix];
-    struct trackDb *view = rFindView(parentTdb->subtracks, viewName);
+    struct trackDb *view = rFindViewInList(parentTdb->subtracks, viewName);
     if (view != NULL)
         {
         matchedSubtracks[ix] = view;
@@ -6109,29 +6129,49 @@ freeMem(rootLabel);
 return cloneString(label);
 }
 
+#ifdef BUTTONS_BY_CSS
+#define BUTTON_MAT "<span class='pmButton' onclick=\"matSetMatrixCheckBoxes(%s%s%s%s)\">%c</span>"
+#else///ifndef BUTTONS_BY_CSS
 #define PM_BUTTON_UC "<IMG height=18 width=18 onclick=\"return (matSetMatrixCheckBoxes(%s%s%s%s%s%s) == false);\" id='btn_%s' src='../images/%s'>"
+#endif///def BUTTONS_BY_CSS
+
 #define MATRIX_RIGHT_BUTTONS_AFTER 8
 #define MATRIX_BOTTOM_BUTTONS_AFTER 20
 
 static void buttonsForAll()
 {
+#ifdef BUTTONS_BY_CSS
+printf(BUTTON_MAT,"true", "", "", "", '+');
+printf(BUTTON_MAT,"false","", "", "", '-');
+#else///ifndef BUTTONS_BY_CSS
 printf(PM_BUTTON_UC,"true", "", "", "", "", "",  "plus_all",    "add_sm.gif");
 printf(PM_BUTTON_UC,"false","", "", "", "", "", "minus_all", "remove_sm.gif");
+#endif///def BUTTONS_BY_CSS
 }
 static void buttonsForOne(char *name,char *class,boolean vertical)
 {
+#ifdef BUTTONS_BY_CSS
+printf(BUTTON_MAT, "true",  ",'", class, "'", '+');
+if (vertical)
+    puts("<BR>");
+printf(BUTTON_MAT, "false", ",'", class, "'", '-');
+#else///ifndef BUTTONS_BY_CSS
 printf(PM_BUTTON_UC, "true",  ",'", class, "'", "", "", name,    "add_sm.gif");
 if (vertical)
     puts("<BR>");
 printf(PM_BUTTON_UC, "false", ",'", class, "'", "", "", name, "remove_sm.gif");
+#endif///def BUTTONS_BY_CSS
 }
 
-//#define MATRIX_SQUEEZE 10
+#define MATRIX_SQUEEZE 10
 #ifdef MATRIX_SQUEEZE
-static int matrixSqueeze(membersForAll_t* membersForAll)
+static boolean matrixSqueeze(membersForAll_t* membersForAll)
 // Returns non-zero if the matrix will be squeezed.  Non-zero is actually squeezedLabelHeight
 {
-boolean labelHeight = 0;
+char *browserVersion;
+if (btIE == cgiClientBrowser(&browserVersion, NULL, NULL) && *browserVersion < '9')
+    return 0;
+
 members_t *dimensionX = membersForAll->members[dimX];
 members_t *dimensionY = membersForAll->members[dimY];
 if(dimensionX && dimensionY)
@@ -6142,38 +6182,33 @@ if(dimensionX && dimensionY)
         for (ixX = 0; ixX < dimensionX->count; ixX++)
             {
             if(dimensionX->subtrackList && dimensionX->subtrackList[ixX] && dimensionX->subtrackList[ixX]->val)
-                {
                 cntX++;
-                char *ptr = dimensionX->titles[ixX];
-                int ttlLen = strlen(ptr);
-                while((ptr = strstr(ptr+1,"&nbsp;")) != NULL)  // &nbsp; ????
-                    ttlLen -= 5;
-                if (labelHeight < ttlLen)
-                    labelHeight = ttlLen;
-                }
             }
         if(cntX>MATRIX_SQUEEZE)
-            labelHeight = (labelHeight * 8) + 5;//0.50;
-        else
-            labelHeight = 0;
+            return TRUE;
         }
     }
-return labelHeight;
+return FALSE;
 }
 #else///ifndef MATRIX_SQUEEZE
-#define matrixSqueeze(membersForAll) 0
+#define matrixSqueeze(membersForAll) FALSE
 #endif///ndef MATRIX_SQUEEZE
 
-static void matrixXheadingsRow1(char *db,struct trackDb *parentTdb,int squeeze, membersForAll_t* membersForAll,boolean top)
+static void matrixXheadingsRow1(char *db,struct trackDb *parentTdb,boolean squeeze, membersForAll_t* membersForAll,boolean top)
 /* prints the top row of a matrix: 'All' buttons; X titles; buttons 'All' */
 {
 members_t *dimensionX = membersForAll->members[dimX];
 members_t *dimensionY = membersForAll->members[dimY];
 
+#ifdef MATRIX_SQUEEZE
+printf("<TR ALIGN=CENTER valign=%s>\n",top?"BOTTOM":"TOP");
+#else///ifndef MATRIX_SQUEEZE
 printf("<TR ALIGN=CENTER BGCOLOR='%s' valign=%s>\n",COLOR_BG_ALTDEFAULT,top?"BOTTOM":"TOP");
+#endif///ndef MATRIX_SQUEEZE
 if(dimensionX && dimensionY)
     {
     printf("<TH ALIGN=LEFT valign=%s>",top?"TOP":"BOTTOM");
+    //printf("<TH ALIGN=LEFT valign=%s>",(top == squeeze)?"BOTTOM":"TOP");//"TOP":"BOTTOM");
     buttonsForAll();
     puts("&nbsp;All</TH>");
     }
@@ -6185,9 +6220,9 @@ if(dimensionX)
     if(dimensionY)
         {
         #ifdef MATRIX_SQUEEZE
-        if(squeeze>0)
-            printf("<TH align=RIGHT style='height:%dpx;'><div class='%s'><B><EM>%s</EM></B></div></TH>",
-                   squeeze, (top?"up45":"dn45"), dimensionX->groupTitle);
+        if(squeeze)
+            printf("<TH align=RIGHT><div class='%s'><B><EM>%s</EM></B></div></TH>",
+                   (top?"up45":"dn45"), dimensionX->groupTitle);
         else
         #endif///def MATRIX_SQUEEZE
             printf("<TH align=RIGHT><B><EM>%s</EM></B></TH>", dimensionX->groupTitle);
@@ -6200,15 +6235,18 @@ if(dimensionX)
         if(dimensionX->subtrackList && dimensionX->subtrackList[ixX] && dimensionX->subtrackList[ixX]->val)
             {
         #ifdef MATRIX_SQUEEZE
-            if(dimensionY && squeeze>0)
-                printf("<TH nowrap='' class='%s'><div class='%s'>%s</div></TH>",dimensionX->tags[ixX],(top?"up45":"dn45"),
+            if(dimensionY && squeeze)
+                {
+                strSwapStrs(dimensionX->titles[ixX],strlen(dimensionX->titles[ixX]),"<BR>"," "); // Breaks must be removed!
+                printf("<TH nowrap='' class='%s'><div class='%s'>%s</div></TH>\n",dimensionX->tags[ixX],(top?"up45":"dn45"),
                        compositeLabelWithVocabLink(db,parentTdb,dimensionX->subtrackList[ixX]->val,dimensionX->groupTag,dimensionX->titles[ixX]));
+                }
             else
         #endif///def MATRIX_SQUEEZE
                 {
                 char *label =replaceChars(dimensionX->titles[ixX]," (","<BR>(");
         #ifdef MATRIX_SQUEEZE
-                printf("<TH WIDTH='60' class='%s'>&nbsp;%s&nbsp;</TH>",dimensionX->tags[ixX],
+                printf("<TH WIDTH='60' class='matCell %s all'>&nbsp;%s&nbsp;</TH>",dimensionX->tags[ixX],
         #else///ifndef MATRIX_SQUEEZE
                 printf("<TH WIDTH='60'>&nbsp;%s&nbsp;</TH>",
         #endif///ndef MATRIX_SQUEEZE
@@ -6224,13 +6262,14 @@ if(dimensionX)
         if(dimensionY)
             {
             #ifdef MATRIX_SQUEEZE
-            if(squeeze>0)
+            if(squeeze)
                 printf("<TH align=LEFT><div class='%s'><B><EM>%s</EM></B></div></TH>",
                     (top?"up45":"dn45"), dimensionX->groupTitle);
             else
             #endif///def MATRIX_SQUEEZE
                 printf("<TH align=LEFT><B><EM>%s</EM></B></TH>", dimensionX->groupTitle);
             printf("<TH ALIGN=RIGHT valign=%s>All&nbsp;",top?"TOP":"BOTTOM");
+            //printf("<TH ALIGN=RIGHT valign=%s>All&nbsp;",(top == squeeze)?"BOTTOM":"TOP");//"TOP":"BOTTOM");
             buttonsForAll();
             puts("</TH>");
             }
@@ -6249,7 +6288,7 @@ else if(dimensionY)
 puts("</TR>\n");
 }
 
-static void matrixXheadingsRow2(struct trackDb *parentTdb, int squeeze, membersForAll_t* membersForAll)
+static void matrixXheadingsRow2(struct trackDb *parentTdb, boolean squeeze, membersForAll_t* membersForAll)
 /* prints the 2nd row of a matrix: Y title; X buttons; title Y */
 {
 members_t *dimensionX = membersForAll->members[dimX];
@@ -6259,23 +6298,23 @@ members_t *dimensionY = membersForAll->members[dimY];
 if(dimensionX && dimensionY)
     {
     int ixX,cntX=0;
+    #ifdef MATRIX_SQUEEZE
+    printf("<TR ALIGN=CENTER><TH ALIGN=CENTER colspan=2><B><EM>%s</EM></B></TH>",dimensionY->groupTitle);
+    #else///ifndef MATRIX_SQUEEZE
     printf("<TR ALIGN=CENTER BGCOLOR=\"%s\"><TH ALIGN=CENTER colspan=2><B><EM>%s</EM></B></TH>",COLOR_BG_ALTDEFAULT, dimensionY->groupTitle);
+    #endif///ndef MATRIX_SQUEEZE
     for (ixX = 0; ixX < dimensionX->count; ixX++)    // Special row of +- +- +-
         {
         if(dimensionX->subtrackList && dimensionX->subtrackList[ixX] && dimensionX->subtrackList[ixX]->val)
             {
             char objName[SMALLBUF];
             #ifdef MATRIX_SQUEEZE
-            puts("<TD nowrap>");
+            printf("<TD nowrap class='matCell %s all'>\n",dimensionX->tags[ixX]);
             #else///ifndef MATRIX_SQUEEZE
             puts("<TD>");
             #endif///ndef MATRIX_SQUEEZE
             safef(objName, sizeof(objName), "plus_%s_all", dimensionX->tags[ixX]);
-            boolean vertical = FALSE;
-            #ifdef MATRIX_SQUEEZE
-            vertical = (squeeze>0);
-            #endif///def MATRIX_SQUEEZE
-            buttonsForOne( objName, dimensionX->tags[ixX], vertical );
+            buttonsForOne( objName, dimensionX->tags[ixX], squeeze );
             puts("</TD>");
             cntX++;
             }
@@ -6287,10 +6326,10 @@ if(dimensionX && dimensionY)
     }
 }
 
-static int matrixXheadings(char *db,struct trackDb *parentTdb, membersForAll_t* membersForAll,boolean top)
+static boolean matrixXheadings(char *db,struct trackDb *parentTdb, membersForAll_t* membersForAll,boolean top)
 /* UI for X headings in matrix */
 {
-int squeeze = matrixSqueeze(membersForAll);
+boolean squeeze = matrixSqueeze(membersForAll);
 
 if(top)
     matrixXheadingsRow1(db,parentTdb,squeeze,membersForAll,top);
@@ -6317,7 +6356,7 @@ if(dimensionX && dimensionY && childTdb != NULL) // Both X and Y, then column of
     {
     char objName[SMALLBUF];
     #ifdef MATRIX_SQUEEZE
-    printf("<TH class='%s' ALIGN=%s nowrap colspan=2>",dimensionY->tags[ixY],left?"RIGHT":"LEFT");
+    printf("<TH class='matCell all %s' ALIGN=%s nowrap colspan=2>",dimensionY->tags[ixY],left?"RIGHT":"LEFT");
     #else///ifndef MATRIX_SQUEEZE
     printf("<TH ALIGN=%s nowrap colspan=2>",left?"RIGHT":"LEFT");
     #endif///ndef MATRIX_SQUEEZE
@@ -6337,7 +6376,7 @@ else if (dimensionX)
     }
 else if (left && dimensionY && childTdb != NULL)
     #ifdef MATRIX_SQUEEZE
-    printf("<TH class='%s' ALIGN=RIGHT nowrap>%s</TH>\n",dimensionY->tags[ixY],
+    printf("<TH class='matCell all %s' ALIGN=RIGHT nowrap>%s</TH>\n",dimensionY->tags[ixY],
            compositeLabelWithVocabLink(db,parentTdb,childTdb,dimensionY->groupTag,dimensionY->titles[ixY]));
     #else///ifndef MATRIX_SQUEEZE
     printf("<TH ALIGN=RIGHT nowrap>%s</TH>\n",compositeLabelWithVocabLink(db,parentTdb,childTdb,dimensionY->groupTag,dimensionY->titles[ixY]));
@@ -6471,14 +6510,14 @@ static boolean compositeUiByFilter(char *db, struct cart *cart, struct trackDb *
 membersForAll_t* membersForAll = membersForAllSubGroupsGet(parentTdb,cart);
 if(membersForAll == NULL || membersForAll->filters == FALSE) // Not Matrix or filters
     return FALSE;
-webIncludeResourceFile("ui.dropdownchecklist.css");
-jsIncludeFile("ui.dropdownchecklist.js",NULL);
+    webIncludeResourceFile("ui.dropdownchecklist.css");
+    jsIncludeFile("ui.dropdownchecklist.js",NULL);
 #ifdef NEW_JQUERY
-jsIncludeFile("ddcl.js",NULL);
+    jsIncludeFile("ddcl.js",NULL);
 #endif///def NEW_JQUERY
 
 cgiDown(0.7);
-printf("<B>Filter subtracks %sby:</B> (select multiple %sitems - %s)<BR>\n",
+printf("<B>Select subtracks %sby:</B> (select multiple %sitems - %s)<BR>\n",
        (membersForAll->members[dimX] != NULL || membersForAll->members[dimY] != NULL ? "further ":""),
        (membersForAll->dimMax == dimA?"":"categories and "),FILTERBY_HELP_LINK);
 printf("<TABLE><TR valign='top'>\n");
@@ -6486,13 +6525,17 @@ printf("<TABLE><TR valign='top'>\n");
 // Do All [+][-] buttons
 if(membersForAll->members[dimX] == NULL && membersForAll->members[dimY] == NULL) // No matrix
     {
-    #define PM_BUTTON_FILTER_COMP "<input type='button' class='inOutButton' onclick=\"waitOnFunction(filterCompositeSet,this,%s); return false;\" id='btn_%s' value='%c'>"
     printf("<TD align='left' width='50px'><B>All:</B><BR>");
+#ifdef BUTTONS_BY_CSS
+    // TODO: Test when a real world case actually calls this.  Currently no trackDb.ra cases exist
+    #define BUTTON_FILTER_COMP "<span class='pmButton inOutButton' onclick='waitOnFunction(filterCompositeSet,this,%s)'>%c</span>"
+    printf(BUTTON_FILTER_COMP,"true", '+');
+    printf(BUTTON_FILTER_COMP,"false",'-');
+#else///ifndef BUTTONS_BY_CSS
+    #define PM_BUTTON_FILTER_COMP "<input type='button' class='inOutButton' onclick=\"waitOnFunction(filterCompositeSet,this,%s); return false;\" id='btn_%s' value='%c'>"
     printf(PM_BUTTON_FILTER_COMP,"true",  "plus_fc",'+');
     printf(PM_BUTTON_FILTER_COMP,"false","minus_fc",'-');
-    //#define PM_BUTTON2_FILTER_COMP "<IMG height=18 width=18 onclick=\"filterCompositeSet(%s);\" id='btn_%s' src='../images/%s'>"
-    //printf(PM_BUTTON2_FILTER_COMP,"true",  "plus_fc",   "add_sm.gif");
-    //printf(PM_BUTTON2_FILTER_COMP,"false","minus_fc","remove_sm.gif");
+#endif///ndef BUTTONS_BY_CSS
     printf("</TD>\n");
     }
 
@@ -6644,12 +6687,11 @@ if(dimensionX == NULL && dimensionY == NULL) // Could have been just filterCompo
     return FALSE;
 
 #ifdef MATRIX_SQUEEZE
-printf("<TABLE class='greenBox' cellspacing=0 style='background-color:%s;'>\n",COLOR_BG_ALTDEFAULT);
+printf("<TABLE class='greenBox matrix' cellspacing=0 style='background-color:%s;'>\n",COLOR_BG_ALTDEFAULT);
 #else///ifndef MATRIX_SQUEEZE
 printf("<TABLE class='greenBox' style='background-color:%s;'>\n",COLOR_BG_DEFAULT);
 #endif///ndef MATRIX_SQUEEZE
 
-//int squeeze = matrixXheadings(db,parentTdb,membersForAll,TRUE); // right side labels could be dependent upon squeeze
 (void)matrixXheadings(db,parentTdb,membersForAll,TRUE);
 
 // Now the Y by X matrix
@@ -6660,7 +6702,11 @@ for (ixY = 0; ixY < sizeOfY; ixY++)
         {
         cntY++;
         assert(!dimensionY || ixY < dimensionY->count);
+    #ifdef MATRIX_SQUEEZE
+        printf("<TR ALIGN=CENTER>");
+    #else///ifndef MATRIX_SQUEEZE
         printf("<TR ALIGN=CENTER BGCOLOR='%s'>",COLOR_BG_ALTDEFAULT);
+    #endif///ndef MATRIX_SQUEEZE
 
         matrixYheadings(db,parentTdb, membersForAll,ixY,TRUE);
 
@@ -6776,9 +6822,15 @@ if (trackDbCountDescendantLeaves(parentTdb) <= 1)
 if(dimensionsExist(parentTdb))
     return FALSE;
 
+#ifdef BUTTONS_BY_CSS
+#define BUTTON_ALL   "<span class='pmButton' onclick='matSubCBsCheck(%s)'>%c</span>"
+#define BUTTON_PLUS_ALL_GLOBAL()  printf(BUTTON_ALL,"true", '+')
+#define BUTTON_MINUS_ALL_GLOBAL() printf(BUTTON_ALL,"false",'-')
+#else///ifndef BUTTONS_BY_CSS
 #define PM_BUTTON_GLOBAL "<IMG height=18 width=18 onclick=\"matSubCBsCheck(%s);\" id='btn_%s' src='../images/%s'>"
 #define    BUTTON_PLUS_ALL_GLOBAL()  printf(PM_BUTTON_GLOBAL,"true",  "plus_all",   "add_sm.gif")
 #define    BUTTON_MINUS_ALL_GLOBAL() printf(PM_BUTTON_GLOBAL,"false","minus_all","remove_sm.gif")
+#endif///ndef BUTTONS_BY_CSS
 BUTTON_PLUS_ALL_GLOBAL();
 BUTTON_MINUS_ALL_GLOBAL();
 puts("&nbsp;<B>Select all subtracks</B><BR>");
@@ -6953,13 +7005,13 @@ boolean viewsOnly = FALSE;
 if (primarySubtrack == NULL)
     {
     if (!cartVarExists(cart, "ajax"))
-        {
-        if(trackDbSetting(tdb, "dragAndDrop") != NULL)
-            jsIncludeFile("jquery.tablednd.js", NULL);
-        jsIncludeFile("ajax.js",NULL);
-        #ifdef TABLE_SCROLL
-        jsIncludeFile("jquery.fixedtable.js",NULL);
-        #endif//def TABLE_SCROLL
+    {
+    if(trackDbSetting(tdb, "dragAndDrop") != NULL)
+        jsIncludeFile("jquery.tablednd.js", NULL);
+    jsIncludeFile("ajax.js",NULL);
+    #ifdef TABLE_SCROLL
+    jsIncludeFile("jquery.fixedtable.js",NULL);
+    #endif//def TABLE_SCROLL
         }
     jsIncludeFile("hui.js",NULL);
     }
@@ -7360,12 +7412,46 @@ void printBbiUpdateTime(time_t *timep)
 	sqlUnixTimeToDate(timep, FALSE));
 }
 
-struct extraField *extraFieldsGet(struct trackDb *tdb)
+#ifdef EXTRA_FIELDS_SUPPORT
+static struct extraField *asFieldsGet(char *db, struct trackDb *tdb)
+// returns the as style fields from a table or remote data file
+{
+struct extraField *asFields = NULL;
+struct sqlConnection *conn = hAllocConnTrack(db, tdb);
+struct asObject *as = asForTdb(conn, tdb);
+hFreeConn(&conn);
+if (as != NULL)
+    {
+    struct asColumn *asCol = as->columnList;
+    for (;asCol != NULL; asCol = asCol->next)
+        {
+        struct extraField *asField  = NULL;
+        AllocVar(asField);
+        asField->name = cloneString(asCol->name);
+        if (asCol->comment != NULL && strlen(asCol->comment) > 0)
+            asField->label = cloneString(asCol->comment);
+        else
+            asField->label = cloneString(asField->name);
+        asField->type = ftString; // default
+        if (asTypesIsInt(asCol->lowType->type))
+            asField->type = ftInteger;
+        else if (asTypesIsFloating(asCol->lowType->type))
+            asField->type = ftFloat;
+        slAddHead(&asFields,asField);
+        }
+    if (asFields != NULL)
+        slReverse(&asFields);
+    asObjectFree(&as);
+    }
+return asFields;
+}
+
+struct extraField *extraFieldsGet(char *db, struct trackDb *tdb)
 // returns any extraFields defined in trackDb
 {
 char *fields = trackDbSetting(tdb, "extraFields"); // showFileds pValue=P_Value qValue=qValue
 if (fields == NULL)
-    return NULL;
+    return asFieldsGet(db, tdb);
 
 char *field = NULL;
 struct extraField *extras = NULL;
@@ -7430,4 +7516,99 @@ if (pExtras != NULL)
         }
     *pExtras = NULL;
     }
+}
+#endif///def EXTRA_FIELDS_SUPPORT
+
+static struct asObject *asForTdbOrDie(struct sqlConnection *conn, struct trackDb *tdb)
+// Get autoSQL description if any associated with tdb.
+// Abort if there's a problem
+{
+struct asObject *asObj = NULL;
+if (tdbIsBigBed(tdb))
+    {
+    char *fileName = tdbBigFileName(conn, tdb);
+    asObj = bigBedFileAsObjOrDefault(fileName);
+    freeMem(fileName);
+    }
+// TODO: standardize to a wig as
+//else if (tdbIsBigWig(tdb))
+//    asObj = asObjFrombigBed(conn,tdb);
+else if (tdbIsBam(tdb))
+    asObj = bamAsObj();
+else if (tdbIsVcf(tdb))
+    asObj = vcfAsObj();
+if (startsWithWord("makeItems", tdb->type))
+    asObj = makeItemsItemAsObj();
+else if (sameWord("bedDetail", tdb->type))
+    asObj = bedDetailAsObj();
+else if (sameWord("pgSnp", tdb->type))
+    asObj = pgSnpAsObj();
+else
+    {
+    if (sqlTableExists(conn, "tableDescriptions"))
+        {
+        char query[256];
+        char *asText = NULL;
+
+        // Try unsplit table first.
+        safef(query, sizeof(query),
+            "select autoSqlDef from tableDescriptions where tableName='%s'",tdb->table);
+        asText = sqlQuickString(conn, query);
+
+        // If no result try split table.
+        if (asText == NULL)
+            {
+            safef(query, sizeof(query),
+                "select autoSqlDef from tableDescriptions where tableName='chrN_%s'",tdb->table);
+            asText = sqlQuickString(conn, query);
+            }
+
+        if (asText != NULL && asText[0] != 0)
+            asObj = asParseText(asText);
+        freez(&asText);
+        }
+    }
+return asObj;
+}
+
+struct asObject *asForTdb(struct sqlConnection *conn, struct trackDb *tdb)
+// Get autoSQL description if any associated with table.
+{
+struct errCatch *errCatch = errCatchNew();
+struct asObject *asObj = NULL;
+// Wrap some error catching around asForTdbOrDie.
+if (errCatchStart(errCatch))
+    {
+    asObj = asForTdbOrDie(conn, tdb);
+    }
+errCatchEnd(errCatch);
+errCatchFree(&errCatch);
+return asObj;
+}
+
+struct asColumn *asColumnFind(struct asObject *asObj, char *name)
+// Return named column.
+{
+struct asColumn *asCol = NULL;
+if (asObj!= NULL)
+    {
+    for (asCol = asObj->columnList; asCol != NULL; asCol = asCol->next)
+        if (sameString(asCol->name, name))
+             break;
+    }
+return asCol;
+}
+
+struct slName *asColNames(struct asObject *as)
+// Get list of column names.
+{
+struct slName *list = NULL, *el;
+struct asColumn *col;
+for (col = as->columnList; col != NULL; col = col->next)
+    {
+    el = slNameNew(col->name);
+    slAddHead(&list, el);
+    }
+slReverse(&list);
+return list;
 }

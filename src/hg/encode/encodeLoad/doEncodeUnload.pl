@@ -19,26 +19,35 @@ use Getopt::Long;
 use Cwd;
 use File::Basename;
 
-BEGIN{
+use FindBin qw($Bin);
+use lib "$Bin";
+use Encode;
+use HgAutomate;
+use HgDb;
+use RAFile;
 
-unshift(@INC, ".");
-require Encode; Encode->import;
-require HgAutomate; HgAutomate->import;
-require HgDb; HgDb->import;
-require RAFile; RAFile->import;
-require SafePipe; SafePipe->import;
 
-}
 use vars qw/$opt_verbose $opt_configDir/;
 my $PROG = basename $0;
 
 sub usage
 {
     print STDERR <<END;
-    usage: doEncodeUnload.pl submission_type project_submission_dir
-           submission_type is currently ignored
-           project_submission_dir needs a full path
-           OPTIONS: -verbose=i -configDir=s
+usage: doEncodeUnload.pl pipeline-instance project_submission_dir
+
+The pipeline instance variable is a switch that changes the behavior of doEncodeUnload.
+The changes if the instance is:
+
+standard
+    allows use of hg19 and mm9 databases only
+
+anything else
+    allows use of the encodeTest database only
+
+	project_submission_dir needs a full path
+	OPTIONS:
+		-verbose=i	Verbosity level
+		-configDir=s	Config directory location
 END
     exit(1);
 }
@@ -123,7 +132,7 @@ if(@ARGV != 2) {
     usage();
 }
 
-my $submitType = $ARGV[0];	# currently not used
+my $pipelineInstance = $ARGV[0];	# currently not used
 my $submitDir = $ARGV[1];	# directory where data files are
 my $configPath;
 if (defined $opt_configDir) {
@@ -136,20 +145,9 @@ if (defined $opt_configDir) {
     $configPath = "$submitDir/../config"
 }
 
-# Add a suffix for non-production loads (to avoid loading over existing tables).
-
-my $tableSuffix = "";
-if(dirname($submitDir) =~ /_(.*)/) {
-    if($1 ne 'prod') {
-	# yank out "beta" from encinstance_beta
-        $tableSuffix = "_$1_" . basename($submitDir);;
-    }
-} else {
-    $tableSuffix = "_" . basename($submitDir);;
-}
 
 my $fields = Encode::getFields($configPath);
-my $daf = Encode::getDaf($submitDir, $fields);
+my $daf = Encode::getDaf($submitDir, $fields, $pipelineInstance);
 my $downloadDir = Encode::downloadDir($daf);
 
 chdir($submitDir) || die "Couldn't chdir to '$submitDir'";
@@ -167,7 +165,7 @@ my %ra = RAFile::readRaFile($unloadRa, 'tablename');
 my $db;
 for my $key (keys %ra) {
     my $h = $ra{$key};
-    my $tablename = $h->{tablename} . $tableSuffix;
+    my $tablename = $h->{tablename};
     my $files = $h->{files};
     my @files = split(/\s+/, $files);
 
