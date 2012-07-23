@@ -149,7 +149,8 @@ wikiDisconnect(&wikiConn);
 
 slSort(&lfList, linkedFeaturesCmp);
 
-if (wikiTrackEnabled(database, NULL))
+/* read-only option 2012-06-25 */
+if ((! wikiTrackReadOnly()) && wikiTrackEnabled(database, NULL))
     {
     // add special item to allow creation of new entries
     AllocVar(bed);
@@ -234,6 +235,7 @@ if (wikiTrackEnabled(database, NULL))
     tg->exonArrows = TRUE;
     tg->nextItemButtonable = TRUE;
     tdb->track = cloneString(tg->track);
+    tdb->canPack = tg->canPack;
     tdb->table = cloneString(tg->table);
     tdb->shortLabel = cloneString(tg->shortLabel);
     tdb->longLabel = cloneString(tg->longLabel);

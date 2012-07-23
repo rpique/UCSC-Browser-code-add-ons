@@ -452,17 +452,6 @@ oldToNew kg3ToKg4
 baseColorUseCds given
 baseColorDefault genomicCodons
 
-track tRNAs
-shortLabel tRNA Genes
-longLabel Transfer RNA genes identified with tRNAscan-SE
-group genes
-priority 53.5
-visibility hide
-color 0,20,150
-type bed 6 +
-nextItemButton on
-noScoreFilter .
-
 # Overrides for track pgSnp:
     track pgKb1Comb override
     pgSiftPredTab pgKb1Sift
@@ -596,14 +585,6 @@ searchTable nscanGene
 searchType genePred
 termRegex (chr)?.*\.[0-9]+\.[0-9]+\.[a-z]+
 searchPriority 50
-
-searchName tRNA-name
-searchTable tRNAs
-searchType bed
-searchMethod fuzzy
-query select chrom,chromStart,chromEnd,name from %s where name like '%%%s%%'
-searchDescription tRNAscan-SE tRNA Name
-searchPriority 63
 
 searchTable nscanPasaGene
 searchType genePred
@@ -1110,7 +1091,7 @@ spectrum on
 urlLabel Transfac matrix link:
 url http://www.gene-regulation.com/cgi-bin/pub/databases/transfac/getTF.cgi?AC=$$
 
-track agilentCgh
+track genotypeArrays
 shortLabel Agilent Array
 longLabel Agilent Microarray Probesets
 compositeTrack on
@@ -1121,56 +1102,56 @@ noScoreFilter .
 type bed 6 .
 
     track agilentCgh1x1m
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag CGH 1x1m
     longLabel Agilent SurePrint G3 Human CGH Microarray 1x1M AMADID 021529
     color 0,128,0
     priority 1
 
     track agilentHrd1x1m
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag HRD 1x1m
     longLabel Agilent SurePrint G3 Human High-Resolution Microarray 1x1M AMADID 023642
     color 255,128,0
     priority 2
 
     track agilentCgh2x400k
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag CGH 2x400k
     longLabel Agilent SurePrint G3 Human CGH Microarray 2x400K AMADID 021850
     color 0,128,0
     priority 3
 
     track agilentCgh4x180k
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag CGH 4x180k
     longLabel Agilent SurePrint G3 Human CGH Microarray 4x180K AMADID 022060
     color 255,128,0
     priority 4
 
     track agilentCgh8x60k
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag CGH 8x60k
     longLabel Agilent SurePrint G3 Human CGH Microarray 8x60K AMADID 021924
     color 0,128,0
     priority 5
 
     track agilentCgh244a
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag CGH 1x244k
     longLabel Agilent SurePrint HD Human CGH Microarray 1x244K AMADID 014693
     color 255,128,0
     priority 6
 
     track agilentCgh105a
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag CGH 2x105k
     longLabel Agilent SurePrint HD Human CGH Microarray 2x105K AMADID 014698
     color 0,128,0
     priority 7
 
     track agilentCgh44k
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag CGH 4x44k
     longLabel Agilent SurePrint HD Human CGH Microarray 4x44K AMADID 014950
     color 255,128,0
@@ -3701,54 +3682,6 @@ priority 110
         minScore 0
         maxScore 99
 
-track oneKGHighCovSeq
-compositeTrack on
-shortLabel 1kG High-Cov Seq
-longLabel 1000 Genomes High-Coverage Individuals Sequence Reads
-group x
-priority 4.1
-visibility hide
-type bam
-pairEndsByName .
-stripPrefix chr
-baseColorUseSequence lfExtra
-baseColorDefault diffBases
-showDiffBasesAllScales .
-showDiffBasesMaxZoom 100
-chromosomes chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY
-maxWindowToDraw 200000
-
-    track bamNA12878
-    parent oneKGHighCovSeq on
-    shortLabel NA12878 Slx BAM
-    longLabel 1000Genomes NA12878 Solexa aligned reads
-
-    track bamNA12891
-    parent oneKGHighCovSeq on
-    shortLabel NA12891 Slx BAM
-    longLabel 1000Genomes NA12891 Solexa aligned reads
-
-track NA12878Slx
-shortLabel NA12878 depth
-longLabel 1000Genomes NA12878 chr22 Solexa read depth
-group x
-priority 4.11
-visibility hide
-type wig 1 11161
-viewLimits 1:50
-maxHeightPixels 128:32:16
-autoScale off
-chromosomes chr22
-
-track phasedGenotypesNA12878
-shortLabel Phased NA12878
-longLabel 1000Genomes NA12878 SNPs (Dec. 08) phased by Tim Reddy at Stanford
-group x
-priority 4.12
-visibility hide
-type bed 4
-chromosomes chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX
-
 track fantom4CageGraphTop
 compositeTrack on
 shortLabel Fantom 4 Promoter
@@ -3988,3 +3921,11 @@ priority 500.4
 visibility hide
 type bedDetail 6
 color 128,0,128
+
+track sibGene override
+url http://ccg.vital-it.ch/cgi-bin/tromer/tromer_quick_search_internal.pl?db=hg18&query_str=$$
+urlLabel SIB link:
+
+track sibTxGraph override
+url http://ccg.vital-it.ch/cgi-bin/tromer/tromergraph2draw.pl?db=hg18&species=H.+sapiens&tromer=$$
+

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 
 #
 # cellType.py: parse any to-be-registered cell type from the wiki,
@@ -14,7 +14,7 @@ import re
 import string
 import sys
 import urllib2
-from ucscgenomics.rafile.RaFile import *
+from ucscGb.gbData.ra.raStanza import RaStanza
 
 
 
@@ -190,7 +190,7 @@ soup = BeautifulSoup(thepage)
 # Once you reach the table, process each <td> line until an end of
 # table tag is reached.
 #
-cellTypeTable = soup.findAll("table")[2]
+cellTypeTable = soup.findAll("table")[1]
 skippedHeaderRow = False
 for entry in cellTypeTable.findAll("tr"):
     if not skippedHeaderRow:

@@ -7,13 +7,19 @@ wgEncodeCaltechRnaSeq.ra \
 wgEncodeCshlLongRnaSeq.ra \
 wgEncodeCshlShortRnaSeq.ra \
 wgEncodeDukeAffyExon.ra \
-wgEncodeGencodeV4.ra \
+wgEncodeFsuRepliChip.ra \
 wgEncodeGencodeV7.ra \
+wgEncodeGencodeV10.ra \
+wgEncodeGencodeV11.ra \
+wgEncodeGencodeV12.ra \
+wgEncodeGisChiaPet.ra \
 wgEncodeGisDnaPet.ra \
 wgEncodeGisRnaPet.ra \
 wgEncodeGisRnaSeq.ra \
 wgEncodeHaibGenotype.ra \
+wgEncodeHaibMethyl450.ra \
 wgEncodeHaibMethylRrbs.ra \
+wgEncodeHaibRnaSeq.ra \
 wgEncodeHaibTfbs.ra \
 wgEncodeMapability.ra \
 wgEncodeOpenChromChip.ra \
@@ -29,16 +35,17 @@ wgEncodeSunySwitchgear.ra \
 wgEncodeSydhHistone.ra \
 wgEncodeSydhNsome.ra \
 wgEncodeSydhRnaSeq.ra \
+wgEncodeSydhTfbs.ra \
 wgEncodeUchicagoTfbs.ra \
+wgEncodeUmassDekker5C.ra \
 wgEncodeUncBsuProt.ra \
 wgEncodeUw5C.ra \
 wgEncodeUwAffyExonArray.ra \
 wgEncodeUwDgf.ra \
 wgEncodeUwDnase.ra \
 wgEncodeUwHistone.ra \
+wgEncodeUwRepliSeq.ra \
 wgEncodeUwTfbs.ra \
-wgEncodeSydhTfbs.ra \
-wgEncodeHaibMethyl450.ra \
 
 include ../../../../makefile.metaDb
 

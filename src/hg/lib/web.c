@@ -26,6 +26,7 @@
 #include <utime.h>
 #include <htmlPage.h>
 #include <signal.h>
+#include "geoMirror.h"
 /* phoneHome business */
 
 
@@ -386,12 +387,57 @@ else if (dbIsFound)
 
 #endif
 
+if (endsWith(scriptName, "hgGateway") && geoMirrorEnabled())
+    {
+    // Show an opt-out alert if user is on a host to which user has been automatically redirected (just once, right after they have been redirected)
+    char *source = cgiOptionalString("source");
+    char *redirect = cgiOptionalString("redirect");
+    if (source != NULL && redirect != NULL && sameString(redirect, "auto"))
+	{
+	char *domain = cgiServerName();
+	char *port = cgiServerPort();
+        // We don't bother maintaining stuff in request URI, because it may contain items like hgsid and other host specific values
+        int newUriSize = 2048;
+	char *newUri = needMem(newUriSize);
+	// TODO what about https?
+	safef(newUri, newUriSize, "http://%s:%s/cgi-bin/hgGateway?redirect=manual&source=%s", source, port, domain);
+
+	//empty TD disappears
+	/*
+	printf("<TR><TD COLSPAN=3 id='redirectTd' onclick=\"javascript:document.getElementById('redirectTd').innerHTML='';\">"
+	    "<center>"
+	    "You've been redirected to your nearest mirror - %s<br>"
+	    "<a href=\"%s\">Take me back to %s</a>"
+	    "</center>"
+	    "</TD></TR>\n"
+	    , domain, newUri, source );
+	    "<h3 style=\"background-color: #2636d1; text-align: center; color:#E0F0F0; margin-top:0px;\">"
+	*/
+
+	printf("<TR><TD COLSPAN=3 id='redirectTd' onclick=\"javascript:document.getElementById('redirectTd').innerHTML='';\">"
+	    "<div style=\"margin: 10px 25%%; border-style:solid; border-width:thin; border-color:#97D897;\">"
+	    "<h3 style=\"background-color: #97D897; text-align: left; margin-top:0px; margin-bottom:0px;\">"
+	    "<img style=\"float:left; margin-top:4px; margin-left:3px; margin-right:4px;\" src=\"http://uswest.ensembl.org/i/info_blue_13.png\">"
+	    "You've been redirected to your nearest mirror - %s"
+	    "<img title=\"Hide hint panel\" alt=\"Hide hint panel\" style=\"float:right; margin-top:3px; margin-right:3px\" src=\"http://uswest.ensembl.org/i/close.gif\">"
+	    "</h3> "
+	    "<ul style=\"margin:5px;\">"
+	    "<li>Take me back to <a href=\"%s\">%s</a>"
+	    "</li>"
+	    "</ul>"
+	    "</div>"
+	    "</TD></TR>\n"
+	    , domain, newUri, source );
+	}
+    }
+
 if(!skipSectionHeader)
 /* this HTML must be in calling code if skipSectionHeader is TRUE */
     {
     puts(        // TODO: Replace nested tables with CSS (difficulty is that tables are closed elsewhere)
          "<!-- +++++++++++++++++++++ CONTENT TABLES +++++++++++++++++++ -->" "\n"
          "<TR><TD COLSPAN=3>\n"
+	 "<div id=firstSection>"
          "      <!--outer table is for border purposes-->\n"
          "      <TABLE WIDTH='100%' BGCOLOR='#" HG_COL_BORDER "' BORDER='0' CELLSPACING='0' CELLPADDING='1'><TR><TD>\n"
          "    <TABLE BGCOLOR='#" HG_COL_INSIDE "' WIDTH='100%'  BORDER='0' CELLSPACING='0' CELLPADDING='0'><TR><TD>\n"
@@ -492,6 +538,7 @@ puts(
     "	</TD></TR></TABLE>" "\n"
     "	</TD></TR></TABLE>" "\n"
     "	" );
+puts("</div>");
 }
 
 void webNewSection(char* format, ...)
@@ -501,6 +548,7 @@ va_list args;
 va_start(args, format);
 
 webEndSection();
+puts("<div>");
 puts("<!-- +++++++++++++++++++++ START NEW SECTION +++++++++++++++++++ -->");
 puts(  // TODO: Replace nested tables with CSS (difficulty is that tables are closed elsewhere)
     "<BR>\n\n"
@@ -543,10 +591,13 @@ if(!webInTextMode)
     }
 }
 
+static boolean gotWarnings = FALSE;
+
 void webVaWarn(char *format, va_list args)
 /* Warning handler that closes out page and stuff in
  * the fancy form. */
 {
+gotWarnings = TRUE;
 boolean needStart = !webHeadAlreadyOutputed;
 if (needStart)
     webStart(errCart, NULL, "Error");
@@ -557,6 +608,12 @@ if (needStart)
     webEnd();
 }
 
+
+boolean webGotWarnings()
+/* Return TRUE if webVaWarn has been called. */
+{
+return gotWarnings;
+}
 
 void webAbort(char* title, char* format, ...)
 /* an abort function that outputs a error page */
@@ -886,10 +943,24 @@ return retDb;
 }
 
 static unsigned long expireSeconds = 0;
+static boolean lazarus = FALSE;
+void lazarusLives(unsigned long newExpireSeconds)
+/* Long running process requests more time */
+{
+lazarus = TRUE;
+expireSeconds = newExpireSeconds;
+}
+
 /* phoneHome business */
 static void cgiApoptosis(int status)
 /* signal handler for SIGALRM for phoneHome function and CGI expiration */
 {
+if (lazarus)
+    {
+    (void) alarm(expireSeconds);    /* CGI timeout */
+    lazarus = FALSE;
+    return;
+    }
 if (expireSeconds > 0)
     {
     /* want to see this error message in the apache error_log also */
@@ -963,8 +1034,8 @@ if (scriptName && ip)  /* will not be true from command line execution */
 	    (void) alarm(6);	/* timeout here in 6 seconds */
 #include "versionInfo.h"
 	    char url[1024];
-	    safef(url, sizeof(url), "%s%s",
-	"http://genomewiki.ucsc.edu/cgi-bin/useCount?version=browser.v",
+	    safef(url, sizeof(url), "%s%s%s%s%s%s", "http://",
+	"genomewiki.", "ucsc.edu/", "cgi-bin/useCount?", "version=browser.v",
 		CGI_VERSION);
 
 	    /* 6 second alarm will exit this page fetch if it does not work */
@@ -1322,8 +1393,10 @@ dyStringFree(&fullDirName);
 char *linkFull = dyStringCannibalize(&linkWithTimestamp);
 char *link = linkFull;
 if (docRoot != NULL)
+    {
     link = cloneString(linkFull + strlen(docRoot) + 1);
-freeMem(linkFull);
+    freeMem(linkFull);
+    }
 
 if (wrapInHtml) // wrapped for christmas
     {

@@ -1,4 +1,4 @@
-# Data Agreement File for RIKEN CAGE project $Revision: 1.6 $
+# Data Agreement File for RIKEN CAGE project $Revision: 1.9 $
 
 # This file specifies the data agreement between your lab and
 # the DCC.  It should not be changed unilaterally.
@@ -19,8 +19,6 @@
 #
 #NOTE:  The optional columns do not have to be in the DDF for validation
 
-
-
 # Lab and general info
 dafVersion        2.0
 grant             Gingeras
@@ -33,38 +31,30 @@ assembly          hg19
 validationSettings      validateFiles.bam:mismatches=8
 
 # Track/view definition
-# Change the required field if you need to submit data separately
-
-#This is still in negotiation with Timo
-#view             Promoters
-#type		 encodeRnaElements
-#required         no
-#hasReplicates    no  #pooled
-
 view             PlusRawSignal   
 type             bigWig    
-required         yes
+required         no 
 hasReplicates    yes
 
 view             MinusRawSignal  
 type             bigWig    
-required         yes
+required         no 
 hasReplicates    yes
 
 view             Alignments
 type             bam
-required         yes
+required         no 
 hasReplicates    yes
 
 view             RawData
 type             fastq
 hasReplicates    yes
-required         yes 
+required         no  
 
-# Optional elements files can be submitted with data or with separate DAF
 # Pooled replicates
-view             TSS
-type             gtf
+view             TssHmm
+type             bedRnaElements
+sql		 bedRnaElements
 hasReplicates    no 
-required         yes
-downloadOnly     yes
+required         no
+

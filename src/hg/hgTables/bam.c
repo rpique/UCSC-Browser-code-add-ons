@@ -21,6 +21,7 @@
 #include "hubConnect.h"
 #include "hgTables.h"
 #include "asFilter.h"
+#include "xmlEscape.h"
 #include "hgBam.h"
 #if (defined USE_BAM && defined KNETFILE_HOOKS)
 #include "knetUdc.h"
@@ -33,7 +34,7 @@ boolean isBamTable(char *table)
 {
 if (isHubTrack(table))
     {
-    struct trackDb *tdb = hashFindVal(fullTrackAndSubtrackHash, table);
+    struct trackDb *tdb = hashFindVal(fullTableToTdbHash, table);
     return startsWithWord("bam", tdb->type);
     }
 else
@@ -240,7 +241,8 @@ return tLength;
 }
 
 static void addFilteredBedsOnRegion(char *fileName, struct region *region,
-	char *table, struct asFilter *filter, struct lm *bedLm, struct bed **pBedList, struct hash *idHash)
+	char *table, struct asFilter *filter, struct lm *bedLm, struct bed **pBedList,
+	struct hash *idHash, int *pMaxOut)
 /* Add relevant beds in reverse order to pBedList */
 {
 struct lm *lm = lmInit(0);
@@ -264,6 +266,9 @@ for (sam = samList; sam != NULL; sam = sam->next)
 	bed->name = lmCloneString(bedLm, sam->qName);
 	slAddHead(pBedList, bed);
 	}
+    (*pMaxOut)--;
+    if (*pMaxOut <= 0)
+	break;
     }
 lmCleanup(&lm);
 }
@@ -273,6 +278,7 @@ struct bed *bamGetFilteredBedsOnRegions(struct sqlConnection *conn,
 	int *retFieldCount)
 /* Get list of beds from BAM, in all regions, that pass filtering. */
 {
+int maxOut = bigFileMaxOutput();
 /* Figure out bam file name get column info and filter. */
 struct asObject *as = bamAsObj();
 struct asFilter *filter = asFilterFromCart(cart, db, table, as);
@@ -284,8 +290,14 @@ struct region *region;
 for (region = regionList; region != NULL; region = region->next)
     {
     char *fileName = bamFileName(table, conn, region->chrom);
-    addFilteredBedsOnRegion(fileName, region, table, filter, lm, &bedList, idHash);
+    addFilteredBedsOnRegion(fileName, region, table, filter, lm, &bedList, idHash, &maxOut);
     freeMem(fileName);
+    if (maxOut <= 0)
+	{
+	warn("Reached output limit of %d data values, please make region smaller,\n"
+	     "\tor set a higher output line limit with the filter settings.", bigFileMaxOutput());
+	break;
+	}
     }
 slReverse(&bedList);
 return bedList;
@@ -375,7 +387,9 @@ for (sam=samList; sam != NULL; sam = sam->next)
     hPrintf("<TR>");
     for (colIx=0; colIx<colCount; ++colIx)
         {
-	writeHtmlCell(row[colIx]);
+        hPrintf("<TD>");
+        xmlEscapeStringToFile(row[colIx], stdout);
+        hPrintf("</TD>");
 	}
     hPrintf("</TR>\n");
     }

@@ -54,11 +54,6 @@
 #define MAXPIXELS 14000
 #endif
 
-// imageV2 dragReorder supercedes 'priority' based reordering which used to be allowed
-// on the cfg controls page.  While the priority order is still supported as default,
-// you can re-allow setting those priorities by defining PRIORITY_CHANGES_IN_CONFIG_UI
-//#define PRIORITY_CHANGES_IN_CONFIG_UI
-
 struct track
 /* Structure that displays of tracks. The central data structure
  * of the graphical genome browser. */
@@ -296,6 +291,13 @@ enum {lfWithBarbs = 3}; /* Turn on barbs to show direction based on
 enum {lfSubChain = 4};
 enum {lfNoIntronLines = 5}; /* Draw no lines between exon blocks */
 
+enum highlightMode
+    {
+    highlightNone=0,
+    highlightBackground=1,
+    highlightOutline=2
+    };
+
 struct linkedFeatures
 /* A linked set of features - drawn as a bunch of boxes (often exons)
  * connected by horizontal lines (often introns).  About 75% of
@@ -315,6 +317,8 @@ struct linkedFeatures
     void *original;			/* The structure that was converted
 					   into this (when needed later).  */
     struct itemAttr *itemAttr;          /* itemAttr object for this lf, or NULL */
+    unsigned highlightColor;            /* highlight color,0 if no highlight */
+    enum highlightMode highlightMode;   /* highlight mode,0 if no highlight */
     };
 
 struct linkedFeaturesSeries
@@ -351,18 +355,9 @@ struct gsidSeq
     char *subjId;
     };
 
-/* list of links to display in a menu */
-struct hotLink
-    {
-    struct hotLink *next;
-    char *name;
-    char *url;
-    char *id;
-    };
-
 extern char *excludeVars[];
 extern struct trackLayout tl;
-extern struct jsonHashElement *jsonForClient;
+extern struct jsonElement *jsonForClient;
 
 extern struct cart *cart; /* The cart where we keep persistent variables. */
 extern struct hash *oldVars;       /* List of vars from previous cart. */
@@ -697,6 +692,9 @@ struct linkedFeatures *lfFromBedExtra(struct bed *bed, int scoreMin, int scoreMa
 
 struct linkedFeatures *lfFromBed(struct bed *bed);
 /* Return a linked feature from a (full) bed. */
+
+void loadSimpleBedAsLinkedFeaturesPerBase(struct track *tg);
+/* bed list not freed as pointer to it is stored in 'original' field */
 
 void loadSimpleBed(struct track *tg);
 /* Load the items in one track - just move beds in
@@ -1148,6 +1146,9 @@ struct track *trackNew();
 void bedMethods(struct track *tg);
 /* Fill in methods for (simple) bed tracks. */
 
+void bed9Methods(struct track *tg);
+/* Fill in methods for bed9 tracks. */
+
 void complexBedMethods(struct track *track, struct trackDb *tdb, boolean isBigBed,
                                 int wordCount, char *words[]);
 /* Fill in methods for more complex bed tracks. */
@@ -1254,8 +1255,9 @@ void createHgFindMatchHash();
 /* Read from the cart the string assocated with matches and
    put the matching items into a hash for highlighting later. */
 
-TrackHandler lookupTrackHandler(char *name);
-/* Lookup handler for track of give name.  Return NULL if none. */
+TrackHandler lookupTrackHandlerClosestToHome(struct trackDb *tdb);
+/* Lookup handler for track of give name.  Try parents if
+ * subtrack has a NULL handler.  Return NULL if none. */
 
 void registerTrackHandlers();
 /* Register tracks that include some non-standard methods. */
@@ -1280,6 +1282,12 @@ boolean superTrackHasVisibleMembers(struct trackDb *tdb);
 
 enum trackVisibility limitedVisFromComposite(struct track *subtrack);
 /* returns the subtrack visibility which may be limited by composite with multi-view dropdowns. */
+
+INLINE enum trackVisibility actualVisibility(struct track *track)
+// return actual visibility for this track (limited to limitedVis if appropriate)
+{
+return track->limitedVisSet ? track->limitedVis : track->visibility;
+}
 
 char *getScoreFilterClause(struct cart *cart,struct trackDb *tdb,char *scoreColumn);
 // Returns "score >= ..." extra where clause if one is needed
@@ -1336,6 +1344,9 @@ int gCmpPriority(const void *va, const void *vb);
 
 int tgCmpPriority(const void *va, const void *vb);
 /* Compare to sort based on priority; use shortLabel as secondary sort key. */
+
+void printMenuBar();
+/* Put up the menu bar. */
 
 #define measureTime uglyTime
 

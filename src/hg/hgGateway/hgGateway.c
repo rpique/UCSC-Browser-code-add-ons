@@ -19,7 +19,7 @@
 #include "hPrint.h"
 #include "suggest.h"
 #include "search.h"
-
+#include "geoMirror.h"
 
 struct cart *cart = NULL;
 struct hash *oldVars = NULL;
@@ -55,44 +55,33 @@ if (sameString(position, "genome") || sameString(position, "hgBatch"))
     position = defaultPosition;
 
 jsIncludeFile("jquery.js", NULL);
-#ifdef NEW_JQUERY
 webIncludeResourceFile("jquery-ui.css");
 jsIncludeFile("jquery-ui.js", NULL);
-printf("<script type='text/javascript'>var newJQuery=true;</script>\n");
-#else///ifndef NEW_JQUERY
-webIncludeResourceFile("autocomplete.css");
-jsIncludeFile("jquery.autocomplete.js", NULL);
-printf("<script type='text/javascript'>var newJQuery=false;</script>\n");
-#endif///ndef NEW_JQUERY
 jsIncludeFile("ajax.js", NULL);
 jsIncludeFile("autocomplete.js", NULL);
 jsIncludeFile("hgGateway.js", NULL);
 jsIncludeFile("utils.js", NULL);
 
-puts(
-"<CENTER style='font-size:small;'>"
-"The UCSC Genome Browser was created by the \n"
-"<A HREF=\"../staff.html\">Genome Bioinformatics Group of UC Santa Cruz</A>.\n"
-"<BR>"
-"Software Copyright (c) The Regents of the University of California.\n"
-"All rights reserved.\n"
-"</CENTER>\n"
-);
+puts("<CENTER style='font-size:small;'>"
+     "The UCSC Genome Browser was created by the \n"
+     "<A HREF=\"../staff.html\">Genome Bioinformatics Group of UC Santa Cruz</A>.\n"
+     "<BR>"
+     "Software Copyright (c) The Regents of the University of California.\n"
+     "All rights reserved.\n"
+     "</CENTER>\n");
 
-puts(
-"<FORM ACTION='../cgi-bin/hgTracks' NAME='mainForm' METHOD='GET' style='display:inline;'>\n"
-"<CENTER>"
-"<table style='background-color:#FFFEF3; border: 1px solid #CCCC99;'>\n"
-"<tr><td>\n");
+puts("<FORM ACTION='../cgi-bin/hgTracks' NAME='mainForm' METHOD='GET' style='display:inline;'>\n"
+     "<CENTER>"
+     "<table style='background-color:#FFFEF3; border: 1px solid #CCCC99;'>\n"
+     "<tr><td>\n");
 cgiMakeHiddenVar(hgHubConnectCgiDestUrl, "../cgi-bin/hgTracks");
 
 puts("<table><tr>");
 if (gotClade)
     puts("<td align=center valign=baseline>clade</td>");
-puts(
-"<td align=center valign=baseline>genome</td>\n"
-"<td align=center valign=baseline>assembly</td>\n"
-"<td align=center valign=baseline>position or search term</td>\n");
+puts("<td align=center valign=baseline>genome</td>\n"
+     "<td align=center valign=baseline>assembly</td>\n"
+     "<td align=center valign=baseline>position or search term</td>\n");
 if(supportsSuggest)
     puts("<td align=center valign=baseline><a title='click for help on gene search box' target='_blank' href='../goldenPath/help/geneSearchBox.html'>gene</a></td>\n");
 puts(
@@ -145,34 +134,35 @@ if(supportsSuggest)
     hButtonWithOnClick("Submit", "submit", NULL, "submitButtonOnClick()");
 else
     cgiMakeButton("Submit", "submit");
-/* This is a clear submit button that browsers will use by default when enter is pressed in position box. FIXME: This should be done with js onchange event! */
-printf("<input TYPE=\"IMAGE\" BORDER=\"0\" NAME=\"hgt.dummyEnterButton\" src=\"../images/DOT.gif\" WIDTH=1 HEIGHT=1 ALT=dot>");
+// This is a clear submit button that browsers will use by default when enter is pressed 
+// in position box. FIXME: This should be done with js onchange event!
+printf("<input TYPE=\"IMAGE\" BORDER=\"0\" NAME=\"hgt.dummyEnterButton\" "
+        "src=\"../images/DOT.gif\" WIDTH=1 HEIGHT=1 ALT=dot>");
 cartSaveSession(cart);  /* Put up hgsid= as hidden variable. */
-puts(
-"</td>\n"
-"</tr></table>\n"
-"</td></tr>\n");
+puts("</td>\n"
+     "</tr></table>\n"
+     "</td></tr>\n");
 
-puts(
-"<tr><td><CENTER><BR>\n"
-"<a HREF=\"../cgi-bin/cartReset\">Click here to reset</a> the browser user interface settings to their defaults.");
+puts("<tr><td><CENTER><BR>\n"
+     "<a HREF=\"../cgi-bin/cartReset\">Click here to reset</a> "
+     "the browser user interface settings to their defaults.");
 
 #define SURVEY 1
 #ifdef SURVEY
 if (survey && differentWord(survey, "off"))
-    printf("&nbsp;&nbsp;&nbsp;<span style='background-color:yellow;'><A HREF=\"%s\" TARGET=_BLANK><EM><B>%s</EM></B></A></span>", survey, surveyLabel ? surveyLabel : "Take survey");
+    printf("&nbsp;&nbsp;&nbsp;<span style='background-color:yellow;'>"
+           "<A HREF=\"%s\" TARGET=_BLANK><EM><B>%s</EM></B></A></span>", 
+           survey, surveyLabel ? surveyLabel : "Take survey");
 #endif
 
-puts(
-"<BR>\n"
-"</CENTER>\n"
-"</td></tr><tr><td><CENTER>\n"
-);
+puts("<BR>\n"
+     "</CENTER>\n"
+     "</td></tr><tr><td><CENTER>\n");
 
 puts("<TABLE BORDER=\"0\">");
 puts("<TR>");
 
-if(isSearchTracksSupported(db,cart))
+if (isSearchTracksSupported(db,cart))
     {
     puts("<TD VALIGN=\"TOP\">");
     cgiMakeButtonWithMsg(TRACK_SEARCH, TRACK_SEARCH_BUTTON,TRACK_SEARCH_HINT);
@@ -197,13 +187,14 @@ if (hubConnectTableExists())
     {
     puts("<TD VALIGN=\"TOP\">");
     printf("<input TYPE=SUBMIT onclick=\"document.mainForm.action='%s';\" VALUE='%s' title='%s'>\n",
-        "../cgi-bin/hgHubConnect", "track hubs", "Import tracks");
+           "../cgi-bin/hgHubConnect", "track hubs", "Import tracks");
     puts("</TD>");
     }
 
 // configure button
 puts("<TD VALIGN=\"TOP\">");
-cgiMakeButtonWithMsg("hgTracksConfigPage", "configure tracks and display","Configure track selections and browser display");
+cgiMakeButtonWithMsg("hgTracksConfigPage", "configure tracks and display",
+                     "Configure track selections and browser display");
 puts("</TD>");
 
 // clear possition button
@@ -220,10 +211,6 @@ puts("</CENTER>\n"
 "</td></tr></table>\n"
 );
 puts("</CENTER>");
-#ifdef NEW_JQUERY
-hPrintf("<input type='hidden' id='hgt.newJQuery' name='hgt.newJQuery' value='1'>\n");
-#endif
-
 
 if(!cartVarExists(cart, "pix"))
     // put a hidden input for pix on page so default value can be filled in on the client side
@@ -252,8 +239,8 @@ puts("<P>WARNING: This is our development and test site.  It usually works, but 
 if (hIsGsidServer())
     {
     webNewSection("%s", "Sequence View\n");
-    printf("%s",
-	   "Sequence View is a customized version of the UCSC Genome Browser, which is specifically tailored to provide functions needed for the GSID HIV Data Browser.\n");
+    printf("%s","Sequence View is a customized version of the UCSC Genome Browser, which is "
+           "specifically tailored to provide functions needed for the GSID HIV Data Browser.\n");
     }
 
 hgPositionsHelpHtml(organism, db);
@@ -307,6 +294,63 @@ hgGateway();
 cartWebEnd();
 }
 
+static void checkForGeoMirrorRedirect()
+{
+// Implement Geo/IP based redirection
+//
+// NOTE that we want to redirect people as quickly as possible, so for efficiency purposes, this code is designed to be
+// called from main BEFORE the cart is loaded (so we only use CGI parameters and/or cookies).
+
+char *thisNodeStr = geoMirrorNode();
+if (thisNodeStr)
+    {
+    char *redirectCookie = findCookieData("redirect");
+    char *redirect = cgiOptionalString("redirect");
+
+    fprintf(stderr, "GALT redirectCookie=%s redirect=%s\n", 
+            redirectCookie, redirect); fflush(stderr); // DEBUG REMOVE
+
+    if (redirect == NULL && redirectCookie == NULL)
+        {
+        int thisNode = sqlUnsigned(thisNodeStr);
+        struct sqlConnection *centralConn = hConnectCentral();
+        char *ipStr = cgiRemoteAddr();
+        int node = defaultNode(centralConn, ipStr);
+
+        // get location of redirect node
+        if (thisNode != node)
+            {
+            char query[1056];
+            safef(query, sizeof query, "select domain from gbNode where node = %d", node);
+            char *newDomain = sqlQuickString(centralConn, query);
+            fprintf(stderr, "GALT newDomain=%s\n", newDomain); fflush(stderr); // DEBUG REMOVE
+            char *oldDomain = cgiServerName();
+            char *port = cgiServerPort();
+            char *uri = cgiRequestUri();
+            char *sep = strchr(uri, '?') ? "&" : "?";
+            int newUriSize = strlen(uri) + 1024;
+            char *newUri = needMem(newUriSize);
+            // TODO what about https?
+            safef(newUri, newUriSize, "http://%s:%s%s%sredirect=auto&source=%s", newDomain, port, uri, sep, oldDomain);
+            struct dyString *dy = dyStringNew(256);
+            dyStringPrintf(dy,
+                           "HTTP/1.1 302 found: \n"
+                           "Content-Type: text/html; charset=iso-8859-1\n"
+                           "Connection: close\n"
+                           "Location: %s\n"
+                           "\n"
+                           "<html><head><title>Redirecting to closer site</title></head>\n"
+                           "<body><a href=\"%s\">%s</a></body>\n"
+                           , newUri , newUri, newUri);
+            fprintf(stderr, "GALT redirect response:\n%s", dy->string); fflush(stderr); // DEBUG REMOVE
+            puts(dyStringContents(dy));
+            exit(0);
+            }
+        hDisconnectCentral(&centralConn);
+        }
+    }
+}
+
 char *excludeVars[] = {NULL};
 
 int main(int argc, char *argv[])
@@ -314,6 +358,9 @@ int main(int argc, char *argv[])
 {
 oldVars = hashNew(10);
 cgiSpoof(&argc, argv);
+
+if(cgiIsOnWeb())
+    checkForGeoMirrorRedirect();
 
 cartEmptyShell(doMiddle, hUserCookie(), excludeVars, oldVars);
 return 0;

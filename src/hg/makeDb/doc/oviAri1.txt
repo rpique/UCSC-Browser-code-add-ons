@@ -5,6 +5,9 @@
 
 # Ovis aries (domestic sheep) --  ISGC Ovis_aries_1.0 (2010-02-01)
 
+#	http://www.ncbi.nlm.nih.gov/genome/83
+#	http://www.ncbi.nlm.nih.gov/bioproject/33937
+#	http://www.ncbi.nlm.nih.gov/Traces/wgs/?val=ACIV01
 
 # file template copied from susScr2.txt
 
@@ -114,6 +117,11 @@ taxId 9940
     # real    real    12m42.419s
     #	add the trackDb entries to the source tree, and the 2bit link:
     ln -s `pwd`/oviAri1.unmasked.2bit /gbdb/oviAri1/oviAri1.2bit
+    # make sure /gbdb/oviAri1/oviAri1.2bit is pointing to the masked 2bit
+    # file:
+    rm /gbdb/oviAri1/oviAri1.2bit
+    ln -s `pwd`/oviAri1.rmsk.2bit /gbdb/oviAri1/oviAri1.2bit
+
 
     #  Per instructions in makeGenomeDb.log:
     #   - cvs add sheep/oviAri1

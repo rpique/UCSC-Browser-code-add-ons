@@ -1,7 +1,8 @@
-// encodeChipMatrix.js - pull experiment table and metadata from server 
-//      and display ChIP antibodies vs. cell types in a matrix
-// Formatted: jsbeautify.py -j
-// Syntax checked: jslint indent:4, plusplus: true, continue: true, unparam: true, sloppy: true, browser: true */
+/* encodeChipMatrix.js - ENCODE web app to display ChIP-seq data vs. cell types in a matrix
+
+ Formatted: jsbeautify.py -j
+ Syntax checked: jslint indent:4, plusplus: true, continue: true, unparam: true, sloppy: true, browser: true 
+*/
 /*global $, encodeProject */
 
 $(function () {
@@ -9,185 +10,48 @@ $(function () {
         // requests to server API
         encodeProject.serverRequests.experiment,
         encodeProject.serverRequests.cellType,
-        encodeProject.serverRequests.antibody,
-        encodeProject.serverRequests.expId
+        encodeProject.serverRequests.antibody
         ];
 
-    var cellTypeHash = {}, antibodyHash = {}, targetHash = {};
-    var cellType, antibody, target;
-    var organism, assembly, server, header;
-    var karyotype;
-    var spinner;
-
-    function tableOut(matrix, cellTiers, antibodyGroups) {
-        // Create table with rows for each cell type and columns for each antibody target
-        var table, tableHeader, row, td;
-
-        // fill in column headers from antibody targets returned by server
-        tableHeader = $('#columnHeaders');
-        $.each(antibodyGroups, function (i, group) {
-            tableHeader.append('<th class="groupType"><div class="verticalText">' + 
-                                group.label + '</div></th>');
-            $.each(group.targets, function (i, target) {
-                // prune out targets with no experiments 
-                if (targetHash[target] === undefined) {
-                    return true;
-                }
-                if (targetHash[target].count !== undefined) {
-                    tableHeader.append('<th class="elementType" title="' +
-                                        targetHash[target].description +
-                                        '"><div class="verticalText">' + 
-                                        target + '</div></th>');
-                }
-            });
-        });
-        // fill in matrix:
-        // add rows with cell type labels (column 1) and cells for experiments
-        table = $('#matrixTable');
-
-        // add sections for each Tier of cells
-        $.each(cellTiers, function (i, tier) {
-            //skip bogus 4th tier (not my property ?)
-            if (tier === undefined) {
-                return true;
-            }
-            table.append($('<tr class="matrix"><th class="groupType">' + "Tier " + 
-                                tier.term + '</th></td></tr>'));
-
-            $.each(tier.cellTypes, function (i, cellType) {
-                if (!cellType) {
-                    return true;
-                }
-                if (!matrix[cellType]) {
-                    return true;
-                }
-                karyotype = cellTypeHash[cellType].karyotype;
-                if (karyotype !== 'cancer' && karyotype !== 'normal') {
-                    karyotype = 'unknown';
-                }
-                row = $('<tr><th class="elementType" title="' +
-                        cellTypeHash[cellType].description +
-                        '"><a href="/cgi-bin/hgEncodeVocab?ra=encode/cv.ra&term=' + cellType 
-                        + '">' + cellType + '</a><span title="karyotype: ' + karyotype +
-                        '" class="' + karyotype + '">&bull;</span></th>');
-
-                $.each(antibodyGroups, function (i, group) {
-                    // skip group header
-                    row.append('<td></td>');
-                    $.each(group.targets, function (i, target) {
-                        // prune out targets with no experiments
-                        if (targetHash[target] === undefined) {
-                            return true;
-                        }
-                        if (targetHash[target].count === undefined) {
-                            return true;
-                        }
-                        td = $('<td></td>');
-                        td.addClass('matrixCell');
-                        if (matrix[cellType][target]) {
-                            td.addClass('experiment');
-                            td.text(matrix[cellType][target]);
-                            td.data({
-                                'target' : target,
-                                'cellType' : cellType
-                            });
-                            td.mouseover(function() {
-                                $(this).attr('title', 'Click to select: ' +
-                                                $(this).data().target + ' ' + ' in ' +
-                                                $(this).data().cellType +' cells');
-                            });
-                            td.click(function() {
-                               // TODO: base on preview ?
-                                var url = encodeProject.getSearchUrl(assembly);
-
-                                // TODO: encapsulate var names
-                                // TODO: search on antibody
-                                url +=
-                                   '&hgt_mdbVar1=dataType&hgt_mdbVal1=' + 'ChipSeq' +
-                                   '&hgt_mdbVar2=cell&hgt_mdbVal2=' + cellType +
-                                   '&hgt_mdbVar3=antibody';
-                                // TODO: html encode ?
-                                $.each(targetHash[target].antibodies, function (i, antibody) {
-                                    url += '&hgt_mdbVal3=' + antibody;
-                                });
-                                url += '&hgt_mdbVar4=view&hgt_mdbVal4=Any';
-                                // TODO: open search window 
-                                //window.open(url, "searchWindow");
-                                window.location = url;
-                            });
-                        }
-                        row.append(td);
-                    });
-                    table.append(row);
-                });
-                table.append(row);
-            });
-        });
-        $("body").append(table);
-
-        // use floating-table-header plugin
-        table.floatHeader({
-            cbFadeIn: function (header) {
-                // hide axis labels -- a bit tricky to do so
-                // as special handling needed for X axis label
-                $(".floatHeader #headerLabelRow").remove();
-                $(".floatHeader #searchTypePanel").remove();
-                $(".floatHeader #cellHeaderLabel").html('');
-
-                // Note: user-defined callback requires 
-                // default actions from floatHeader plugin
-                // implementation (stop+fadeIn)
-                header.stop(true, true);
-                header.fadeIn(100);
-            }
-        });
-    }
+    var $matrixTable = $('#matrixTable');
 
     function handleServerData(responses) {
-        // main actions, called when loading data from server is complete
-        var experiments = responses[0], cellTypes = responses[1], 
-                antibodies = responses[2], expIds = responses[3];
-        var antibodyGroups, cellTiers, expIdHash;
-        var matrix = {};
+        // Main actions, called when loading data from server is complete
 
-        hideLoadingImage(spinner);
-        $('#matrixTable').show();
+        var experiments = responses[0], 
+                cellTypes = responses[1], 
+                antibodies = responses[2];
 
-        // set up structures for antibodies and their groups
-        $.each(antibodies, function (i, antibody) {
-            antibodyHash[antibody.term] = antibody;
-            target = antibody.target;
-            if (targetHash[target] === undefined) {
-                targetHash[target] = {
-                    count: 0,   // experiments
-                    description: antibody.targetDescription,
-                    antibodies: []
-                };
-            }
-            targetHash[target].antibodies.push(antibody.term)
-        });
+        var antibodyGroups, cellTiers;
+        var antibodyTarget, cellType;
+        var matrix, antibodyTargetExps = {};
+
+        // hide spinner and show table
+        encodeMatrix.show($matrixTable);
+
+        // set up structures for antibody targets and groups
         antibodyGroups = encodeProject.getAntibodyGroups(antibodies);
 
         // set up structures for cell types and their tiers
-        $.each(cellTypes, function (i, cellType) {
-            cellTypeHash[cellType.term] = cellType;
-        });
-        cellTiers = encodeProject.getCellTiers(cellTypes);
-
-        // use to filter out experiments not in this assembly
-        expIdHash = encodeProject.getExpIdHash(expIds);
+        cellTiers = encodeProject.getCellTiers(cellTypes, encodeMatrix_organism);
 
         // gather experiments into matrix
+        matrix = makeExperimentMatrix(experiments, antibodyTargetExps);
+
+       // fill in table using matrix
+        encodeMatrix.tableOut($matrixTable, matrix, cellTiers, antibodyGroups, antibodyTargetExps, 
+                encodeProject.pruneAntibodyGroupsToExps, tableHeaderOut, rowAddCells);
+    }
+
+    function makeExperimentMatrix(experiments, antibodyTargetExps) {
+        // Populate antibodyTarget vs. cellType array with counts of experiments
+
+        var antibody, target, cellType;
+        var matrix = {};
+
         $.each(experiments, function (i, exp) {
-            // todo: filter out with arg to hgApi
-            if (exp.organism !== organism) {
-                return true;
-            }
             // exclude ref genome annotations
             if (exp.cellType === 'None') {
-                return true;
-            }
-            if (expIdHash[exp.ix] === undefined) {
                 return true;
             }
             // todo: filter out with arg to hgApi ?
@@ -198,10 +62,17 @@ $(function () {
             // (the matrix[cellType] indicates this for cell types 
             // so don't need hash for those
             antibody = encodeProject.antibodyFromExp(exp);
-            target = encodeProject.targetFromAntibody(antibody, antibodyHash);
-            if (targetHash[target] !== undefined) {
-                targetHash[target].count++;
+            if (antibody === undefined) {
+                return true;
             }
+            target = encodeProject.targetFromAntibody(antibody);
+            if (target === undefined) {
+                return true;
+            }
+            if (antibodyTargetExps[target] === undefined) {
+                antibodyTargetExps[target] = 0;
+            }
+            antibodyTargetExps[target]++;
 
             cellType = exp.cellType;
             if (!matrix[cellType]) {
@@ -212,39 +83,117 @@ $(function () {
             }
             matrix[cellType][target]++;
         });
+    return matrix;
+    }
 
-        // fill in table
-        tableOut(matrix, cellTiers, antibodyGroups);
+    function tableHeaderOut($table, antibodyGroups) {
+        // Generate table header and add to document
+
+        var $tableHeaders, $thead, $th;
+        var maxLen;  // for resizing header cells to accomodate label lengths
+        var antibodyTarget;
+
+        // fill in column headers from antibody targets returned by server
+        $tableHeaders = $('#columnHeaders');
+        $thead = $('thead');
+
+        // 1st column is row headers
+        // colgroups are needed to support cross-hair hover effect
+        $thead.before('<colgroup></colgroup>');
+
+        $.each(antibodyGroups, function (i, group) {
+            $tableHeaders.append('<th class="groupType"><div class="verticalText">' + 
+                                group.label + '</div></th>');
+            maxLen = Math.max(maxLen, group.label.length);
+            $thead.before('<colgroup></colgroup>');
+
+            $.each(group.targets, function (i, target) {
+                antibodyTarget = encodeProject.getAntibodyTarget(target);
+                $th = $('<th class="elementType">' + '<div class="verticalText">'+
+                    '<a target="cvWindow" href="/cgi-bin/hgEncodeVocab?ra=encode/cv.ra&deprecated=true&target=' + 
+                    encodeURIComponent(target) + '">' + target + '</a></div></th>');
+                if (!encodeProject.isIE8()) {
+                    // Suppress mouseover under IE8 as QA noted flashing effect
+                    $th.attr('title', antibodyTarget.description);
+                }
+                $tableHeaders.append($th);
+                // add colgroup element to support cross-hair hover effect
+                $thead.before('<colgroup class="experimentCol"></colgroup>');
+                maxLen = Math.max(maxLen, target.length);
+            });
+        });
+        // adjust size of headers based on longest label length
+        // empirically len/2 em's is right
+        $('#columnHeaders th').css('height', (String((maxLen/2 + 2)).concat('em')));
+        $('#columnHeaders th').css('width', '1em');
+
+        //also need to set additional width for non-IE
+        if (!$.browser.msie) {
+            $('.verticalText').css('width', '1em');
+        }
+    }
+
+    function rowAddCells($row, antibodyGroups, matrix, cellType) {
+        // populate a row in the matrix with cells for antibody target groups and the targets
+        // null cellType indicates this is a row for a cell group (tier)
+
+        var $td;
+
+        $.each(antibodyGroups, function (i, group) {
+            // skip group header
+            $td = $('<td></td>');
+            $td.addClass('matrixCell');
+            $row.append($td);
+
+            $.each(group.targets, function (i, target) {
+                $td = $('<td></td>');
+                $td.addClass('matrixCell');
+                $row.append($td);
+
+                if (cellType === null) {
+                    return true;
+                }
+                if (!matrix[cellType][target]) {
+                    $td.addClass('todoExperiment');
+                    return true;
+                }
+                // this cell represents experiments that
+                // fill in count, mouseover and selection by click
+                $td.addClass('experiment');
+                $td.text(matrix[cellType][target]);
+                $td.data({
+                    'target' : target,
+                    'cellType' : cellType
+                });
+
+                $td.attr('title', 'Click to select: ' +  target +
+                        ' in ' + cellType +' cells');
+
+                // add highlight when moused over
+                encodeMatrix.hoverExperiment($td);
+
+                $td.click(function() {
+                    var url, antibodyTarget;
+                    var antibodies = []; 
+
+                    // get list of antibodies for this protein target
+                    antibodyTarget = encodeProject.getAntibodyTarget($(this).data().target);
+                    $.each(antibodyTarget.antibodies, function (i, antibody) {
+                        antibodies.push(antibody);
+                    });
+                    url = encodeMatrix.getSearchUrl(
+                            {'mdbVar': 'dataType', 'mdbVal': 'ChipSeq'},
+                            {'mdbVar': 'cell', 'mdbVal': $(this).data().cellType},
+                            {'mdbVar': 'antibody', 'mdbVal': antibodies});
+                    window.open(url, "searchWindow");
+                });
+            });
+        });
     }
 
     // initialize
+    encodeMatrix.start($matrixTable);
 
-    // get server from calling web page (intended for genome-preview)
-    if ('encodeDataMatrix_server' in window) {
-        server = encodeDataMatrix_server;
-    } else {
-        server = document.location.hostname;
-    }
-
-    // variables passed from calling page
-    organism = encodeChipMatrix_organism;
-    assembly = encodeChipMatrix_assembly;
-    $("#assemblyLabel").text(assembly);
-    header = encodeChipMatrix_pageHeader;
-    $("#pageHeader").text(header);
-    document.title = 'ENCODE ' + header;
-
-    encodeProject.setup({
-        server: server,
-        assembly: assembly
-    });
-
-    // show only spinner until data is retrieved
-    $('#matrixTable').hide();
-    spinner = showLoadingImage("spinner");
-
-    // add radio buttons for search type to specified div on page
-    encodeProject.addSearchPanel('#searchTypePanel');
-
+    // load data from server and set up callback
     encodeProject.loadAllFromServer(requests, handleServerData);
 });

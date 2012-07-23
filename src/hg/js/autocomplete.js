@@ -5,14 +5,14 @@
 
 var suggestCache;
 
-function ajaxGet(getDb, cache, newJQuery)
+function ajaxGet(getDb, cache)
 {
 // Returns jquery.autocomplete.js ajax_get function object
 // getDb should be a function which returns the relevant assembly (e.g. "hg18")
 // cache is an optional object used as a hash to cache responses from the server.
     suggestCache = cache;
     return function (request, callback) {
-        var key = newJQuery ? request.term : request;
+        var key = request.term;
         if(suggestCache == null || suggestCache[key] == null)
         {
             $.ajax({
@@ -29,7 +29,7 @@ function ajaxGet(getDb, cache, newJQuery)
                            var msg = "ajax call failed";
                            if(status != "error")
                                msg = msg + "; error: " + status;
-                           showWarning(msg + "; statusText: " + request.statusText + "; responseText: " + request.responseText);
+                           warn(msg + "; statusText: " + request.statusText + "; responseText: " + request.responseText);
                        },
                        key: key,
                        cont: callback
@@ -37,7 +37,7 @@ function ajaxGet(getDb, cache, newJQuery)
         } else {
             callback(eval(suggestCache[key]));
         }
-        // showWarning(request.term);
+        // warn(request.term);
     }
 }
 

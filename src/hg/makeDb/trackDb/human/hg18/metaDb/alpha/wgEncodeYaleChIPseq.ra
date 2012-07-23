@@ -172,7 +172,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2008-11-25
 dateUnrestricted 2009-08-25
@@ -196,7 +196,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateSubmitted 2010-04-28
 dateUnrestricted 2011-01-28
 expId 782
@@ -218,7 +218,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateSubmitted 2010-04-28
 dateUnrestricted 2011-01-28
 expId 783
@@ -312,7 +312,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2009-01-09
 dateUnrestricted 2009-10-09
@@ -366,6 +366,7 @@ fileName wgEncodeYaleChIPseqAlignmentsRep1Gm12878NfkbIggrab.tagAlign.gz
 grant Snyder
 lab Stanford
 labVersion Data paired with GM12878_IgG_Control
+objStatus revoked - incorrect rawdata files used for generation of processed data
 project wgEncode
 replicate 1
 setType exp
@@ -426,7 +427,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2009-02-24
 dateUnrestricted 2009-11-24
@@ -4154,7 +4155,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2008-11-25
 dateUnrestricted 2009-08-25
@@ -4178,7 +4179,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateSubmitted 2010-04-28
 dateUnrestricted 2011-01-28
 expId 782
@@ -4200,7 +4201,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateSubmitted 2010-04-28
 dateUnrestricted 2011-01-28
 expId 783
@@ -4269,7 +4270,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2009-01-09
 dateUnrestricted 2009-10-09
@@ -4323,6 +4324,7 @@ fileName wgEncodeYaleChIPseqAlignmentsRep2Gm12878NfkbIggrab.tagAlign.gz
 grant Snyder
 lab Stanford
 labVersion Data paired with GM12878_IgG_Control
+objStatus revoked - incorrect rawdata files used for generation of processed data
 project wgEncode
 replicate 2
 setType exp
@@ -4383,7 +4385,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2009-02-24
 dateUnrestricted 2009-11-24
@@ -7812,6 +7814,7 @@ fileName wgEncodeYaleChIPseqAlignmentsRep3Gm12878NfkbIggrab.tagAlign.gz
 grant Snyder
 lab Stanford
 labVersion Data paired with GM12878_IgG_Control
+objStatus revoked - incorrect rawdata files used for generation of processed data
 project wgEncode
 replicate 3
 setType exp
@@ -7872,7 +7875,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2009-02-24
 dateUnrestricted 2009-11-24
@@ -8770,6 +8773,7 @@ fileName wgEncodeYaleChIPseqAlignmentsRep4Gm12878NfkbIggrab.tagAlign.gz
 grant Snyder
 lab Stanford
 labVersion Data paired with GM12878_IgG_Control
+objStatus revoked - incorrect rawdata files used for generation of processed data
 project wgEncode
 replicate 4
 setType exp
@@ -9222,7 +9226,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2008-11-25
 dateUnrestricted 2009-08-25
@@ -9247,7 +9251,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateSubmitted 2010-04-28
 dateUnrestricted 2011-01-28
 expId 782
@@ -9270,7 +9274,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateSubmitted 2010-04-28
 dateUnrestricted 2011-01-28
 expId 783
@@ -9318,7 +9322,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2009-01-09
 dateUnrestricted 2009-10-09
@@ -9351,6 +9355,7 @@ fileName wgEncodeYaleChIPseqPeaksGm12878NfkbIggrab.narrowPeak.gz
 grant Snyder
 lab Stanford
 labVersion Data paired with GM12878_IgG_Control
+objStatus revoked - incorrect rawdata files used for generation of processed data
 project wgEncode
 setType exp
 softwareVersion PeakSeq1.0
@@ -9414,7 +9419,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2009-02-24
 dateUnrestricted 2009-11-24
@@ -12617,7 +12622,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2008-11-25
 dateUnrestricted 2009-08-25
@@ -12641,7 +12646,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateSubmitted 2010-04-28
 dateUnrestricted 2011-01-28
 expId 782
@@ -12663,7 +12668,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateSubmitted 2010-04-28
 dateUnrestricted 2011-01-28
 expId 783
@@ -12729,7 +12734,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2009-01-09
 dateUnrestricted 2009-10-09
@@ -12784,6 +12789,7 @@ fileName wgEncodeYaleChIPseqRawDataRep1Gm12878NfkbIggrab.fastq.gz
 grant Snyder
 lab Stanford
 labVersion Data paired with GM12878_IgG_Control
+objStatus revoked - incorrect rawdata files used for generation of processed data
 project wgEncode
 replicate 1
 setType exp
@@ -12845,7 +12851,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2009-02-24
 dateUnrestricted 2009-11-24
@@ -16229,7 +16235,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2008-11-25
 dateUnrestricted 2009-08-25
@@ -16253,7 +16259,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateSubmitted 2010-04-28
 dateUnrestricted 2011-01-28
 expId 782
@@ -16275,7 +16281,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateSubmitted 2010-04-28
 dateUnrestricted 2011-01-28
 expId 783
@@ -16341,7 +16347,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2009-01-09
 dateUnrestricted 2009-10-09
@@ -16396,6 +16402,7 @@ fileName wgEncodeYaleChIPseqRawDataRep2Gm12878NfkbIggrab.fastq.gz
 grant Snyder
 lab Stanford
 labVersion Data paired with GM12878_IgG_Control
+objStatus revoked - incorrect rawdata files used for generation of processed data
 project wgEncode
 replicate 2
 setType exp
@@ -16457,7 +16464,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2009-02-24
 dateUnrestricted 2009-11-24
@@ -19731,6 +19738,7 @@ fileName wgEncodeYaleChIPseqRawDataRep3Gm12878NfkbIggrab.fastq.gz
 grant Snyder
 lab Stanford
 labVersion Data paired with GM12878_IgG_Control
+objStatus revoked - incorrect rawdata files used for generation of processed data
 project wgEncode
 replicate 3
 setType exp
@@ -19791,7 +19799,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2009-02-24
 dateUnrestricted 2009-11-24
@@ -20664,6 +20672,7 @@ fileName wgEncodeYaleChIPseqRawDataRep4Gm12878NfkbIggrab.fastq.gz
 grant Snyder
 lab Stanford
 labVersion Data paired with GM12878_IgG_Control
+objStatus revoked - incorrect rawdata files used for generation of processed data
 project wgEncode
 replicate 4
 setType exp
@@ -21693,7 +21702,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2008-11-25
 dateUnrestricted 2009-08-25
@@ -21718,7 +21727,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateSubmitted 2010-04-28
 dateUnrestricted 2011-01-28
 expId 782
@@ -21741,7 +21750,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateSubmitted 2010-04-28
 dateUnrestricted 2011-01-28
 expId 783
@@ -21787,7 +21796,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2009-01-09
 dateUnrestricted 2009-10-09
@@ -21843,6 +21852,7 @@ fileName wgEncodeYaleChIPseqSignalGm12878NfkbIggrab.bedGraph4.gz
 grant Snyder
 lab Stanford
 labVersion Data paired with GM12878_IgG_Control
+objStatus revoked - incorrect rawdata files used for generation of processed data
 project wgEncode
 setType exp
 softwareVersion PeakSeq1.0
@@ -21906,7 +21916,7 @@ composite wgEncodeYaleChIPseq
 control std
 controlId GM12878/None/Input/std
 dataType ChipSeq
-dataVersion post ENCODE Jan 2011 Freeze
+dataVersion ENCODE Mar 2012 Freeze
 dateResubmitted 2010-04-28
 dateSubmitted 2009-02-24
 dateUnrestricted 2009-11-24
@@ -25122,4 +25132,4 @@ tableName wgEncodeYaleChIPseqSignalRep1K562InputV2
 treatment None
 view Signal
 
-# MAGIC: 1139598526
+# MAGIC: -1499139788

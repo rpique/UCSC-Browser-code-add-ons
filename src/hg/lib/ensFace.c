@@ -140,14 +140,14 @@ void ensGeneTrackVersion(char *database, char *ensVersionString,
 /* check for trackVersion table and find Ensembl version */
 {
 /* see if hgFixed.trackVersion exists */
-boolean trackVersionExists = hTableExists("hgFixed", "trackVersion");
+boolean trackVersionExists = (sqlDatabaseExists("hgFixed") && hTableExists("hgFixed", "trackVersion"));
 ensVersionString[0] = 0;
 ensDateReference[0] = 0;
 if (trackVersionExists)
     {
     struct sqlConnection *conn = hAllocConn("hgFixed");
     char query[256];
-    safef(query, sizeof(query), "select version,dateReference from hgFixed.trackVersion where db = '%s' order by updateTime DESC limit 1", database);
+    safef(query, sizeof(query), "select version,dateReference from hgFixed.trackVersion where db = '%s' and name = 'ensGene' order by updateTime DESC limit 1", database);
     struct sqlResult *sr = sqlGetResult(conn, query);
     char **row;
 

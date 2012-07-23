@@ -535,15 +535,19 @@ return def->type;
 }
 
 static int parseInfoValue(struct vcfRecord *record, char *infoKey, enum vcfInfoType type,
-			  char *valStr, union vcfDatum **pData)
+			  char *valStr, union vcfDatum **pData, bool **pMissingData)
 /* Parse a comma-separated list of values into array of union vcfInfoDatum and return count. */
 {
 char *valWords[VCF_MAX_INFO];
 int count = chopCommas(valStr, valWords);
 struct vcfFile *vcff = record->file;
 union vcfDatum *data = vcfFileAlloc(vcff, count * sizeof(union vcfDatum));
+bool *missingData = vcfFileAlloc(vcff, count * sizeof(*missingData));
 int j;
 for (j = 0;  j < count;  j++)
+    {
+    if (type != vcfInfoString && type != vcfInfoCharacter && sameString(valWords[j], "."))
+	missingData[j] = TRUE;
     switch (type)
 	{
 	case vcfInfoInteger:
@@ -566,10 +570,12 @@ for (j = 0;  j < count;  j++)
 	    errAbort("invalid vcfInfoType (uninitialized?) %d", type);
 	    break;
 	}
+    }
 // If END is given, use it as chromEnd:
 if (sameString(infoKey, vcfInfoEnd))
     record->chromEnd = data[0].datInt;
 *pData = data;
+*pMissingData = missingData;
 return count;
 }
 
@@ -614,11 +620,53 @@ for (i = 0;  i < record->infoCount;  i++)
     el->key = vcfFilePooledStr(vcff, elStr);
     enum vcfInfoType type = typeForInfoKey(vcff, el->key);
     char *valStr = eq+1;
-    el->count = parseInfoValue(record, el->key, type, valStr, &(el->values));
+    el->count = parseInfoValue(record, el->key, type, valStr, &(el->values), &(el->missingData));
     if (el->count >= VCF_MAX_INFO)
 	vcfFileErr(vcff, "A single element of the INFO column has at least %d values; "
 	       "VCF_MAX_INFO may need to be increased in vcf.c!", VCF_MAX_INFO);
     }
+}
+
+struct vcfRecord *vcfRecordFromRow(struct vcfFile *vcff, char **words)
+/* Parse words from a VCF data line into a VCF record structure. */
+{
+struct vcfRecord *record = vcfFileAlloc(vcff, sizeof(struct vcfRecord));
+record->file = vcff;
+record->chrom = vcfFilePooledStr(vcff, words[0]);
+record->chromStart = lineFileNeedNum(vcff->lf, words, 1) - 1;
+// chromEnd may be overwritten by parseRefAndAlt and parseInfoColumn.
+record->chromEnd = record->chromStart+1;
+record->name = vcfFilePooledStr(vcff, words[2]);
+parseRefAndAlt(vcff, record, words[3], words[4]);
+record->qual = vcfFilePooledStr(vcff, words[5]);
+parseFilterColumn(vcff, record, words[6]);
+parseInfoColumn(vcff, record, words[7]);
+if (vcff->genotypeCount > 0)
+    {
+    record->format = vcfFilePooledStr(vcff, words[8]);
+    record->genotypeUnparsedStrings = vcfFileAlloc(vcff,
+						   vcff->genotypeCount * sizeof(char *));
+    int i;
+    // Don't bother actually parsing all these until & unless we need the info:
+    for (i = 0;  i < vcff->genotypeCount;  i++)
+	record->genotypeUnparsedStrings[i] = vcfFileCloneStr(vcff, words[9+i]);
+    }
+return record;
+}
+
+struct vcfRecord *vcfNextRecord(struct vcfFile *vcff)
+/* Parse the words in the next line from vcff into a vcfRecord. Return NULL at end of file.
+ * Note: this does not store record in vcff->records! */
+{
+char *words[VCF_MAX_COLUMNS];
+int wordCount;
+if ((wordCount = lineFileChop(vcff->lf, words)) <= 0)
+    return NULL;
+int expected = 8;
+if (vcff->genotypeCount > 0)
+    expected = 9 + vcff->genotypeCount;
+lineFileExpectWords(vcff->lf, expected, wordCount);
+return vcfRecordFromRow(vcff, words);
 }
 
 static void vcfParseData(struct vcfFile *vcff, int maxRecords)
@@ -627,38 +675,12 @@ static void vcfParseData(struct vcfFile *vcff, int maxRecords)
 {
 if (vcff == NULL)
     return;
-int recCount = 0, expected = 8;
-if (vcff->genotypeCount > 0)
-    expected = 9 + vcff->genotypeCount;
-char *words[VCF_MAX_COLUMNS];
-int wordCount;
-while ((wordCount = lineFileChop(vcff->lf, words)) > 0)
+int recCount = 0;
+struct vcfRecord *record;
+while ((record = vcfNextRecord(vcff)) != NULL)
     {
     if (maxRecords >= 0 && recCount >= maxRecords)
 	break;
-    lineFileExpectWords(vcff->lf, expected, wordCount);
-    struct vcfRecord *record;
-    AllocVar(record);
-    record->file = vcff;
-    record->chrom = vcfFilePooledStr(vcff, words[0]);
-    record->chromStart = lineFileNeedNum(vcff->lf, words, 1) - 1;
-    // chromEnd may be overwritten by parseRefAndAlt and parseInfoColumn.
-    record->chromEnd = record->chromStart+1;
-    record->name = vcfFilePooledStr(vcff, words[2]);
-    parseRefAndAlt(vcff, record, words[3], words[4]);
-    record->qual = vcfFilePooledStr(vcff, words[5]);
-    parseFilterColumn(vcff, record, words[6]);
-    parseInfoColumn(vcff, record, words[7]);
-    if (vcff->genotypeCount > 0)
-	{
-	record->format = vcfFilePooledStr(vcff, words[8]);
-	record->genotypeUnparsedStrings = vcfFileAlloc(vcff,
-						       vcff->genotypeCount * sizeof(char *));
-	int i;
-	// Don't bother actually parsing all these until & unless we need the info:
-	for (i = 0;  i < vcff->genotypeCount;  i++)
-	    record->genotypeUnparsedStrings[i] = vcfFileCloneStr(vcff, words[9+i]);
-	}
     slAddHead(&(vcff->records), record);
     recCount++;
     }
@@ -666,10 +688,12 @@ slReverse(&(vcff->records));
 lineFileClose(&(vcff->lf));
 }
 
-struct vcfFile *vcfFileMayOpen(char *fileOrUrl, int maxErr, int maxRecords)
-/* Parse a VCF file into a vcfFile object.  If maxErr not zero, then
- * continue to parse until this number of error have been reached.  A maxErr
- * less than zero does not stop and reports all errors. */
+struct vcfFile *vcfFileMayOpen(char *fileOrUrl, int maxErr, int maxRecords, boolean parseAll)
+/* Open fileOrUrl and parse VCF header; return NULL if unable.
+ * If parseAll, then read in all lines, parse and store in
+ * vcff->records; if maxErr >= zero, then continue to parse until
+ * there are maxErr+1 errors.  A maxErr less than zero does not stop
+ * and reports all errors. */
 {
 struct lineFile *lf = NULL;
 if (startsWith("http://", fileOrUrl) || startsWith("ftp://", fileOrUrl) ||
@@ -678,17 +702,19 @@ if (startsWith("http://", fileOrUrl) || startsWith("ftp://", fileOrUrl) ||
 else
     lf = lineFileMayOpen(fileOrUrl, TRUE);
 struct vcfFile *vcff = vcfFileHeaderFromLineFile(lf, maxErr);
-vcfParseData(vcff, maxRecords);
+if (parseAll)
+    vcfParseData(vcff, maxRecords);
 return vcff;
 }
 
 struct vcfFile *vcfTabixFileMayOpen(char *fileOrUrl, char *chrom, int start, int end,
 				    int maxErr, int maxRecords)
-/* Parse header and rows within the given position range from a VCF file that has been
- * compressed and indexed by tabix into a vcfFile object; return NULL if or if file has
- * no items in range.
- * If maxErr not zero, then continue to parse until this number of error have been reached.
- * A maxErr less than zero does not stop and reports all errors. */
+/* Open a VCF file that has been compressed and indexed by tabix and
+ * parse VCF header, or return NULL if unable.  If chrom is non-NULL,
+ * seek to the position range and parse all lines in range into
+ * vcff->records.  If maxErr >= zero, then continue to parse until
+ * there are maxErr+1 errors.  A maxErr less than zero does not stop
+ * and reports all errors. */
 {
 struct lineFile *lf = lineFileTabixMayOpen(fileOrUrl, TRUE);
 struct vcfFile *vcff = vcfFileHeaderFromLineFile(lf, maxErr);
@@ -858,16 +884,21 @@ for (i = 0;  i < vcff->genotypeCount;  i++)
 		gt->isPhased = TRUE;
 	    else
 		sep = strchr(genotype, '/');
-	    gt->hapIxA = atoi(genotype);
+	    if (genotype[0] == '.')
+		gt->hapIxA = -1;
+	    else
+		gt->hapIxA = atoi(genotype);
 	    if (sep == NULL)
 		gt->isHaploid = TRUE;
+	    else if (sep[1] == '.')
+		gt->hapIxB = -1;
 	    else
 		gt->hapIxB = atoi(sep+1);
 	    }
 	struct vcfInfoElement *el = &(gt->infoElements[j]);
 	el->key = formatWords[j];
 	el->count = parseInfoValue(record, formatWords[j], formatTypes[j], gtWords[j],
-				   &(el->values));
+				   &(el->values), &(el->missingData));
 	if (el->count >= VCF_MAX_INFO)
 	    vcfFileErr(vcff, "A single element of the genotype column for \"%s\" "
 		       "has at least %d values; "
@@ -893,20 +924,27 @@ return NULL;
 }
 
 static char *vcfDataLineAutoSqlString =
-"table vcfDataLine"
-"\"The fields of a Variant Call Format data line\""
-"    ("
-"    string chrom;      \"An identifier from the reference genome\""
-"    uint pos;          \"The reference position, with the 1st base having position 1\""
-"    string id;         \"Semi-colon separated list of unique identifiers where available\""
-"    string ref;                \"Reference base(s)\""
-"    string alt;                \"Comma separated list of alternate non-reference alleles called on at least one of the samples\""
-"    string qual;       \"Phred-scaled quality score for the assertion made in ALT. i.e. give -10log_10 prob(call in ALT is wrong)\""
-"    string filter;     \"PASS if this position has passed all filters. Otherwise, a semicolon-separated list of codes for filters that fail\""
-"    string info;       \"Additional information encoded as a semicolon-separated series of short keys with optional comma-separated values\""
-"    string format;     \"If genotype columns are specified in header, a semicolon-separated list of of short keys starting with GT\""
-"    string genotypes;  \"If genotype columns are specified in header, a tab-separated set of genotype column values; each value is a colon-separated list of values corresponding to keys in the format column\""
-"    )";
+        "table vcfDataLine"
+        "\"The fields of a Variant Call Format data line\""
+        "    ("
+        "    string chrom;      \"An identifier from the reference genome\""
+        "    uint pos;          \"The reference position, with the 1st base having position 1\""
+        "    string id;         \"Semi-colon separated list of unique identifiers where available\""
+        "    string ref;                \"Reference base(s)\""
+        "    string alt;                \"Comma separated list of alternate non-reference alleles "
+                                         "called on at least one of the samples\""
+        "    string qual;       \"Phred-scaled quality score for the assertion made in ALT. i.e. "
+                                 "give -10log_10 prob(call in ALT is wrong)\""
+        "    string filter;     \"PASS if this position has passed all filters. Otherwise, a "
+                                  "semicolon-separated list of codes for filters that fail\""
+        "    string info;       \"Additional information encoded as a semicolon-separated series "
+                                 "of short keys with optional comma-separated values\""
+        "    string format;     \"If genotype columns are specified in header, a "
+                                 "semicolon-separated list of of short keys starting with GT\""
+        "    string genotypes;  \"If genotype columns are specified in header, a tab-separated "
+                                 "set of genotype column values; each value is a colon-separated "
+                                 "list of values corresponding to keys in the format column\""
+        "    )";
 
 struct asObject *vcfAsObj()
 // Return asObject describing fields of VCF

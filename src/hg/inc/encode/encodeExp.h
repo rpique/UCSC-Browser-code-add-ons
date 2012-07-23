@@ -121,6 +121,14 @@ void encodeExpJsonOutput(struct encodeExp *el, FILE *f);
 
 #define ENCODE_EXP_HISTORY_TABLE_SUFFIX "History"
 
+void encodeExpJson(struct dyString *json, struct encodeExp *el);
+/* Print out encodeExp in JSON format. Manually converted from autoSql which outputs
+ * to file pointer.
+*/
+
+int encodeExpIdMax(struct sqlConnection *conn);
+/* Return largest ix value */
+
 void encodeExpFieldIndex(char *fieldName);
 /* Get column number of named field in EncodeExp schema */
 
@@ -179,6 +187,10 @@ char *encodeExpAddAccession(struct sqlConnection *conn, char *tableName, int id)
  * after experiment is determined to be valid.
  * Return the accession. */
 
+int encodeExpIdOffset();
+/* Length of prefix preceding experiment ID in the accession. 
+ * Prefix is defined string + 1 for org character */
+
 void encodeExpSetAccession(struct encodeExp *exp, char *tableName);
 // Adds accession field to an existing experiment, updating the table.
 
@@ -210,7 +222,8 @@ struct encodeExp *encodeExpGetByMdbVars(char *db, struct mdbVar *vars);
 
 struct encodeExp *encodeExpGetOrCreateByMdbVarsFromTable(char *db, struct mdbVar *vars, char *table);
 // Return experiment looked up or created from the mdb var list from the named experiment table.
-#define encodeExpGetOrCreateByMdbVars(db,vars) encodeExpGetOrCreateByMdbVarsFromTable((db),(vars),ENCODE_EXP_TABLE)
+#define encodeExpGetOrCreateByMdbVars(db,vars) \
+        encodeExpGetOrCreateByMdbVarsFromTable((db),(vars),ENCODE_EXP_TABLE)
 
 int encodeExpExists(char *db, struct mdbVar *vars);
 /* Return TRUE if at least one experiment exists for these vars */

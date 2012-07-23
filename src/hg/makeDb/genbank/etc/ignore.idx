@@ -1,4 +1,5 @@
 #acc	modDate	srcdb	comment
+FJ543108	2010-11-17	GenBank	2011-11-29 changes organism "Sus scrofa" to "Ailuropoda melanoleuca"
 GQ918493	2009-11-07	GenBank	2009-12-06 changes organism "Danio rerio" to "synthetic construct"
 GQ352546	2010-02-07	GenBank	2010-02-08 changes organism "Papio anubis" to "Papio hamadryas"
 AM924188	2008-12-13	GenBank	2010-02-19 changes organism "Carassius auratus" to "Homo sapiens"
@@ -394,3 +395,8 @@ Z98843	2001-03-03	GenBank	...
 Z98844	2001-03-03	GenBank	...
 Z98845	2001-03-03	GenBank	...
 D82082	2006-11-27	GenBank	2010-12-15 changes organism "Bos primigenius" to "Bos taurus"
+FJ847230	2011-12-01	GenBank	2011-12-01 changes organism "Lama pacos" to "Vicugna pacos"
+FJ847229	2011-12-01	GenBank	2011-12-01 changes organism "Lama pacos" to "Vicugna pacos"
+FJ847231	2011-12-01	GenBank	2011-12-01 changes organism "Lama pacos" to "Vicugna pacos"
+FJ847232	2011-12-01	GenBank	2011-12-01 changes organism "Lama pacos" to "Vicugna pacos"
+FJ847233	2011-12-01	GenBank	2011-12-01 changes organism "Lama pacos" to "Vicugna pacos"

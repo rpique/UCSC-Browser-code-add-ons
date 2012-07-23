@@ -3,30 +3,24 @@
 #ifndef IMAGEV2_H
 #define IMAGEV2_H
 
-// set IN_PLACE_UPDATE 1 to update the hgTracks image in-place in the client.
-#define IN_PLACE_UPDATE  1
-
-//  UNCOMMENT IMAGEv2_DRAG_SCROLL and IMAGEv2_DRAG_SCROLL_SZ to allow dragScroll
-//  NOTE: 1x should work fine. Set IMAGEv2_DRAG_SCROLL_SZ > 1 (3=3x) to see hidden image while dragging.
+//  DRAG_SCROLL means dragging the image left-right to reposition the viwing window on the chromosome.
+//  NOTE: 1x works fine and is released. Set IMAGEv2_DRAG_SCROLL_SZ > 1 (3=3x) to see hidden image while dragging.
 //        Problems with >1x: nextExon and nextItem arrows not addressed.  Dynamic resize occasionally fails.
-#define IMAGEv2_DRAG_SCROLL
 #define IMAGEv2_DRAG_SCROLL_SZ 1
 
-#ifdef IMAGEv2_DRAG_SCROLL
-    #if defined(IMAGEv2_DRAG_SCROLL_SZ) && (IMAGEv2_DRAG_SCROLL_SZ > 1)
-        #define IMAGEv2_SHORT_MAPITEMS
-        //#define IMAGEv2_SHORT_TOGGLE
-        //#define IMAGEv2_NO_LEFTLABEL_ON_FULL
-        // Because the sideLabel clipping will leave a no longer needed label
-        // aligned with the centerLabel, we will need to either: remove sideLabels
-        // (which otherwise work) or add a new side-slice to match the centerlabel
-    #endif //defined(IMAGEv2_DRAG_SCROLL_SZ) && (IMAGEv2_DRAG_SCROLL_SZ > 1)
-#endif//def IMAGEv2_DRAG_SCROLL
+#if defined(IMAGEv2_DRAG_SCROLL_SZ) && (IMAGEv2_DRAG_SCROLL_SZ > 1)
+    #define IMAGEv2_SHORT_MAPITEMS
+    //#define IMAGEv2_SHORT_TOGGLE
+    //#define IMAGEv2_NO_LEFTLABEL_ON_FULL
+    // Because the sideLabel clipping will leave a no longer needed label
+    // aligned with the centerLabel, we will need to either: remove sideLabels
+    // (which otherwise work) OR add a new side-slice to match the centerlabel
+#endif //defined(IMAGEv2_DRAG_SCROLL_SZ) && (IMAGEv2_DRAG_SCROLL_SZ > 1)
 
 // CURRENT PROBLEMS with dragScroll > 1X:
 // o Dynamic height for data/label based on image map currently works EXCEPT, occasionally does not resize.  Consider resize while dragging!
 // o next item feature '>>' arrows should check if items are in the wings
-// o next exon feature '>>' arrows are only seen in the wings and only look belond the wings
+// o next exon feature '>>' arrows are only seen in the wings and only look beyond the wings
 
 // UNCOMMENT  USE_NAVIGATION_LINKS for so far experimental UI changes to replace buttons at top with more streamlined links
 //#define USE_NAVIGATION_LINKS
@@ -65,12 +59,12 @@ void flatTracksFree(struct flatTracks **flatTracks);
 
 /////////////////////////
 // JSON support.  Eventually the whole imgTbl could be written out as JSON
-void jsonTdbSettingsBuild(struct jsonHashElement *settings, struct track *track, boolean configurable);
+void jsonTdbSettingsBuild(struct jsonElement *settings, struct track *track, boolean configurable);
 
 // Creates then successively adds trackDb settings to the jsonTdbSettingsString
 // Initially pass in NULL pointer to a dyString to properly begin building
 
-void jsonTdbSettingsUse(struct jsonHashElement *settings);
+void jsonTdbSettingsUse(struct jsonElement *settings);
 // Closes and returns the contents of the jsonTdbSettingsString
 
 /////////////////////////

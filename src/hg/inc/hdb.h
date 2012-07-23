@@ -815,6 +815,11 @@ char *addCommasToPos(char *db, char *position);
 /* add commas to the numbers in a position
  * returns pointer to static */
 
+boolean parsePosition(char *position, char **retChrom, uint *retStart, uint *retEnd);
+/* If position is word:number-number (possibly with commas & whitespace),
+ * set retChrom, retStart (subtracting 1) and retEnd, and return TRUE.
+ * Otherwise return FALSE and leave rets unchanged. */
+
 struct grp* hLoadGrps(char *db);
 /* load the grp tables using the list configured in hg.conf, returning a list
  * sorted by priority. */
@@ -887,5 +892,9 @@ boolean hIsBigBed(char *database, char *table, struct trackDb *parent, struct cu
 
 char *bbiNameFromSettingOrTable(struct trackDb *tdb, struct sqlConnection *conn, char *table);
 /* Return file name from bigDataUrl or little table. */
+
+char *bbiNameFromSettingOrTableChrom(struct trackDb *tdb, struct sqlConnection *conn, char *table,
+				     char *seqName);
+/* Return file name from bigDataUrl or little table (which might have a seqName column). */
 
 #endif /* HDB_H */

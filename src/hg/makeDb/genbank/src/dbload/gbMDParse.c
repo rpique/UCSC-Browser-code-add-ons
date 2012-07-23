@@ -212,7 +212,7 @@ return NULL; /* don't make it here */
 static void parseMdiffStart(char *val, struct gbMiscDiff *mdiff)
 /* parse start of mdiff location, setting flags */
 {
-if (val[0] == '<')
+if ((val[0] == '>') || (val[0] == '<'))
     val++;
 mdiff->mrnaStart = sqlSigned(val);
 }
@@ -220,7 +220,7 @@ mdiff->mrnaStart = sqlSigned(val);
 static void parseMdiffEnd(char *val, struct gbMiscDiff *mdiff)
 /* parse end of mdiff location, setting flags */
 {
-if (val[0] == '>')
+if ((val[0] == '>') || (val[0] == '<'))
     val++;
 mdiff->mrnaEnd = sqlSigned(val);
 }
@@ -323,7 +323,9 @@ void parseWarn(char *tag, char *val)
 {
 if (raWarn != NULL)
     errAbort("multiple wrn");
-raWarn = cloneString(val);
+// ignore outdated invitroNorm
+if (!sameString(val, "invitroNorm"))
+    raWarn = cloneString(val);
 }
 
 static void resetEntry()

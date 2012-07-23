@@ -98,49 +98,49 @@ void addIntro()
 if (hIsGsidServer())
   {
   puts(" Data must be formatted in\n"
-  " <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html#BED'>BED</A>,\n"
+  " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format1'>BED</A>,\n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/bigBed.html'>bigBed</A>,\n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/bedgraph.html'>bedGraph</A>,\n"
-  " <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html#GFF'>GFF</A>,\n"
-  " <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html#GTF'>GTF</A>,\n"
+  " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format3'>GFF</A>,\n"
+  " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format4'>GTF</A>,\n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/wiggle.html'>WIG</A>\n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/bigWig.html'>bigWig</A>,\n"
   " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format1.7'>BED detail</A>,\n"
   " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format10'>Personal Genome SNP</A>,\n"
-  " or <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html#PSL'>PSL</A>\n"
+  " or <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format2'>PSL</A>\n"
   " formats. To configure the display, set\n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html#TRACK'>track</A>\n"
   " and"
   " <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html#BROWSER'>browser</A>\n"
   " line attributes as described in the \n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html'>User's Guide</A>.\n"
-  " URLs for data in the bigBed, bigWig BAM and VCF formats must be embedded in a track\n"
+  " URLs for data in the bigBed, bigWig, BAM and VCF formats must be embedded in a track\n"
   " line in the box below.\n"
   );
   }
 else
   {
   puts(" Data must be formatted in\n"
-  " <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html#BED'>BED</A>,\n"
+  " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format1'>BED</A>,\n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/bigBed.html'>bigBed</A>,\n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/bedgraph.html'>bedGraph</A>,\n"
-  " <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html#GFF'>GFF</A>,\n"
-  " <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html#GTF'>GTF</A>,\n"
+  " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format3'>GFF</A>,\n"
+  " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format4'>GTF</A>,\n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/wiggle.html'>WIG</A>,\n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/bigWig.html'>bigWig</A>,\n"
-  " <A TARGET=_BLANK HREF='../goldenPath/help/maf.html'>MAF</A>,\n"
+  " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format5'>MAF</A>,\n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/bam.html'>BAM</A>,\n"
   " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format1.7'>BED detail</A>,\n"
   " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format10'>Personal Genome SNP,</A>\n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/vcf.html'>VCF</A>,\n"
-  " or <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html#PSL'>PSL</A>\n"
+  " or <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format2'>PSL</A>\n"
   " formats. To configure the display, set\n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html#TRACK'>track</A>\n"
   " and"
   " <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html#BROWSER'>browser</A>\n"
   " line attributes as described in the \n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html'>User's Guide</A>.\n"
-  " URLs for data in the bigBed and bigWig formats must be embedded in a track\n"
+  " URLs for data in the bigBed, bigWig, BAM and VCF formats must be embedded in a track\n"
   " line in the box below.\n"
   " Publicly available custom tracks are listed\n"
   " <A HREF='../goldenPath/customTracks/custTracks.html'>here</A>.\n"
@@ -170,6 +170,7 @@ else
 jsIncludeFile("jquery.js", NULL);
 jsIncludeFile("hgCustom.js", NULL);
 jsIncludeFile("utils.js", NULL);
+jsIncludeFile("ajax.js", NULL);
 
 /* main form */
 printf("<FORM ACTION=\"%s\" METHOD=\"%s\" "
@@ -185,10 +186,11 @@ if (!isUpdateForm)
     char *onChangeOrg = "onchange=\"document.orgForm.org.value = document.mainForm.org.options[document.mainForm.org.selectedIndex].value; document.orgForm.db.value = 0; document.orgForm.submit();\"";
     char *onChangeClade = "onchange=\"document.orgForm.clade.value = document.mainForm.clade.options[document.mainForm.clade.selectedIndex].value; document.orgForm.org.value = 0; document.orgForm.db.value = 0; document.orgForm.submit();\"";
 
-if (hIsGsidServer())
-    {
-    printf("<span style='color:red;'>The Custom Track function and its documentation is currently under development ...</span><BR><BR>\n");
-    }
+    if (hIsGsidServer())
+        {
+        printf("<span style='color:red;'>The Custom Track function and its documentation is "
+                "currently under development ...</span><BR><BR>\n");
+        }
 
     puts("<TABLE BORDER=0>\n");
     if (gotClade)
@@ -226,7 +228,8 @@ puts("<P>");
 
 /* row for error message */
 if (err)
-    printf("<P><B>&nbsp;&nbsp;&nbsp;&nbsp;<span style='color:RED; font-style:italic;'>Error</span>&nbsp;%s</B><P>", err);
+    printf("<P><B>&nbsp;&nbsp;&nbsp;&nbsp;<span style='color:RED; font-style:italic;'>"
+           "Error</span>&nbsp;%s</B><P>", err);
 
 cgiSimpleTableStart();
 
@@ -1119,10 +1122,8 @@ if (sameString(initialDb, "0"))
                 dbWithCts = cloneString(dbDb->name);
             }
         }
-    if (dbWithCts)
-        /* set the database for the selected organism to an assembly that
-         * has custom tracks */
-        {
+    if (dbWithCts)  // set the database for the selected organism to an assembly that
+        {           // has custom tracks
         database = dbWithCts;
         cartSetString(cart, "db", database);
         }

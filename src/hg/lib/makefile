@@ -3,7 +3,8 @@ XINC = -I$(MYSQLINC)
 
 O = acemblyClass.o affyAllExonProbe.o affyAtlas.o affy10KDetails.o affy120KDetails.o \
     affyOffset.o affyPairs.o agp.o agpFrag.o agpGap.o alignSeqSizes.o altGraph.o \
-    altGraphX.o ancientRref.o atomDb.o  axtInfo.o \
+    altGraphX.o ancientRref.o annoGratorGpVar.o  annoGrateWig.o annoStreamDb.o annoStreamWig.o \
+    api.o atomDb.o  axtInfo.o \
     axtLib.o bactigPos.o hgBam.o baseMaskCommon.o bdgpExprLink.o bdgpGeneInfo.o \
     bed.o bed5FloatScore.o bed5Pval.o bed6FloatScore.o bed8Attrs.o bed12Source.o \
     bed12wSeq.o bedCart.o bgiGeneInfo.o bgiGeneSnp.o bgiSnp.o bioImage.o \
@@ -34,7 +35,8 @@ O = acemblyClass.o affyAllExonProbe.o affyAtlas.o affy10KDetails.o affy120KDetai
     encode/wgEncodeGencodeTag.o  \
     encode/wgEncodeGencodePdb.o encode/wgEncodeGencodePubMed.o \
     encode/wgEncodeGencodeRefSeq.o encode/wgEncodeGencodeGeneSource.o encode/wgEncodeGencodeTranscriptSource.o \
-    encode/wgEncodeGencodeTranscriptSupport.o encode/wgEncodeGencodeUniProt.o \
+    encode/wgEncodeGencodeTranscriptSupport.o encode/wgEncodeGencodeTranscriptionSupportLevel.o \
+    encode/wgEncodeGencodeUniProt.o \
     encode/wgEncodeGencodePolyAFeature.o encode/wgEncodeGencodeAnnotationRemark.o \
     encode/encodeExp.o \
     ensFace.o ensInfo.o ensPhusionBlast.o ensXRefZfish.o \
@@ -43,12 +45,12 @@ O = acemblyClass.o affyAllExonProbe.o affyAtlas.o affy10KDetails.o affy120KDetai
     fbTables.o featureBits.o fileUi.o findKGAlias.o findKGProtAlias.o fishClones.o \
     flyBase2004Xref.o \
     flyBaseSwissProt.o flyreg.o flyreg2.o gbExtFile.o gbWarn.o gbMiscDiff.o gbProtAnn.o gcPercent.o gbSeq.o \
-    genbank.o gencodeGeneClass.o gencodeIntron.o genMapDb.o \
+    genbank.o genbankBlackList.o gencodeGeneClass.o gencodeIntron.o genMapDb.o \
     geneBands.o geneCheck.o geneCheckDetails.o geneCheckWidget.o \
     geneGraph.o genePred.o genePredReader.o geneSimilarities.o genoLay.o \
     genomeRangeTreeFile.o genomicDups.o \
-    genomicSuperDups.o ggCluster.o ggDbIo.o ggDump.o ggGraph.o ggMrnaAli.o \
-    ggTypes.o glDbRep.o goa.o goaPart.o googleAnalytics.o \
+    genomicSuperDups.o geoMirror.o ggCluster.o ggDbIo.o ggDump.o ggGraph.o ggMrnaAli.o \
+    ggTypes.o glDbRep.o goa.o goaPart.o googleAnalytics.o gpFx.o \
     growthCondition.o grp.o gwasCatalog.o \
     hapmapAllelesOrtho.o hapmapAllelesSummary.o hapmapPhaseIIISummary.o \
     hapmapSnps.o hapmapSnpsCombined.o \
@@ -57,7 +59,7 @@ O = acemblyClass.o affyAllExonProbe.o affyAtlas.o affy10KDetails.o affy120KDetai
     hgFindSpec.o hgFindSpecCustom.o \
     hgGene.o hgMaf.o hgRelate.o hgSeq.o hgdpGeo.o hPrint.o hVarSubst.o hvGfx.o \
     HInv.o hubConnect.o hui.o humanParalog.o \
-    imageClone.o isochores.o ispyTables.o itemAttr.o itemConf.o jalview.o \
+    imageClone.o isochores.o ispyTables.o itemAttr.o itemConf.o itemDetailsHtml.o jalview.o \
     jaxOrtholog.o jaxQTL.o jaxQTL3.o jksql.o joiner.o jsHelper.o kg1ToKg2.o \
     jgiGene.o \
     kgAlias.o kgColor.o kgProtAlias.o kgXref.o knownInfo.o knownMore.o knownToSuper.o \
@@ -96,7 +98,7 @@ O = acemblyClass.o affyAllExonProbe.o affyAtlas.o affy10KDetails.o affy120KDetai
     transRegCode.o transRegCodeCondition.o \
     transRegCodeProbe.o txCluster.o txCommon.o txEdgeBed.o \
     txEdgeOrtho.o txGraph.o txInfo.o txRnaAccs.o ucscRetroInfo.o ucscRetroOrtho.o \
-    validateGisaid.o vcfUi.o vegaInfo.o vegaInfoZfish.o visiGene.o vntr.o \
+    validateGisaid.o variant.o vcfUi.o vegaInfo.o vegaInfoZfish.o visiGene.o vntr.o \
     wabAli.o web.o ncRna.o wgRna.o wigAsciiToBinary.o wigDataStream.o wiggle.o \
     wiggleCart.o wiggleUtils.o wikiLink.o wikiTrack.o yaleGencodeAssoc.o \
     zdobnovSynt.o oreganno.o \

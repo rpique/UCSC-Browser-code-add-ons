@@ -3,7 +3,6 @@
 # chainNet tracks
 include trackDb.chainNet.ra
 include trackDb.wgEncode.ra
-include trackDb.merckPolyA.all.ra
 
 #large composites
 include uMassBrainHistone.ra
@@ -13,6 +12,12 @@ visibility hide
 
 track gap override
 visibility hide
+
+track encodeRegions override
+shortLabel ENCODE Pilot
+longLabel Regions used for ENCODE Pilot Project (1%)
+group map
+pennantIcon encodeThumbnail.jpg ../ENCODE "encode project"
 
 track switchDbTss override
 origAssembly hg17
@@ -52,22 +57,12 @@ track HInvGeneMrna override
 origAssembly hg18
 pennantIcon 18.jpg ../goldenPath/help/hg18ToHg19LiftOver.html "lifted from hg18"
 
-track sibTxGraph
-shortLabel SIB Alt-Splicing
-longLabel Alternative Splicing Graph from Swiss Institute of Bioinformatics 
-group rna
-priority 74.5
-visibility hide
-type altGraphX
-url http://www.isrec.isb-sib.ch/cgi-bin/tromer/tromergraph2draw.pl?species=H.+sapiens&tromer=$$
-urlLabel SIB link:
-idInUrlSql select name from sibTxGraph where id=%s
-
 track gwasCatalog override
-snpTable snp132
-snpVersion 132
+snpTable snp135
+snpVersion 135
 
 track ucscRetroAli1
+release alpha
 shortLabel Retroposed Genes
 longLabel Retroposed GenesV1, Including Pseudogenes - November 2010 
 group genes
@@ -78,7 +73,7 @@ visibility hide
 ucscRetroInfo ucscRetroInfo1
 baseColorDefault diffCodons
 baseColorUseCds table ucscRetroCds
-baseColorUseSequence extFile ucscRetroSeq ucscRetroExtFile
+baseColorUseSequence extFile ucscRetroSeq1 ucscRetroExtFile1
 indelDoubleInsert on
 indelQueryInsert on
 showDiffBasesAllScales .
@@ -119,16 +114,60 @@ xrefTable kgXref, ucscRetroInfo1
 xrefQuery select ucscRetroInfo1.name, geneSymbol from %s where geneSymbol like '%s%%' and kgName = kgID 
 searchPriority 3.53
 
-track tRNAs
-shortLabel tRNA Genes
-longLabel Transfer RNA genes identified with tRNAscan-SE 
+track ucscRetroAli2
+release alpha
+shortLabel Retroposed Genes 2.0
+longLabel Retroposed Genes, Including Pseudogenes 2011-10-22 [ucscRetroAli2]
 group genes
-priority 53.5
-visibility hide
-color 0,20,150
-type bed 6 +
+type psl
+priority 37.14
+color 20,0,250
+visibility pack
 nextItemButton on
-noScoreFilter .
+ucscRetroInfo ucscRetroInfo2
+baseColorDefault diffCodons
+baseColorUseCds table ucscRetroCds2
+baseColorUseSequence extFile ucscRetroSeq2 ucscRetroExtFile2
+indelDoubleInsert on
+indelQueryInsert on
+showDiffBasesAllScales .
+showDiffBasesMaxZoom 10000.0
+showCdsAllScales .
+showCdsMaxZoom 10000.0
+html ucscRetroAli1
+
+searchName ucscRetroInfoRefSeq2
+searchTable ucscRetroAli2
+searchDescription Retroposed GenesV2, Including Pseudogenes - 2011-10-22
+query select tName, tStart,tEnd, qName from %s where qName like '%s%%'
+xrefTable refLink, ucscRetroInfo2
+dontCheckXrefQueryFormat 1
+xrefQuery select ucscRetroInfo2.name, refLink.name from %s where refLink.name like '%s%%' and refSeq = mrnaAcc 
+searchPriority 3.52
+
+searchName ucscRetroInfoMrna2
+searchTable ucscRetroAli2
+searchDescription Retroposed GenesV2, Including Pseudogenes - 2011-10-22
+query select tName, tStart,tEnd, qName from %s where qName like '%s%%'
+searchPriority 3.55
+
+searchName ucscRetroUniProt2
+searchTable ucscRetroAli2
+searchDescription Retroposed GenesV2, Including Pseudogenes - 2011-10-22
+query select tName, tStart,tEnd, qName from %s where qName like '%s%%'
+dontCheckXrefQueryFormat 1
+xrefTable kgXref, ucscRetroInfo2
+xrefQuery select ucscRetroInfo2.name, spDisplayID from %s where spDisplayID like '%s%%' and kgName = kgID 
+searchPriority 3.54
+
+searchName ucscRetroKnownGene2
+searchTable ucscRetroAli2
+searchDescription Retroposed GenesV2, Including Pseudogenes - 2011-10-22
+query select tName, tStart,tEnd, qName from %s where qName like '%s%%'
+dontCheckXrefQueryFormat 1
+xrefTable kgXref, ucscRetroInfo2
+xrefQuery select ucscRetroInfo2.name, geneSymbol from %s where geneSymbol like '%s%%' and kgName = kgID 
+searchPriority 3.53
 
 track illuminaProbes override
 origAssembly hg18
@@ -802,13 +841,13 @@ html hg19mammalChainNet
         type chain myoLuc1
         otherDb myoLuc1
 
-        track chainBosTau6
+        track chainBosTau7
         subTrack placentalChainNetViewchain off
         subGroups view=chain species=lCow clade=bLaura
         shortLabel $o_Organism Chain
         longLabel $o_Organism ($o_date) Chained Alignments
-        type chain bosTau6
-        otherDb bosTau6
+        type chain bosTau7
+        otherDb bosTau7
 
         track chainCavPor3
         subTrack placentalChainNetViewchain off
@@ -860,13 +899,13 @@ html hg19mammalChainNet
         type chain echTel1
         otherDb echTel1
 
-        track chainMm9
+        track chainMm10
         subTrack placentalChainNetViewchain on 
         subGroups view=chain species=bMouse clade=aEuarch
         shortLabel $o_Organism Chain
         longLabel $o_Organism ($o_date) Chained Alignments
-        type chain mm9
-        otherDb mm9
+        type chain mm10
+        otherDb mm10
 
         track chainRn4
         subTrack placentalChainNetViewchain off
@@ -1023,13 +1062,13 @@ html hg19mammalChainNet
         type netAlign myoLuc1 chainMyoLuc1
         otherDb myoLuc1
 
-        track netBosTau6
+        track netBosTau7
         subTrack placentalChainNetViewnet on 
         subGroups view=net species=lCow clade=bLaura
         shortLabel $o_Organism Net
         longLabel $o_Organism ($o_date) Alignment Net
-        type netAlign bosTau6 chainBosTau6
-        otherDb bosTau6
+        type netAlign bosTau7 chainBosTau7
+        otherDb bosTau7
 
         track netCavPor3
         subTrack placentalChainNetViewnet off
@@ -1081,13 +1120,13 @@ html hg19mammalChainNet
         type netAlign echTel1 chainEchTel1
         otherDb echTel1
 
-        track netMm9
+        track netMm10
         subTrack placentalChainNetViewnet on
         subGroups view=net species=bMouse clade=aEuarch
         shortLabel $o_Organism Net
         longLabel $o_Organism ($o_date) Alignment Net
-        type netAlign mm9 chainMm9
-        otherDb mm9
+        type netAlign mm10 chainMm10
+        otherDb mm10
 
         track netRn4
         subTrack placentalChainNetViewnet on 
@@ -1595,7 +1634,7 @@ priority 103.29
 track snp135Common override
 snpSeqFile /gbdb/hg19/snp/snp135.fa
 chimpOrangMacOrthoTable snp135OrthoPt3Pa2Rm2
-chimpDb panTro2
+chimpDb panTro3
 orangDb ponAbe2
 macaqueDb rheMac2
 hapmapPhase III
@@ -1606,7 +1645,7 @@ codingAnnotations snp135CodingDbSnp,
 track snp135Flagged override
 snpSeqFile /gbdb/hg19/snp/snp135.fa
 chimpOrangMacOrthoTable snp135OrthoPt3Pa2Rm2
-chimpDb panTro2
+chimpDb panTro3
 orangDb ponAbe2
 macaqueDb rheMac2
 hapmapPhase III
@@ -1617,7 +1656,7 @@ codingAnnotations snp135CodingDbSnp,
 track snp135Mult override
 snpSeqFile /gbdb/hg19/snp/snp135.fa
 chimpOrangMacOrthoTable snp135OrthoPt3Pa2Rm2
-chimpDb panTro2
+chimpDb panTro3
 orangDb ponAbe2
 macaqueDb rheMac2
 hapmapPhase III
@@ -1627,7 +1666,7 @@ codingAnnotations snp135CodingDbSnp,
 
 track snp135 override
 chimpOrangMacOrthoTable snp135OrthoPt3Pa2Rm2
-chimpDb panTro2
+chimpDb panTro3
 orangDb ponAbe2
 macaqueDb rheMac2
 hapmapPhase III
@@ -1902,19 +1941,18 @@ track pgSaqqaqHc override
 origAssembly hg18
 pennantIcon 18.jpg ../goldenPath/help/hg18ToHg19LiftOver.html "lifted from hg18"
 
+track tgpPhase1
+shortLabel 1000Genomes Ph 1
+longLabel 1000 Genomes Phase 1 Integrated Variant Calls: SNVs, InDels, SVs
+type vcfTabix
+group varRep
+priority 101.5
+visibility hide
 
 searchTable nscanGene
 searchType genePred
 termRegex chr[0-9a-zA-Z_]+\.([0-9]+|pasa)((\.[0-9a-z]+)?\.[0-9a-z]+)?
 searchPriority 50
-
-searchName tRNA-name
-searchTable tRNAs
-searchType bed
-searchMethod fuzzy
-query select chrom,chromStart,chromEnd,name from %s where name like '%%%s%%'
-searchDescription tRNAscan-SE tRNA Name
-searchPriority 63
 
 searchTable ctgPos
 searchMethod exact
@@ -1946,7 +1984,7 @@ longLabel Vega Annotations
 group genes
 priority 37.1
 visibility hide
-chromosomes chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY
+chromosomes chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY,chr6_apd_hap1,chr6_cox_hap2,chr6_dbb_hap3,chr6_mann_hap4,chr6_mcf_hap5,chr6_qbl_hap6,chr6_ssto_hap7
 type genePred vegaPep
 urlLabel Vega Transcript:
 url http://vega.sanger.ac.uk/Homo_sapiens/transview?transcript=$$
@@ -1975,6 +2013,7 @@ group genes
 priority 55
 visibility hide
 type bed 12
+configureByPopup off
 url http://h-invitational.jp/hinv/spsoup/transcript_view?hit_id=$$
 
     track hinv70Coding
@@ -2239,6 +2278,7 @@ visibility hide
 noInherit on
 type bed 3 .
 origAssembly hg18
+configureByPopup off
 pennantIcon 18.jpg ../goldenPath/help/hg18ToHg19LiftOver.html "lifted from hg18"
 
 
@@ -2262,9 +2302,180 @@ pennantIcon 18.jpg ../goldenPath/help/hg18ToHg19LiftOver.html "lifted from hg18"
     origAssembly hg18
     pennantIcon 18.jpg ../goldenPath/help/hg18ToHg19LiftOver.html "lifted from hg18"
 
+track polyASeqSites
+compositeTrack on
+shortLabel PolyA-Seq
+longLabel Poly(A)-sequencing from Merck Research Laboratories
+group rna
+subGroup1 view Views Signal=Signal 
+subGroup2 tissType Tissue_Type Kidney=Kidney Brain=Brain Liver=Liver MaqcBrain1=MAQC_Brain_1 MaqcBrain2=MAQC_Brain_2 MaqcUhr1=MAQC_UHR_1 MaqcUhr2=MAQC_UHR_2 Muscle=Muscle Testis=Testis
+subGroup3 strand Strand fwd=Forward rev=Reverse
+dimensions dimensionY=tissType dimensionX=strand
+sortOrder tissType=+ strand=+ view=+
+priority 79.2
+type bed 
+dragAndDrop subTracks
+visibility hide
+noInherit on
+
+    track polyASeqSitesSignalView
+    shortLabel Signal
+    view Signal
+    visibility full
+    subTrack polyASeqSites
+    maxHeightPixels 50:50:5
+    autoScale on
+    yLineOnOff on
+    type bigWig -1 2 
+
+        track polyASeqSitesBrainFwd
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=Brain strand=fwd
+        shortLabel PolyA-Seq Brain
+        longLabel Poly(A)-tail sequencing of Brain from Merck (Fwd strand)
+        color 153,51,51
+        type bigWig 0.340000 194860.187500
+
+        track polyASeqSitesBrainRev
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=Brain strand=rev
+        shortLabel PolyA-Seq Brain
+        longLabel Poly(A)-tail sequencing of Brain from Merck (Rev strand)
+        color 0,0,0
+        type bigWig 0.340000 21771.560547
+
+        track polyASeqSitesKidneyFwd
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=Kidney strand=fwd
+        shortLabel PolyA-Seq Kidney
+        longLabel Poly(A)-tail sequencing of Kidney from Merck (Fwd strand)
+        color 153,51,51
+        type bigWig 0.220000 146019.640625
+
+        track polyASeqSitesKidneyRev
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=Kidney strand=rev
+        shortLabel PolyA-Seq Kidney
+        longLabel Poly(A)-tail sequencing of Kidney from Merck (Rev strand)
+        color 0,0,0
+        type bigWig 0.220000 12818.589844
+
+        track polyASeqSitesLiverFwd
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=Liver strand=fwd
+        shortLabel PolyA-Seq Liver
+        longLabel Poly(A)-tail sequencing of Liver from Merck (Fwd strand)
+        color 153,51,51
+        type bigWig 0.180000 63606.449219
+
+        track polyASeqSitesLiverRev
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=Liver strand=rev
+        shortLabel PolyA-Seq Liver
+        longLabel Poly(A)-tail sequencing of Liver from Merck (Rev strand)
+        color 0,0,0
+        type bigWig 0.180000 109706.320312
+
+        track polyASeqSitesMaqcBrain1Fwd
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=MaqcBrain1 strand=fwd
+        shortLabel PolyA-Seq MaqcBrain1
+        longLabel Poly(A)-tail sequencing of MAQC Brain (replicate 1) from Merck (Fwd strand)
+        color 153,51,51
+        type bigWig 0.250000 62850.468750
+
+        track polyASeqSitesMaqcBrain1Rev
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=MaqcBrain1 strand=rev
+        shortLabel PolyA-Seq MaqcBrain1
+        longLabel Poly(A)-tail sequencing of MAQC Brain (replicate 1) from Merck (Rev strand)
+        color 0,0,0
+        type bigWig 0.250000 15009.809570
+
+        track polyASeqSitesMaqcBrain2Fwd
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=MaqcBrain2 strand=fwd
+        shortLabel PolyA-Seq MaqcBrain2
+        longLabel Poly(A)-tail sequencing of MAQC Brain (replicate 2) from Merck (Fwd strand)
+        color 153,51,51
+        type bigWig 0.260000 61466.800781
+
+        track polyASeqSitesMaqcBrain2Rev
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=MaqcBrain2 strand=rev
+        shortLabel PolyA-Seq MaqcBrain2
+        longLabel Poly(A)-tail sequencing of MAQC Brain (replicate 2) from Merck (Rev strand)
+        color 0,0,0
+        type bigWig 0.260000 17027.939453
+
+        track polyASeqSitesMaqcUhr1Fwd
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=MaqcUhr1 strand=fwd
+        shortLabel PolyA-Seq MaqcUhr1
+        longLabel Poly(A)-tail sequencing of MAQC UHR (replicate 1) from Merck (Fwd strand)
+        color 153,51,51
+        type bigWig 0.200000 25178.449219
+
+        track polyASeqSitesMaqcUhr1Rev
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=MaqcUhr1 strand=rev
+        shortLabel PolyA-Seq MaqcUhr1
+        longLabel Poly(A)-tail sequencing of MAQC UHR (replicate 1) from Merck (Rev strand)
+        color 0,0,0
+        type bigWig 0.200000 18536.800781
+
+        track polyASeqSitesMaqcUhr2Fwd
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=MaqcUhr2 strand=fwd
+        shortLabel PolyA-Seq MaqcUhr2
+        longLabel Poly(A)-tail sequencing of MAQC UHR (replicate 2) from Merck (Fwd strand)
+        color 153,51,51
+        type bigWig 0.200000 25301.960938
+
+        track polyASeqSitesMaqcUhr2Rev
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=MaqcUhr2 strand=rev
+        shortLabel PolyA-Seq MaqcUhr2
+        longLabel Poly(A)-tail sequencing of MAQC UHR (replicate 2) from Merck (Rev strand)
+        color 0,0,0
+        type bigWig 0.200000 16088.179688
+
+        track polyASeqSitesMuscleFwd
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=Muscle strand=fwd
+        shortLabel PolyA-Seq Muscle
+        longLabel Poly(A)-tail sequencing of Muscle from Merck (Fwd strand)
+        color 153,51,51
+        type bigWig 0.210000 37201.500000
+
+        track polyASeqSitesMuscleRev
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=Muscle strand=rev
+        shortLabel PolyA-Seq Muscle
+        longLabel Poly(A)-tail sequencing of Muscle from Merck (Rev strand)
+        color 0,0,0
+        type bigWig 0.210000 124901.000000
+
+        track polyASeqSitesTestisFwd
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=Testis strand=fwd
+        shortLabel PolyA-Seq Testis
+        longLabel Poly(A)-tail sequencing of Testis from Merck (Fwd strand)
+        color 153,51,51
+        type bigWig 0.200000 61261.609375
+
+        track polyASeqSitesTestisRev
+        parent polyASeqSitesSignalView
+        subGroups view=Signal tissType=Testis strand=rev
+        shortLabel PolyA-Seq Testis
+        longLabel Poly(A)-tail sequencing of Testis from Merck (Rev strand)
+        color 0,0,0
+        type bigWig 0.200000 69989.523438
+
+
 #include jkExperiments.ra
 
-track agilentCgh
+track genotypeArrays
 shortLabel Arrays
 longLabel Microarray probesets
 compositeTrack on
@@ -2274,8 +2485,16 @@ noScoreFilter .
 noInherit on
 type bed 3 .
 
+    track affyCytoScan
+    parent genotypeArrays
+    shortLabel Affy CytoScan
+    longLabel Affymetrix Cytoscan CNV and SNP array probeset
+    priority 0
+    itemRgb on
+    type bed 9 .
+
     track agilentCgh1x1m
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag CGH 1x1m
     longLabel Agilent SurePrint G3 Human CGH Microarray 1x1M AMADID 021529
     color 0,128,0
@@ -2283,7 +2502,7 @@ type bed 3 .
     priority 1
 
     track agilentHrd1x1m
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag HRD 1x1m
     longLabel Agilent SurePrint G3 Human High-Resolution Microarray 1x1M AMADID 023642
     color 255,128,0
@@ -2291,7 +2510,7 @@ type bed 3 .
     priority 2
 
     track agilentCghSnp2x400k
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag SNP 2x400k
     longLabel Agilent SurePrint G3 Human CGH+SNP Microarray 2x400K AMADID 028081
     color 0,0,128
@@ -2300,7 +2519,7 @@ type bed 3 .
     priority 3
 
     track agilentCgh2x400k
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag CGH 2x400k
     longLabel Agilent SurePrint G3 Human CGH Microarray 2x400K AMADID 021850
     color 0,128,0
@@ -2308,7 +2527,7 @@ type bed 3 .
     priority 4
 
     track agilentCghSnpCancer4x180k
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag Can 4x180k
     longLabel Agilent SurePrint G3 Human CGH+SNP Cancer Microarray 4x180K AMADID 030587
     color 0,0,128
@@ -2317,7 +2536,7 @@ type bed 3 .
     priority 5
 
     track agilentCghSnp4x180k
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag SNP 4x180k
     longLabel Agilent SurePrint G3 Human CGH+SNP Microarray 4x180K AMADID 029830
     color 0,0,128
@@ -2326,7 +2545,7 @@ type bed 3 .
     priority 6
 
     track agilentCgh4x180k
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag CGH 4x180k
     longLabel Agilent SurePrint G3 Human CGH Microarray 4x180K AMADID 022060
     color 255,128,0
@@ -2334,7 +2553,7 @@ type bed 3 .
     priority 7
 
     track agilentCgh8x60k
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag CGH 8x60k
     longLabel Agilent SurePrint G3 Human CGH Microarray 8x60K AMADID 021924
     type bed 4 .
@@ -2342,7 +2561,7 @@ type bed 3 .
     priority 8
 
     track agilentCgh1x244k
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag CGH 1x244k
     longLabel Agilent SurePrint HD Human CGH Microarray 1x244K AMADID 014693
     color 255,128,0
@@ -2350,7 +2569,7 @@ type bed 3 .
     priority 9
 
     track agilentCgh2x105k
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag CGH 2x105k
     longLabel Agilent SurePrint HD Human CGH Microarray 2x105K AMADID 014698
     color 0,128,0
@@ -2358,7 +2577,7 @@ type bed 3 .
     priority 10
 
     track agilentCgh4x44k
-    parent agilentCgh
+    parent genotypeArrays
     shortLabel Ag CGH 4x44k
     longLabel Agilent SurePrint HD Human CGH Microarray 4x44K AMADID 014950
     color 255,128,0
@@ -2529,6 +2748,24 @@ type bigWig -15 7
 autoScale on
 maxHeightPixels 128:64:20
 
+track multizBasal
+#subTrack consDinoViewalign on
+shortLabel Basal Align
+longLabel Basal Alignments of 7 
+#subGroups view=align clade=vert
+noInherit on
+irows on
+summary multizBasalSummary
+frames multiz46wayFrames
+group x
+color 0, 10, 100
+altColor 0,90,10
+type wigMaf 0.0 1.0
+speciesCodonDefault hg19
+#speciesOrder ornAna1 galGal3 taeGut1 anoCar2 pytMol0 chrPic0 pelSin0 cheMyd0 allMis0
+speciesOrder mm9 bosTau4 monDom5 anoCar1 galGal3 xenTro2 danRer6 fr2 gasAcu1 oryLat2 calMil0
+priority 100
+
 track multizDino
 #subTrack consDinoViewalign on
 shortLabel Dino Align
@@ -2548,7 +2785,7 @@ speciesCodonDefault hg19
 #sGroup_Placental_Mammal tupBel1 mm9 rn4 dipOrd1 cavPor3 speTri1 oryCun2 ochPri2 vicPac1 turTru1 bosTau4 equCab2 felCat3 canFam2 myoLuc1 pteVam1 eriEur1 sorAra1 loxAfr3 proCap1 echTel1 dasNov2 choHof1 
 #sGroup_Vertebrate macEug1 monDom5 ornAna1 galGal3 taeGut1 anoCar1 xenTro2 tetNig2 fr2 gasAcu1 oryLat2 danRer6 petMar1 
 #speciesDefaultOff panTro2 gorGor1 ponAbe2 papHam1 calJac1 tarSyr1 otoGar1 equCab2 micMur1 tupBel1 rn4 dipOrd1 cavPor3 speTri1 oryCun2 ochPri2 sorAra1 eriEur1 felCat3 pteVam1 myoLuc1 turTru1 bosTau4 vicPac1 choHof1 echTel1 dasNov2 macEug1 ornAna1 taeGut1 anoCar1 proCap1 tetNig2 fr2 gasAcu1 oryLat2 petMar1
-speciesOrder ornAna1 galGal3 taeGut1 anoCar2 pytMol0 chrPic0 allMis0
+speciesOrder ornAna1 galGal3 taeGut1 anoCar2 pytMol0 chrPic0 pelSin0 cheMyd0 allMis0
 #itemFirstCharCase noChange
 #treeImage phylo/hg19_Dino.gif
 priority 100
@@ -2582,41 +2819,9 @@ track decodeRmap override
 origAssembly hg18
 pennantIcon 18.jpg ../goldenPath/help/hg18ToHg19LiftOver.html "lifted from hg18"
 
-#
-# This stanza should go away when the new version of UCSC Genes goes public.
-# It's there temporarily while UCSC Genes is in QA, to ensure that the old
-# version of the track details page is used on beta and rr while the new
-# version is used on alpha only.
-#
 track knownGene
-release beta, public
 shortLabel UCSC Genes
-longLabel UCSC Genes Based on RefSeq, UniProt, GenBank, CCDS and Comparative Genomics
-group genes
-priority 34
-visibility pack
-color 12,12,120
-type genePred knownGenePep knownGeneMrna
-idXref kgAlias kgID alias
-hgGene on
-hgsid on
-directUrl /cgi-bin/hgGene?hgg_gene=%s&hgg_chrom=%s&hgg_start=%d&hgg_end=%d&hgg_type=%s&db=%s
-baseColorUseCds given
-baseColorDefault genomicCodons
-defaultLinkedTables kgXref
-intronGap 12
-
-#
-# This stanza should go away when the new version of UCSC Genes goes public.
-# It's there temporarily while UCSC Genes is in QA, to ensure that the old
-# version of the track details page is used on beta and rr while the new
-# version is used on alpha only.
-#
-track knownGene
-release alpha
-html knownGeneNew
-shortLabel UCSC Genes
-longLabel UCSC Genes Based on RefSeq, UniProt, GenBank, CCDS and Comparative Genomics
+longLabel UCSC Genes (RefSeq, UniProt, CCDS, Rfam, tRNAs & Comparative Genomics)
 group genes
 priority 34
 visibility pack
@@ -2667,4 +2872,11 @@ query select chrom, txStart,txEnd, name from %s where name like '%%%s%%'
 searchPriority 3.53
 
 include lincRNAs.ra
+
+track sibGene override
+url http://ccg.vital-it.ch/cgi-bin/tromer/tromer_quick_search_internal.pl?db=hg19&query_str=$$
+urlLabel SIB link:
+
+track sibTxGraph override
+url http://ccg.vital-it.ch/cgi-bin/tromer/tromergraph2draw.pl?db=hg19&species=H.+sapiens&tromer=$$
 

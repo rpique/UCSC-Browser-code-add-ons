@@ -32,8 +32,6 @@
 #define TRACK_SEARCH_ON_DESCR    "tsDescr"
 #define TRACK_SEARCH_SORT        "tsSort"
 
-#define SUPPORT_SUBTRACKS_INHERIT_DESCRIPTION
-
 static int gCmpGroup(const void *va, const void *vb)
 /* Compare groups based on label. */
 {
@@ -298,14 +296,10 @@ for (group = groupList; group != NULL; group = group->next)
                     if ((matchingTracks == NULL || hashLookup(matchingTracks, subTrack->track) != NULL)
                     && (isEmpty(typeSearch) || sameWord(typeSearch, trackType))
                     && (isEmpty(nameSearch) || searchNameMatches(subTrack->tdb, nameList))
-                #ifdef SUPPORT_SUBTRACKS_INHERIT_DESCRIPTION
-                    && (isEmpty(descSearch)
+                    && (isEmpty(descSearch) // subtracks inherit description
                         || searchDescriptionMatches(subTrack->tdb, descList)
                         || (tdbIsCompositeChild(subTrack->tdb) && subTrack->parent
                             && searchDescriptionMatches(subTrack->parent->tdb, descList))))
-                #else///ifndef SUPPORT_SUBTRACKS_INHERIT_DESCRIPTION
-                    && (isEmpty(descSearch) || searchDescriptionMatches(subTrack->tdb, descList)))
-                #endif///ndef SUPPORT_SUBTRACKS_INHERIT_DESCRIPTION
                         {
                         if (track != NULL)
                             {
@@ -395,7 +389,6 @@ if(tracksFound < 1)
     }
 else
     {
-    struct hash *tdbHash = makeTrackHash(database, chromName);
     hPrintf("<form action='%s' name='%s' id='%s' method='post'>\n\n", hgTracksName(),SEARCH_RESULTS_FORM,SEARCH_RESULTS_FORM);
     cartSaveSession(cart);  // Creates hidden var of hgsid to avoid bad voodoo
 
@@ -455,7 +448,7 @@ else
     hPrintf("</td></tr>\n");
 
     // Set up json for js functionality
-    struct jsonHashElement *jsonTdbVars = newJsonHash(newHash(8));
+    struct jsonElement *jsonTdbVars = newJsonObject(newHash(8));
 
     int trackCount=0;
     boolean containerTrackCount = 0;
@@ -529,7 +522,7 @@ else
         // shortLabel has description popup and longLabel has "..." metadata
         hPrintf("<td><a target='_top' onclick=\"popUp.hgTrackUi('%s',true); return false;\" href='%s' title='Display track details'>%s</a></td>\n", track->track, trackUrl(track->track, NULL), track->shortLabel);
         hPrintf("<td>%s", track->longLabel);
-        compositeMetadataToggle(database, track->tdb, NULL, TRUE, FALSE, tdbHash);
+        compositeMetadataToggle(database, track->tdb, NULL, TRUE, FALSE);
         hPrintf("</td></tr>\n");
         }
     //hPrintf("</table>\n");
@@ -562,13 +555,7 @@ void doSearchTracks(struct group *groupList)
 webIncludeResourceFile("ui.dropdownchecklist.css");
 jsIncludeFile("ui.dropdownchecklist.js",NULL);
 // This line is needed to get the multi-selects initialized
-#ifdef NEW_JQUERY
 jsIncludeFile("ddcl.js",NULL);
-hPrintf("<script type='text/javascript'>var newJQuery=true;</script>\n");
-#else///ifndef NEW_JQUERY
-hPrintf("<script type='text/javascript'>var newJQuery=false;</script>\n");
-hPrintf("<script type='text/javascript'>$(document).ready(function() { $('.filterBy').each( function(i) { $(this).dropdownchecklist({ firstItemChecksAll: true, noneIsAll: true, maxDropHeight: filterByMaxHeight(this) });});});</script>\n");
-#endif///ndef NEW_JQUERY
 
 struct group *group;
 char *groups[128];

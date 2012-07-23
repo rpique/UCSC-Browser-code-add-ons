@@ -435,7 +435,7 @@ showLinkedFields(dtList);
 dt = dbTableNew(db, table);
 slAddHead(&dtList, dt);
 showLinkedTables(joiner, dtList, selFieldLinkedTablePrefix(),
-	hgtaDoSelectFieldsMore, "Allow Selection From Checked Tables");
+	hgtaDoSelectFieldsMore, "allow selection from checked tables");
 
 /* clean up. */
 hPrintf("</FORM>");
@@ -1015,7 +1015,7 @@ else if (type != NULL && (startsWithWord("makeItems", type) || sameWord("bedDeta
     printSqlFieldListAsControlTable(ftList, db, table, ct->tdb, FALSE);
     hFreeConn(&conn);
     }
-else if (ct->wiggle)
+else if (ct->wiggle || isBigWigTable(table))
     {
     if ((ct->tdb != NULL) && (ct->tdb != NULL))
         {
@@ -1091,7 +1091,7 @@ else
 
 puts("</TABLE>");
 
-if (ct->wiggle)
+if (ct->wiggle || isBigWigTable(table) || isBamTable(table) || isVcfTable(table))
     {
     char *name;
     hPrintf("<TABLE BORDER=0><TR><TD> Limit data output to:&nbsp\n");
@@ -1162,7 +1162,7 @@ showLinkedFilters(dtList);
 dt = dbTableNew(db, table);
 slAddHead(&dtList, dt);
 showLinkedTables(joiner, dtList, filterLinkedTablePrefix,
-	hgtaDoFilterMore, "Allow Filtering Using Fields in Checked Tables");
+	hgtaDoFilterMore, "allow filtering using fields in checked tables");
 
 hPrintf("</FORM>\n");
 cgiDown(0.9);

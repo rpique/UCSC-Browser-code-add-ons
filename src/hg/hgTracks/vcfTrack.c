@@ -104,6 +104,8 @@ if (afEl != NULL && afDef != NULL && afDef->type == vcfInfoFloat)
     gotInfo = TRUE;
     for (i = 0;  i < afEl->count;  i++)
 	{
+	if (afEl->missingData[i])
+	    continue;
 	double altFreq = afEl->values[i].datFloat;
 	refFreq -= altFreq;
 	if (altFreq > maxAltFreq)
@@ -118,12 +120,15 @@ else
     const struct vcfInfoElement *anEl = vcfRecordFindInfo(record, "AN");
     const struct vcfInfoDef *anDef = vcfInfoDefForKey(vcff, "AN");
     if (acEl != NULL && acDef != NULL && acDef->type == vcfInfoInteger &&
-	anEl != NULL && anDef != NULL && anDef->type == vcfInfoInteger && anEl->count == 1)
+	anEl != NULL && anDef != NULL && anDef->type == vcfInfoInteger && anEl->count == 1 &&
+	anEl->missingData[0] == FALSE)
 	{
 	gotInfo = TRUE;
 	int totalCount = anEl->values[0].datFloat;
 	for (i = 0;  i < acEl->count;  i++)
 	    {
+	    if (acEl->missingData[i])
+		continue;
 	    int altCount = acEl->values[i].datFloat;
 	    double altFreq = (double)altCount / totalCount;
 	    refFreq -= altFreq;
@@ -230,7 +235,7 @@ struct hapCluster
     unsigned short *refCounts; // per-variant count of reference alleles observed
     unsigned short *unkCounts; // per-variant count of unknown (or unphased het) alleles
     unsigned short leafCount;  // number of leaves under this node (or 1 if leaf)
-    unsigned short gtHapIx;    // if leaf, (genotype index << 1) + hapIx (0 or 1 for diploid)
+    unsigned short gtHapIx;    // if leaf, (genotype index << 1) + hap (0 or 1 for diploid)
 };
 
 INLINE boolean isRef(const struct hapCluster *c, int varIx)
@@ -404,7 +409,9 @@ for (varIx = 0, rec = vcff->records;  rec != NULL && varIx < endIx;  varIx++, re
 	    // first chromosome:
 	    c1->leafCount = 1;
 	    c1->gtHapIx = gtIx << 1;
-	    if (gt->hapIxA == 0)
+	    if (gt->hapIxA < 0)
+		c1->unkCounts[countIx] = 1;
+	    else if (gt->hapIxA == 0)
 		c1->refCounts[countIx] = 1;
 	    if (gt->isHaploid)
 		haveHaploid = TRUE;
@@ -412,13 +419,15 @@ for (varIx = 0, rec = vcff->records;  rec != NULL && varIx < endIx;  varIx++, re
 		{
 		c2->leafCount = 1;
 		c2->gtHapIx = (gtIx << 1) | 1;
-		if (gt->hapIxB == 0)
+		if (gt->hapIxB < 0)
+		    c2->unkCounts[countIx] = 1;
+		else if (gt->hapIxB == 0)
 		    c2->refCounts[countIx] = 1;
 		}
 	    }
 	else
 	    {
-	    // Unphased heterozygote, don't use haplotype info for clustering
+	    // Missing data or unphased heterozygote, don't use haplotype info for clustering
 	    c1->leafCount = c2->leafCount = 1;
 	    c1->gtHapIx = gtIx << 1;
 	    c2->gtHapIx = (gtIx << 1) | 1;
@@ -627,7 +636,9 @@ for (pixIx = 0;  pixIx < hapHeight;  pixIx++)
 	else
 	    {
 	    int alIx = hapIx ? gt->hapIxB : gt->hapIxA;
-	    if (alIx)
+	    if (alIx < 0)
+		unks++;
+	    else if (alIx > 0)
 		alts++;
 	    else
 		refs++;
@@ -812,14 +823,15 @@ if (ht->left != NULL && ht->right != NULL)
 	Color col = (ht->childDistance == 0) ? purple : MG_BLACK;
 	if (drawRectangle || ht->childDistance != 0)
 	    {
-	    hvGfxLine(hvg, x+branchW-1, yStart, x+branchW-1, yEnd-1, col);
+	    hvGfxLine(hvg, x+branchW, yStart, x+branchW, yEnd-1, col);
 	    hvGfxLine(hvg, x+branchW, yStart, labelEnd, yStart, col);
 	    hvGfxLine(hvg, x+branchW, yEnd-1, labelEnd, yEnd-1, col);
 	    }
 	else
 	    {
-	    hvGfxLine(hvg, x, midY, labelEnd-1, yStart, col);
-	    hvGfxLine(hvg, x, midY, labelEnd-1, yEnd-1, col);
+	    hvGfxLine(hvg, x, midY, x+1, midY, col);
+	    hvGfxLine(hvg, x+1, midY, labelEnd-1, yStart, col);
+	    hvGfxLine(hvg, x+1, midY, labelEnd-1, yEnd-1, col);
 	    }
 	addClusterMapItem(ht, x, yStart, labelEnd, yEnd-1, th);
 	}
@@ -830,11 +842,11 @@ if (ht->left != NULL && ht->right != NULL)
 	int rightMid = rDrawTreeInLabelArea(ht->right, hvg, yrtMidPoint, x+branchW,
 					    yFromNode, yh, th, drawRectangle);
 	midY = (leftMid + rightMid) / 2;
-	hvGfxLine(hvg, x+branchW-1, leftMid, x+branchW-1, rightMid, MG_BLACK);
+	hvGfxLine(hvg, x+branchW, leftMid, x+branchW, rightMid, MG_BLACK);
 	addClusterMapItem(ht, x, min(leftMid, rightMid), x+branchW-1, max(leftMid, rightMid), th);
 	}
     if (drawRectangle || ht->childDistance != 0)
-	hvGfxLine(hvg, x, midY, x+branchW-1, midY, MG_BLACK);
+	hvGfxLine(hvg, x, midY, x+branchW, midY, MG_BLACK);
     return midY;
     }
 else if (ht->left != NULL)
@@ -1089,7 +1101,7 @@ else
     {
     // TODO: may need to handle per-chrom files like bam, maybe fold bamFileNameFromTable into this:
     struct sqlConnection *conn = hAllocConnTrack(database, tg->tdb);
-    fileOrUrl = bbiNameFromSettingOrTable(tg->tdb, conn, tg->table);
+    fileOrUrl = bbiNameFromSettingOrTableChrom(tg->tdb, conn, tg->table, chromName);
     hFreeConn(&conn);
     }
 int vcfMaxErr = -1;
@@ -1130,7 +1142,14 @@ errCatchFree(&errCatch);
 void vcfTabixMethods(struct track *track)
 /* Methods for VCF + tabix files. */
 {
+#ifdef KNETFILE_HOOKS
+knetUdcInstall();
+#endif
 pgSnpMethods(track);
+// Disinherit next/prev flag and methods since we don't support next/prev:
+track->nextExonButtonable = FALSE;
+track->nextPrevExon = NULL;
+track->nextPrevItem = NULL;
 track->loadItems = vcfTabixLoadItems;
 track->canPack = TRUE;
 }
@@ -1156,9 +1175,7 @@ hvGfxTextCentered(hvg, xOff, yOff, width, tg->heightPer, MG_BLACK, font, message
 void vcfTabixMethods(struct track *track)
 /* Methods for VCF alignment files, in absence of tabix lib. */
 {
-#if (defined USE_TABIX && defined KNETFILE_HOOKS)
-knetUdcInstall();
-#endif//def USE_TABIX && KNETFILE_HOOKS
+// NOP warning method to warn users that tabix is not installed.
 messageLineMethods(track);
 track->drawItems = drawUseVcfTabixWarning;
 }

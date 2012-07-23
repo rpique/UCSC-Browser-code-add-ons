@@ -235,6 +235,8 @@
 #include "parClick.h"
 #include "mdb.h"
 #include "yaleGencodeAssoc.h"
+#include "itemDetailsHtml.h"
+#include "trackVersion.h"
 
 static char *rootDir = "hgcData";
 
@@ -288,7 +290,7 @@ char *entrezUidFormat = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retri
 char *unistsnameScript = "http://www.ncbi.nlm.nih.gov:80/entrez/query.fcgi?db=unists";
 char *unistsScript = "http://www.ncbi.nlm.nih.gov/genome/sts/sts.cgi?uid=";
 char *gdbScript = "http://www.gdb.org/gdb-bin/genera/accno?accessionNum=";
-char *cloneRegScript = "http://www.ncbi.nlm.nih.gov/genome/clone/clname.cgi?stype=Name&list=";
+char *cloneDbScript = "http://www.ncbi.nlm.nih.gov/clone?term=";
 char *traceScript = "http://www.ncbi.nlm.nih.gov/Traces/trace.cgi?cmd=retrieve&val=";
 char *genMapDbScript = "http://genomics.med.upenn.edu/perl/genmapdb/byclonesearch.pl?clone=";
 char *uniprotFormat = "http://www.uniprot.org/uniprot/%s";
@@ -443,10 +445,10 @@ fprintf(f, "%s", id);
 }
 */
 
-static void printCloneRegUrl(FILE *f, char *clone)
+static void printCloneDbUrl(FILE *f, char *clone)
 /* Print URL for Clone Registry at NCBI for a clone */
 {
-fprintf(f, "\"%s%s\"", cloneRegScript, clone);
+fprintf(f, "\"%s%s\"", cloneDbScript, clone);
 }
 
 static void printTraceUrl(FILE *f, char *idType, char *name)
@@ -604,6 +606,7 @@ if (!genbankCdsParse(cdsStr, &cds))
     errAbort("can't parse CDS for %s: %s", acc, cdsStr);
 return cds;
 }
+
 
 void printCappedSequence(int start, int end, int extra)
 /* Print DNA from start to end including extra at either end.
@@ -893,6 +896,23 @@ for (i=0; i<subCount; ++i)
     d = NULL;
     }
 return s;
+}
+
+void printItemDetailsHtml(struct trackDb *tdb, char *itemName)
+/* if track has an itemDetailsHtml, retrieve and print the HTML */
+{
+char *tableName = trackDbSetting(tdb, "itemDetailsHtmlTable");
+if (tableName != NULL)
+    {
+    struct sqlConnection *conn = hAllocConn(database);
+    struct itemDetailsHtml *html, *htmls
+        = sqlQueryObjs(conn, (sqlLoadFunc)itemDetailsHtmlLoad, sqlQueryMulti,
+                       "select name, html from %s where name = '%s'", tableName, itemName);
+    for (html = htmls; html != NULL; html = html->next)
+        printf("<br>\n%s\n", html->html);
+    itemDetailsHtmlFreeList(&htmls);
+    hFreeConn(&conn);
+    }
 }
 
 char *getIdInUrl(struct trackDb *tdb, char *itemName)
@@ -1418,7 +1438,10 @@ if (word && (sameWord(word,"bed") || sameWord(word,"bigBed")))
     {
     if (NULL != (word = nextWord(&type)))
         start = sqlUnsigned(word);
-    #ifdef EXTRA_FIELDS_SUPPORT
+    #ifndef EXTRA_FIELDS_SUPPORT
+    else // custom beds and bigBeds may not have full type "begBed 9 +"
+        start = max(0,slCount(as->columnList) - fieldCount); 
+    #else///ifdef EXTRA_FIELDS_SUPPORT
     // extraFields do not have to define all fields
     if (fieldCount > slCount(extras))
         start = 0;
@@ -1469,13 +1492,19 @@ for(;col != NULL && count < fieldCount;col=col->next)
         }
     else if (asTypesIsInt(col->lowType->type))
         {
-        long long valInt = sqlLongLong(fields[ix]);
-        printf("<td>%lld</td></tr>\n", valInt);
+        long valInt = strtol(fields[ix],NULL,10);
+        if (errno == 0 && valInt != 0)
+            printf("<td>%ld</td></tr>\n", valInt);
+        else
+            printf("<td>%s</td></tr>\n", fields[ix]);// decided not to print error
         }
     else if (asTypesIsFloating(col->lowType->type))
         {
-        double valDouble = sqlDouble(fields[ix]);
-        printf("<td>%g</td></tr>\n", valDouble);
+        double valDouble = strtod(fields[ix],NULL);
+        if (errno == 0 && valDouble != 0)
+            printf("<td>%g</td></tr>\n", valDouble);
+        else
+            printf("<td>%s</td></tr>\n", fields[ix]);// decided not to print error
         }
     #endif///ndef EXTRA_FIELDS_SUPPORT
     else
@@ -1544,6 +1573,7 @@ while ((row = sqlNextRow(sr)) != NULL)
     }
 sqlFreeResult(&sr);
 getBedTopScorers(conn, tdb, table, item, start, bedSize);
+printItemDetailsHtml(tdb, item);
 }
 
 #define INTRON 10
@@ -2619,11 +2649,12 @@ if (!foundPep)
 	puts("<LI>\n");
 	/* put out correct message to describe translated mRNA */
         if ((sameString(geneTable, "ensGene")) || (sameString(geneTable, "vegaGene")) || (sameString(geneTable, "vegaPseudoGene"))
+      || (genbankIsRefSeqNonCodingMRnaAcc(geneName))
       || (sameString(geneTable, "lincRNAsTranscripts")) )
 	    {
 	    printf("Non-protein coding gene or gene fragment, no protein prediction available.");
 	    }
-	else if (!genbankIsRefSeqNonCodingMRnaAcc(geneName))
+	else 
 	    {
 	    hgcAnchorSomewhere("htcTranslatedPredMRna", geneName,
 		"translate", seqName);
@@ -2765,6 +2796,7 @@ if (oldToNew != NULL && sqlTableExists(conn, oldToNew))
     sqlFreeResult(&sr);
     }
 geneShowCommon(item, tdb, pepTable);
+printItemDetailsHtml(tdb, item);
 }
 
 void pslDumpHtml(struct psl *pslList)
@@ -2803,6 +2835,7 @@ else
     pslDumpHtml(pslList);
     }
 pslFreeList(&pslList);
+printItemDetailsHtml(tdb, item);
 }
 
 
@@ -2853,14 +2886,10 @@ static void printDataVersion(struct trackDb *tdb)
 {
 metadataForTable(database,tdb,NULL);
 const char *version = metadataFindValue(tdb,"dataVersion");
-if(version != NULL)
-    printf("<B>Data version:</B> %s <BR>\n", version);
-else
-    {
+if(version == NULL)
     version = trackDbSetting(tdb,"dataVersion");
-    if (version != NULL)
-        printf("<B>Data version:</B> %s <BR>\n", version);
-    }
+if (version != NULL)
+    printf("<B>Data version:</B> %s <BR>\n", version);
 }
 
 void printDataRestrictionDate(struct trackDb *tdb)
@@ -2900,9 +2929,13 @@ void printTrackHtml(struct trackDb *tdb)
 {
 if (!isCustomTrack(tdb->track))
     {
-    extraUiLinks(database,tdb,trackHash);
+    extraUiLinks(database,tdb);
     printTrackUiLink(tdb);
-    printDataVersion(tdb);
+    struct trackVersion *trackVersion = getTrackVersion(database, tdb->track);
+    if(trackVersion == NULL)
+        printDataVersion(tdb);
+    else
+        printf("<B>Data version:</B> %s <BR>\n", trackVersion->version);
     printOrigAssembly(tdb);
     printUpdateTime(database, tdb, NULL);
     printDataRestrictionDate(tdb);
@@ -5751,6 +5784,7 @@ printAlignments(pslList, start, "htcCdnaAli", table, acc);
 
 printTrackHtml(tdb);
 hFreeConn(&conn);
+cartWebEnd(cart);
 }
 
 void printPslFormat(struct sqlConnection *conn, struct trackDb *tdb, char *item, int start, char *subType)
@@ -6868,7 +6902,6 @@ puts("</FRAMESET>");
 puts("</HTML>\n");
 exit(0);	/* Avoid cartHtmlEnd. */
 }
-
 
 void htcCdnaAli(char *acc)
 /* Show alignment for accession. */
@@ -10548,14 +10581,14 @@ if (row != NULL)
     image = cloneString(row[0]);
     printf("<BR><B>IMAGE Clone: </B>");
     printf("<A HREF=\"");
-    printf("%s%s", "http://image.hudsonalpha.org/IQ/bin/singleCloneQuery?clone_id=", image);
+    printf("%s%s", "http://www.imageconsortium.org/IQ/bin/singleCloneQuery?clone_id=", image);
     printf("\" TARGET=_blank> %s</A>", image);
     row = sqlNextRow(sr);
     while (row != NULL)
 	{
 	image = cloneString(row[0]);
 	printf(", <A HREF=\"");
-	printf("%s%s", "http://image.hudsonalpha.org/IQ/bin/singleCloneQuery?clone_id=", image);
+	printf("%s%s", "http://www.imageconsortium.org/IQ/bin/singleCloneQuery?clone_id=", image);
 	printf("\" TARGET=_blank>%s</A>", image);
         row = sqlNextRow(sr);
 	}
@@ -14326,7 +14359,7 @@ if (row != NULL)
     fc = fishClonesLoad(row);
     /* Print out general sequence positional information */
     printf("<H2><A HREF=");
-    printCloneRegUrl(stdout, clone);
+    printCloneDbUrl(stdout, clone);
     printf(" TARGET=_BLANK>%s</A></H2>\n", clone);
     htmlHorizontalLine();
     printf("<TABLE>\n");
@@ -15623,7 +15656,7 @@ int start = cartInt(cart, "o");
 
 genericHeader(tdb, itemName);
 printf("<B>NCBI Clone Registry: </B><A href=");
-printCloneRegUrl(stdout, itemName);
+printCloneDbUrl(stdout, itemName);
 printf(" target=_blank>%s</A><BR>\n", itemName);
 safef(query, sizeof(query),
       "select * from %s where chrom = '%s' and "
@@ -15653,7 +15686,7 @@ int start = cartInt(cart, "o");
 
 genericHeader(tdb, itemName);
 printf("<B>NCBI Clone Registry: </B><A href=");
-printCloneRegUrl(stdout, itemName);
+printCloneDbUrl(stdout, itemName);
 printf(" target=_blank>%s</A><BR>\n", itemName);
 safef(query, sizeof(query),
       "select * from %s where chrom = '%s' and "
@@ -15684,7 +15717,7 @@ int start = cartInt(cart, "o");
 
 genericHeader(tdb, itemName);
 printf("<B>NCBI Clone Registry: </B><A href=");
-printCloneRegUrl(stdout, itemName);
+printCloneDbUrl(stdout, itemName);
 printf(" target=_blank>%s</A><BR>\n", itemName);
 safef(query, sizeof(query),
       "select * from %s where chrom = '%s' and "
@@ -15935,7 +15968,7 @@ if (variantSignal == '#')
    stripChar(itemCopy, '#');
 genericHeader(tdb, itemCopy);
 printf("<B>NCBI Clone Registry: </B><A href=");
-printCloneRegUrl(stdout, itemCopy);
+printCloneDbUrl(stdout, itemCopy);
 printf(" target=_blank>%s</A><BR>\n", itemCopy);
 if (variantSignal == '*' || variantSignal == '?' || variantSignal == '#')
     printf("<B>Note this BAC was found to be variant.   See references.</B><BR>\n");
@@ -15969,7 +16002,7 @@ int start = cartInt(cart, "o");
 
 genericHeader(tdb, itemName);
 printf("<B>NCBI Clone Registry: </B><A href=");
-printCloneRegUrl(stdout, itemName);
+printCloneDbUrl(stdout, itemName);
 printf(" target=_blank>%s</A><BR>\n", itemName);
 safef(query, sizeof(query),
       "select * from %s where chrom = '%s' and "
@@ -18267,7 +18300,7 @@ if (row != NULL)
             if (rowb != NULL)
                 {
 	        printf("<H2><A HREF=");
-	        printCloneRegUrl(stdout, clone);
+	        printCloneDbUrl(stdout, clone);
 	        printf(" TARGET=_BLANK>%s</A></H2>\n", clone);
                 if (rowb[0] != NULL)
                     {
@@ -18296,7 +18329,7 @@ if (row != NULL)
         else
             {
 	    printf("<H2><A HREF=");
-	    printCloneRegUrl(stdout, clone);
+	    printCloneDbUrl(stdout, clone);
 	    printf(" TARGET=_BLANK>%s</A></H2>\n", clone);
 	    }
         }
@@ -22957,7 +22990,8 @@ if ((row = sqlNextRow(sr)) != NULL)
     int i = 0;
     printPos(el->chrom, el->chromStart, el->chromEnd, "+", TRUE, el->name);
     printf("Alleles are relative to forward strand of reference genome:<br>\n");
-    printf("<table border=1 cellpadding=3><tr><th>Allele</th><th>Frequency</th><th>Quality Score</th></tr>\n");
+    printf("<table class=\"descTbl\">"
+	   "<tr><th>Allele</th><th>Frequency</th><th>Quality Score</th></tr>\n");
     chopByChar(name, '/', all, el->alleleCount);
     if (differentString(el->alleleFreq, ""))
         {
@@ -22983,7 +23017,8 @@ if ((row = sqlNextRow(sr)) != NULL)
         printPgSiftPred(database, siftTab, el);
     if (polyTab != NULL)
         printPgPolyphenPred(database, polyTab, el);
-    printSeqCodDisplay(database, el);
+    char *genePredTable = "knownGene";
+    printSeqCodDisplay(database, el, genePredTable);
     }
 sqlFreeResult(&sr);
 printTrackHtml(tdb);
@@ -23781,7 +23816,9 @@ if ((row = sqlNextRow(sr)) != NULL)
         printf("%s <BR>\n", r->description);
     }
 sqlFreeResult(&sr);
-printTrackHtml(tdb);
+/* do not print this for custom tracks, they do this later */
+if (ct == NULL)
+    printTrackHtml(tdb);
 
 bedDetailFree(&r);
 freeMem(escName);
@@ -23975,11 +24012,10 @@ while ((row = sqlNextRow(sr)) != NULL)
           printf("<BR><B> GeneReview(s) available for %s:</B> (%s)<BR>",itemName,clickMsg);
           firstTime = FALSE;
           printf("<PRE><TT>");
-              // #1234567890123456789012345678901234567890
+              // #123456789-123456789-123456789-123456789-123456789-123456789-
           printf("Short name    Disease ID     GeneTests disease name<BR>");
-          printf("-----------------------------------------------------------");
-          printf("-----------------------------------------------------------");
-          printf("----------------------------------<BR>");
+          printf("------------------------------------------------------------");
+          printf("--------------------<BR>");
         }
         printf("<A HREF=\"http://www.ncbi.nlm.nih.gov/books/n/gene/%s\" TARGET=_blank><B>%s</B></A>", grShort, grShort);
         if (strlen(grShort) <= 15) {
@@ -25230,9 +25266,9 @@ else if (sameString("par", table))
     {
     doParDetails(tdb, item);
     }
-else if (startsWith("t2g", table))
+else if (startsWith("pubs", table))
     {
-    doT2gDetails(tdb, item);
+    doPubsDetails(tdb, item);
     }
 else if (tdb != NULL && startsWith("bedDetail", tdb->type))
     {

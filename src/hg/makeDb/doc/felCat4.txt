@@ -14,6 +14,13 @@
 #       Felis_catus/catChr4
 #       Felis catus
 
+#	http://www.ncbi.nlm.nih.gov/genome/78
+#	http://www.ncbi.nlm.nih.gov/bioproject/16726 - UWash - Cinnamon
+#	http://www.ncbi.nlm.nih.gov/Traces/wgs/?val=AANG00
+
+#	http://www.ncbi.nlm.nih.gov/bioproject/32759 - NHGRI - multiple cats
+#	http://www.ncbi.nlm.nih.gov/Traces/wgs/?val=ACBE00
+
 ##########################################################################
 # Download sequence (DONE - 2010-05-23 - Chin)
     mkdir /hive/data/genomes/felCat4
@@ -846,8 +853,9 @@ done | ./agpToCtgPos2.pl /dev/stdin > ctgPos2.tab
 
     #   http://genome.ucsc.edu/cgi-bin/phyloGif
     #   to obtain a gif image for htdocs/images/phylo/felCat4_6way.gif
-   /cluster/bin/x86_64/phyloGif -phyloGif_tree=6way.nh \
-   -phyloGif_width=260  -phyloGif_height=260 > felCat4_6way.gif
+    # use the common names for the gif image
+    /cluster/bin/x86_64/phyloGif -phyloGif_tree=commonNames.6way.nh \
+     -phyloGif_width=260  -phyloGif_height=260 > felCat4_6way.gif
 
     /cluster/bin/phast/all_dists 6way.nh > 6way.distances.txt
     # make sure all symlinks lastz.DB -> lastzDb-date

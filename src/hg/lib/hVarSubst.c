@@ -167,6 +167,7 @@ static boolean isDatabaseVar(char *varBase)
 {
 return (strcasecmp(varBase, "organism") == 0)
     || (strcasecmp(varBase, "date") == 0)
+    || (strcasecmp(varBase, "linkToGatewayPage") == 0)
     || (strcasecmp(varBase, "db") == 0);
 }
 
@@ -205,7 +206,7 @@ else if (sameString(varBase, "organism"))
     char *org = hOrganism(database);
     if ((org != NULL) && !isAbbrevScientificName(org))
             tolowers(org);
-        else
+    else
             org = valOrDb(org, database);
     dyStringAppend(dest, org);
     freeMem(org);

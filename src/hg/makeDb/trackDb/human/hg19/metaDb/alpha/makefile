@@ -8,10 +8,14 @@ wgEncodeCaltechRnaSeq.ra \
 wgEncodeCshlLongRnaSeq.ra \
 wgEncodeCshlShortRnaSeq.ra \
 wgEncodeDukeAffyExon.ra \
+wgEncodeFsuRepliChip.ra \
 wgEncodeGencodeV3.ra \
 wgEncodeGencodeV4.ra \
 wgEncodeGencodeV7.ra \
 wgEncodeGencodeV9.ra \
+wgEncodeGencodeV10.ra \
+wgEncodeGencodeV11.ra \
+wgEncodeGencodeV12.ra \
 wgEncodeGisChiaPet.ra \
 wgEncodeGisDnaPet.ra \
 wgEncodeGisRnaPet.ra \
@@ -21,6 +25,7 @@ wgEncodeHaibMethyl450.ra \
 wgEncodeHaibMethylArray.ra \
 wgEncodeHaibMethylRrbs.ra \
 wgEncodeHaibMethylSeq.ra \
+wgEncodeHaibMethylWgbs.ra \
 wgEncodeHaibRnaSeq.ra \
 wgEncodeHaibTfbs.ra \
 wgEncodeMapability.ra \
@@ -40,8 +45,9 @@ wgEncodeSydhRnaSeq.ra \
 wgEncodeSydhTfbs.ra \
 wgEncodeUchicagoTfbs.ra \
 wgEncodeUmassDekker5C.ra \
+wgEncodeUMassWengTfbsValid.ra \
 wgEncodeUncBsuProt.ra \
-wgEncodeUncBsuProtFasp.ra \
+wgEncodeUncBsuProtGenc.ra \
 wgEncodeUw5C.ra \
 wgEncodeUwAffyExonArray.ra \
 wgEncodeUwDgf.ra \

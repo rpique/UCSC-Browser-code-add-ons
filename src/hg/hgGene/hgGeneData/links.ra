@@ -67,7 +67,7 @@ priority 10
 #shortLabel RefSeq
 #tables kgXref
 #idSql select refseq from kgXref where kgID = '%s'
-#url http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Search&db=Nucleotide&term=%s&doptcmdl=GenBank&tool=genome.ucsc.edu
+#url http://www.ncbi.nlm.nih.gov/nuccore/%s?report=GenBank
 #priority 10
 
 name entrezGene
@@ -81,7 +81,7 @@ priority 10
 #shortLabel GenBank
 #tables kgXref
 #idSql select kgID from kgXref where kgID = '%s'
-#url http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Search&db=Nucleotide&term=%s&doptcmdl=GenBank&tool=genome.ucsc.edu
+#url http://www.ncbi.nlm.nih.gov/nuccore/%s?report=GenBank
 #priority 10
 
 name pubMed
@@ -95,7 +95,7 @@ name gepis
 shortLabel Gepis Tissue
 tables kgXref
 idSql select geneSymbol from kgXref where kgID = '%s'
-url http://www.cgl.ucsf.edu/cgi-bin/genentech/genehub-gepis/web_search.pl?intype=1&xrefid=%s&species=human
+url http://research-public.gene.com/cgi-bin/genentech/genehub-gepis/web_search.pl?intype=1&xrefid=%s&species=human
 priority 10
 
 name treeFam
@@ -148,11 +148,25 @@ idSql select allenBrainUrl.url from knownToAllenBrain,allenBrainUrl where knownT
 url %s
 priority 10
 
-name wikiTrack
-shortLabel User annotations
-tables kgXref
-idSql select kgID from kgXref where kgID = '%s'
-url ../cgi-bin/hgGene?hgg_gene=%s&hgg_chrom=none&hgg_do_wikiTrack=1
-dbInUrl on
+# enforce read-only 2012-06-22
+# name wikiTrack
+# shortLabel User annotations
+# tables kgXref
+# idSql select kgID from kgXref where kgID = '%s'
+# url ../cgi-bin/hgGene?hgg_gene=%s&hgg_chrom=none&hgg_do_wikiTrack=1
+# dbInUrl on
+# priority 10
+
+name wikipedia
+shortLabel Wikipedia
+tables knownToLocusLink
+idSql select value from knownToLocusLink where name = '%s';
+url http://plugins.gnf.org/cgi-bin/wp.cgi?id=%s
 priority 10
 
+name biogps
+shortLabel BioGPS
+tables knownToLocusLink
+idSql select value from knownToLocusLink where name = '%s';
+url http://biogps.org/gene/%s
+priority 10

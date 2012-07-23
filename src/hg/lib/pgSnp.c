@@ -382,7 +382,7 @@ return result;
 
 void aaProperties (char *aa1, char *aa2);
 
-void printSeqCodDisplay(char *db, struct pgSnp *item)
+void printSeqCodDisplay(char *db, struct pgSnp *item, char *genePredTable)
 /* print the display of sequence changes for a coding variant */
 {
 struct bed *list = NULL, *el, *th = NULL;
@@ -390,8 +390,15 @@ struct sqlResult *sr;
 char **row;
 char query[512];
 struct sqlConnection *conn = hAllocConn(db);
-safef(query, sizeof(query), "select chrom, txStart, txEnd, name, 0, strand, cdsStart, cdsEnd, 0, exonCount, exonEnds, exonStarts  from knownGene where chrom = '%s' and cdsStart <= %d and cdsEnd >= %d",
-   item->chrom, item->chromStart, item->chromEnd);
+if (!sqlTableExists(conn, genePredTable))
+    {
+    hFreeConn(&conn);
+    return;
+    }
+safef(query, sizeof(query), "select chrom, txStart, txEnd, name, 0, strand, cdsStart, cdsEnd, "
+      "0, exonCount, exonEnds, exonStarts  from %s "
+      "where chrom = '%s' and cdsStart <= %d and cdsEnd >= %d",
+      genePredTable, item->chrom, item->chromStart, item->chromEnd);
 
 sr = sqlGetResult(conn, query);
 while ((row = sqlNextRow(sr)) != NULL)
@@ -441,6 +448,8 @@ for (el = th; el != NULL; el = el->next)
             reverseComplement(allele[i], strlen(allele[i]));
         safef(a, sizeof(a), "<B>%s</B>", allele[i]);
         char *rep = replaceString(cod->seq, (cod->regStart - cod->cdStart), (cod->regEnd - cod->cdStart), a);
+	if (sameString(bold, rep))
+	    continue;
         printf("%s &gt; %s<BR>\n", bold, rep);
 
         if (item->chromStart == item->chromEnd &&
@@ -463,20 +472,34 @@ for (el = th; el != NULL; el = el->next)
                 dnaseq = newDnaSeq(rep2, strlen(rep2), "rep2");
                 aaSeq *repAa = translateSeq(dnaseq, 0, FALSE);
                 //freeDnaSeq(&dnaseq);
-                if (!strstr(repAa->dna, "X") && isNotEmpty(repAa->dna))
+		if (!strstr(rep2, "-") && strlen(allele[i]) != (item->chromEnd - item->chromStart)) 
+		    { //indel
+		    int diff = abs((item->chromEnd - item->chromStart) - strlen(allele[i]));
+		    if (diff % 3 == 0) 
+			printf("&nbsp;&nbsp;&nbsp;&nbsp;in-frame indel<BR>\n");
+		    else 
+			printf("&nbsp;&nbsp;&nbsp;&nbsp;frameshift indel<BR>\n");
+		    }
+                else if (!strstr(rep2, "-") && isNotEmpty(repAa->dna))
                     {
                     printf("&nbsp;&nbsp;&nbsp;&nbsp;%s &gt; %s<BR>\n",
                         origAa->dna, repAa->dna);
                     if (differentString(origAa->dna, repAa->dna))
                         aaProperties(origAa->dna, repAa->dna);
                     }
-                else if ((countChars(rep2, '-')) % 3 != 0)
+                else if (strstr(rep2, "-") && (item->chromEnd - item->chromStart) % 3 != 0)
                     {
                     printf("&nbsp;&nbsp;&nbsp;&nbsp;frameshift<BR>\n");
+                    }
+                else if (strstr(rep2, "-") && (item->chromEnd - item->chromStart) % 3 == 0)
+                    {
+                    printf("&nbsp;&nbsp;&nbsp;&nbsp;in-frame deletion<BR>\n");
                     }
                 }
             }
         }
+    /* print a hr between gene models */
+    printf("<hr style=\"width:30%%;text-align:left;margin-left:0\" />\n");
     }
 bedFreeList(&list);
 }
@@ -568,7 +591,8 @@ char *acid1 = aaAcidity(aa1);
 char *acid2 = aaAcidity(aa2);
 float hyd1 = aaHydropathy(aa1);
 float hyd2 = aaHydropathy(aa2);
-printf("<table border=\"1\"><caption>Amino acid properties</caption><tr><td>&nbsp;</td><td>%s</td><td>%s</td></tr>\n", aa1, aa2);
+printf("<table class=\"descTbl\"><caption>Amino acid properties</caption>"
+       "<tr><th>&nbsp;</th><th>%s</th><th>%s</th></tr>\n", aa1, aa2);
 /* take out highlights, not sure what is significant change for hydropathy */
 //if (differentString(pol1, pol2))
     //printf("<tr bgcolor=\"white\"><td>polarity</td><td>%s</td><td>%s</td></tr>\n", pol1, pol2);
@@ -707,6 +731,8 @@ int i;
 for (i = 0;  i < rec->infoCount;  i++)
     if (sameString(rec->infoElements[i].key, "AN"))
 	{
+	if (rec->infoElements[i].missingData[0])
+	    break;
 	gotTotalCount = TRUE;
 	// Set ref allele to total count, subtract alt counts below.
 	alCounts[0] = rec->infoElements[i].values[0].datInt;
@@ -721,6 +747,8 @@ for (i = 0;  i < rec->infoCount;  i++)
 	    int j;
 	    for (j = 0;  j < rec->infoElements[i].count && j < alDescCount-1;  j++)
 		{
+		if (rec->infoElements[i].missingData[j])
+		    continue;
 		int ac = rec->infoElements[i].values[j].datInt;
 		alCounts[1+j] = ac;
 		if (gotTotalCount)
@@ -752,9 +780,10 @@ else if (!gotTotalCount && !gotAltCounts && rec->file->genotypeCount > 0)
 	struct vcfGenotype *gt = &(rec->genotypes[i]);
 	if (gt == NULL)
 	    uglyf("i=%d gt=NULL wtf?\n", i);
-	alCounts[gt->hapIxA]++;
-	if (! gt->isHaploid)
-	    alCounts[gt->hapIxB]++;
+	if (gt->hapIxA >= 0)
+	    alCounts[(unsigned char)gt->hapIxA]++;
+	if (!gt->isHaploid && gt->hapIxB >= 0)
+	    alCounts[(unsigned char)gt->hapIxB]++;
 	}
     dyStringPrintf(dy, "%d", alCounts[0]);
     for (i = 1;  i < alDescCount;  i++)
@@ -798,7 +827,7 @@ pgs->alleleFreq = alleleCountsFromVcfRecord(rec, alCount);
 // the VCF spec only gives us one BQ... for the reference position?  should ask.
 dyStringClear(dy);
 for (i = 0;  i < rec->infoCount;  i++)
-    if (sameString(rec->infoElements[i].key, "BQ"))
+    if (sameString(rec->infoElements[i].key, "BQ") && !rec->infoElements[i].missingData[0])
 	{
 	float qual = rec->infoElements[i].values[0].datFloat;
 	dyStringPrintf(dy, "%.1f", qual);

@@ -14,6 +14,7 @@
 #include "psl.h"
 #include "web.h"
 #include "hdb.h"
+#include "hgFind.h"
 #include "hCommon.h"
 #include "hgColors.h"
 #include "trackDb.h"
@@ -131,7 +132,6 @@
 #ifdef LOWELAB_WIKI
 #include "wiki.h"
 #endif /* LOWELAB_WIKI */
-
 
 #define CHROM_COLORS 26
 
@@ -501,8 +501,6 @@ struct dyString *uiStateUrlPart(struct track *toggleGroup)
 struct dyString *dy = newDyString(512);
 
 dyStringPrintf(dy, "%s=%u", cartSessionVarName(), cartSessionId(cart));
-#define TOGGLE_SUBTRACKS
-#ifdef TOGGLE_SUBTRACKS
 if(toggleGroup != NULL && tdbIsCompositeChild(toggleGroup->tdb))
     {
     int vis = toggleGroup->visibility;
@@ -530,9 +528,13 @@ if(toggleGroup != NULL && tdbIsCompositeChild(toggleGroup->tdb))
 
     if(setView)
         {
+    #ifdef SUBTRACK_CFG
+        dyStringPrintf(dy, "&%s=%s", toggleGroup->tdb->parent->track, hStringFromTv(vis));
+    #else///ifndef SUBTRACK_CFG
         char *encodeView = cgiEncode(view);
         dyStringPrintf(dy, "&%s.%s.vis=%s", encodedTableName,encodeView, hStringFromTv(vis));
         freeMem(encodeView);
+    #endif///ndef SUBTRACK_CFG
         }
     else
         {
@@ -542,7 +544,6 @@ if(toggleGroup != NULL && tdbIsCompositeChild(toggleGroup->tdb))
     freeMem(encodedTableName);
     }
 else
-#endif//def TOGGLE_SUBTRACKS
     {
     if (toggleGroup != NULL)
         {
@@ -743,8 +744,8 @@ if (x < xEnd)
             }
         else
             {
-            safef(link,sizeof(link),"%s&o=%d&t=%d&g=%s&i=%s",
-                hgcNameAndSettings(), start, end, encodedTrack, encodedItem); // NOTE: chopped out winStart/winEnd
+            safef(link,sizeof(link),"%s&c=%s&o=%d&t=%d&g=%s&i=%s",
+                hgcNameAndSettings(), chromName, start, end, encodedTrack, encodedItem); // NOTE: chopped out winStart/winEnd
             }
         if (extra != NULL)
             safef(link+strlen(link),sizeof(link)-strlen(link),"&%s", extra);
@@ -769,8 +770,8 @@ if (x < xEnd)
             }
         else
             {
-            hPrintf("HREF=\"%s&o=%d&t=%d&g=%s&i=%s&c=%s&l=%d&r=%d&db=%s&pix=%d",
-                hgcNameAndSettings(), start, end, encodedTrack, encodedItem,
+            hPrintf("HREF=\"%s&c=%s&o=%d&t=%d&g=%s&i=%s&c=%s&l=%d&r=%d&db=%s&pix=%d",
+                hgcNameAndSettings(), chromName, start, end, encodedTrack, encodedItem,
                 chromName, winStart, winEnd,
                 database, tl.picWidth);
             }
@@ -913,7 +914,7 @@ for (i=0; i<count; i++, text++, textPos++)
         /* We may want to use this, or add a config setting for it */
         if (*text == '=' || *text == '-' || *text == '.' || *text == 'N')
             clr = noMatchColor;
-#endif
+#endif///def FADE_IN_DOT_MODE
         }
     else
         {
@@ -1999,9 +2000,7 @@ if (scoreColumn == NULL)
 struct dyString *extraWhere = newDyString(128);
 boolean and = FALSE;
 extraWhere = dyAddFilterByClause(cart,tdb,extraWhere,NULL,&and); // gets trackDb 'filterBy' clause, which may filter by 'score', 'name', etc
-#ifdef ALL_SCORE_FILTERS_LOGIC
 extraWhere = dyAddAllScoreFilters(cart,tdb,extraWhere,&and); // All *Filter style filters
-#endif///def ALL_SCORE_FILTERS_LOGIC
 if (and == FALSE || strstrNoCase(extraWhere->string,"score in ") == NULL) // Cannot have both 'filterBy' score and 'scoreFilter'
     extraWhere = dyAddFilterAsInt(cart,tdb,extraWhere,SCORE_FILTER,"0:1000",scoreColumn,&and);
 if (sameString(extraWhere->string, ""))
@@ -2637,6 +2636,18 @@ if ((tallStart == 0 && tallEnd == 0) && !sameWord(tg->table, "jaxQTL3"))
 x1 = round((double)((int)lf->start-winStart)*scale) + xOff;
 x2 = round((double)((int)lf->end-winStart)*scale) + xOff;
 w = x2-x1;
+
+// are we highlighting this feature with background highlighting
+if (lf->highlightColor && (lf->highlightMode == highlightBackground))
+    {
+    // draw the background
+    hvGfxBox(hvg, x1, y, w, heightPer, lf->highlightColor);
+
+    // draw the item slightly smaller
+    y++;
+    heightPer -=2;
+    }
+
 if (!hideLine)
     {
     innerLine(hvg, x1, midY, w, color);
@@ -2645,8 +2656,12 @@ if (!hideArrows)
     {
     if ((intronGap == 0) && (vis == tvFull || vis == tvPack))
 	{
-	clippedBarbs(hvg, x1, midY, w, tl.barbHeight, tl.barbSpacing,
-		 lf->orientation, bColor, FALSE);
+	if (lf->highlightColor && (lf->highlightMode == highlightOutline))
+	    clippedBarbs(hvg, x1, midY, w, tl.barbHeight, tl.barbSpacing,
+		     lf->orientation, lf->highlightColor, FALSE);
+	else
+	    clippedBarbs(hvg, x1, midY, w, tl.barbHeight, tl.barbSpacing,
+		     lf->orientation, bColor, FALSE);
 	}
     }
 
@@ -2661,16 +2676,36 @@ for (sf = components; sf != NULL; sf = sf->next)
 	{
 	e2 = e;
 	if (e2 > tallStart) e2 = tallStart;
-	drawScaledBoxSample(hvg, s, e2, scale, xOff, y+shortOff, shortHeight,
-            color, lf->score);
+	if (lf->highlightColor && (lf->highlightMode == highlightOutline))
+	    {
+	    drawScaledBoxSample(hvg, s, e2, scale, xOff, y+shortOff , shortHeight ,
+		lf->highlightColor, lf->score);
+	    drawScaledBoxSample(hvg, s, e2, scale, xOff + 1, y+shortOff + 1, shortHeight - 2,
+		color, lf->score);
+	    }
+	else
+	    {
+	    drawScaledBoxSample(hvg, s, e2, scale, xOff, y+shortOff, shortHeight,
+		color, lf->score);
+	    }
 	s = e2;
 	}
     if (e > tallEnd)
 	{
 	s2 = s;
 	if (s2 < tallEnd) s2 = tallEnd;
-	drawScaledBoxSample(hvg, s2, e, scale, xOff, y+shortOff, shortHeight,
-            color, lf->score);
+	if (lf->highlightColor && (lf->highlightMode == highlightOutline))
+	    {
+	    drawScaledBoxSample(hvg, s2, e, scale, xOff, y+shortOff, shortHeight,
+		lf->highlightColor, lf->score);
+	    drawScaledBoxSample(hvg, s2, e, scale, xOff+1, y+shortOff+1, shortHeight-2,
+		color, lf->score);
+	    }
+	else
+	    {
+	    drawScaledBoxSample(hvg, s2, e, scale, xOff, y+shortOff, shortHeight,
+		color, lf->score);
+	    }
 	e = s2;
 	}
     /* Draw "tall" portion of exon (or codon) */
@@ -2686,8 +2721,18 @@ for (sf = components; sf != NULL; sf = sf->next)
 				  MAXPIXELS, winStart, color);
         else
             {
-            drawScaledBoxSample(hvg, s, e, scale, xOff, y, heightPer,
-                                color, lf->score );
+	    if (lf->highlightColor && (lf->highlightMode == highlightOutline))
+		{
+		drawScaledBoxSample(hvg, s, e, scale, xOff, y, heightPer,
+				    lf->highlightColor, lf->score );
+		drawScaledBoxSample(hvg, s, e, scale, xOff+1, y+1, heightPer-2,
+				    color, lf->score );
+		}
+	    else
+		{
+		drawScaledBoxSample(hvg, s, e, scale, xOff, y, heightPer,
+				    color, lf->score );
+		}
 
             if (exonArrowsAlways || (exonArrows &&
                 /* Display barbs only if no intron is visible on the item.
@@ -3030,7 +3075,6 @@ int eClp = (e > winEnd)   ? winEnd   : e;
 int x1 = round((sClp - winStart)*scale) + xOff;
 int x2 = round((eClp - winStart)*scale) + xOff;
 int textX = x1;
-char *name = tg->itemName(tg, item);
 
 if(tg->itemNameColor != NULL)
     {
@@ -3045,6 +3089,7 @@ tg->drawItemAt(tg, item, hvg, xOff, y, scale, font, color, vis);
 withLabels = (withLeftLabels && withIndividualLabels && (vis == tvPack) && !tg->drawName);
 if (withLabels)
     {
+    char *name = tg->itemName(tg, item);
     int nameWidth = mgFontStringWidth(font, name);
     int dotWidth = tl.nWidth/2;
     boolean snapLeft = FALSE;
@@ -3536,6 +3581,7 @@ lf->components = sfList;
 linkedFeaturesBoundsAndGrays(lf);
 lf->tallStart = bed->thickStart;
 lf->tallEnd = bed->thickEnd;
+lf->score = bed->score;
 return lf;
 }
 
@@ -5103,8 +5149,8 @@ if (decipherId != NULL)
     {
     if (hTableExists(database, "decipherRaw"))
     	{
-    	safef(query, sizeof(query), 
-	      "select mean_ratio > 0 from decipherRaw where id = '%s' and start=%d and end=%d", 
+    	safef(query, sizeof(query),
+	      "select mean_ratio > 0 from decipherRaw where id = '%s' and start=%d and end=%d",
 	      decipherId, bed->chromStart+1, bed->chromEnd);
 	sr = sqlGetResult(conn, query);
     	if ((row = sqlNextRow(sr)) != NULL)
@@ -7578,8 +7624,8 @@ char *chromPrefixes[] = { "chr", "Group",
 			  NULL };
 
 char *scaffoldPrefixes[] = { "scaffold_", "contig_", "SCAFFOLD", "Scaffold",
-			     "Contig", "SuperCont", "super_", "scaffold", "Zv7_",
-			     NULL };
+    "Contig", "SuperCont", "super_", "scaffold", "Zv7_", "Scfld02_",
+	 NULL };
 
 char *maybeSkipPrefix(char *name, char *prefixes[])
 /* Return a pointer into name just past the first matching string from
@@ -9536,10 +9582,14 @@ char *nameCopy = cloneString(myItem->name);
 char *allFreqCopy = cloneString(myItem->alleleFreq);
 int cnt = chopByChar(nameCopy, '/', allele, myItem->alleleCount);
 if (cnt != myItem->alleleCount)
-    errAbort("Bad allele name %s", myItem->name);
+    errAbort("Bad allele name '%s' (%s:%d-%d): expected %d /-sep'd alleles", myItem->name,
+	     myItem->chrom, myItem->chromStart+1, myItem->chromEnd, myItem->alleleCount);
 int fcnt = chopByChar(allFreqCopy, ',', freq, myItem->alleleCount);
 if (fcnt != myItem->alleleCount && fcnt != 0)
-    errAbort("Bad freq for %s",  myItem->name);
+    errAbort("Bad freq '%s' for '%s' (%s:%d-%d): expected %d ,-sep'd numbers",
+	     myItem->alleleFreq, myItem->name,
+	     myItem->chrom, myItem->chromStart+1, myItem->chromEnd,
+	     myItem->alleleCount);
 int i = 0;
 for (i=0;i<fcnt;i++)
     allTot += atoi(freq[i]);
@@ -9666,7 +9716,6 @@ pgSnpFreeList(((struct pgSnp **)(&tg->items)));
 void loadPgSnp(struct track *tg)
 /* Load up pgSnp (personal genome SNP) type tracks */
 {
-char query[256];
 struct customTrack *ct = tg->customPt;
 char *table = tg->table;
 struct sqlConnection *conn;
@@ -9677,8 +9726,11 @@ else
     conn = hAllocConn(CUSTOM_TRASH);
     table = ct->dbTableName;
     }
-safef(query, sizeof(query), "select * from %s where chrom = '%s' and chromStart < %d and chromEnd > %d", table, chromName, winEnd, winStart);
-tg->items = pgSnpLoadByQuery(conn, query);
+struct dyString *query = dyStringCreate("select * from %s where ", table);
+hAddBinToQuery(winStart, winEnd, query);
+dyStringPrintf(query, "chrom = '%s' and chromStart < %d and chromEnd > %d",
+	       chromName, winEnd, winStart);
+tg->items = pgSnpLoadByQuery(conn, query->string);
 /* base coloring/display decision on count of items */
 tg->customInt = slCount(tg->items);
 hFreeConn(&conn);
@@ -12134,107 +12186,354 @@ track->nextPrevItem = NULL;
 track->nextPrevExon = NULL;
 }
 
-static void tokenizeAndAddToHash(struct hash *hash, char *str)
+char* pubsArticleTable(struct track *tg)
+/* return the name of the pubs articleTable, either
+ * the value from the trackDb statement 'articleTable'
+ * or the default value: <trackName>Article */
 {
-// Pull all words out of a string and add them to an existence hash.
-char *s;
-str = htmlTextReplaceTagsWithChar(str, ' ');
-
-// strip out chars that crash kxTokenize
-for(s = str; *s; s++)
+char *articleTable = trackDbSettingClosestToHome(tg->tdb, "pubsArticleTable");
+if (isEmpty(articleTable))
     {
-    if(*s < 32 || !isalnum(*s))
-        *s = ' ';
+    char buf[256];
+    safef(buf, sizeof(buf), "%sArticle", tg->track);
+    articleTable = cloneString(buf);
     }
-
-struct kxTok *kx = kxTokenize(str, FALSE);
-for( ; kx != NULL; kx = kx->next)
-    {
-    char *str = kx->string;
-    toLowerN(str, strlen(str));
-    hashAddInt(hash, str, 1);
-    }
+return articleTable;
 }
 
-static void t2gLoadItems(struct track *tg)
-/* apply filter to t2g items */
+static char *makeMysqlMatchStr(char *str)
 {
-loadGappedBed(tg);
-struct linkedFeatures *lf, *next, *newList = NULL;
-struct sqlConnection *conn = hAllocConn(database);
-
-char *articleTable = trackDbSetting(tg->tdb, "articleTable");
-char *keyWords = cartOptionalString(cart, "t2gKeywords");
-if(articleTable != NULL && isNotEmpty(keyWords))
+// return a string with all words prefixed with a '+' to force a boolean AND query;
+// we also strip leading/trailing spaces.
+char *matchStr = needMem(strlen(str) * 2 + 1);
+int i = 0;
+for(;*str && isspace(*str);str++)
+    ; while(*str)
     {
-    for( lf = tg->items; lf != NULL; lf = next)
-        {
-        char query[512];
-        struct sqlResult *sr;
-        char **row;
-        next = lf->next;
-        lf->next = NULL;
+    matchStr[i++] = '+';
+    for(; *str && !isspace(*str);str++)
+        matchStr[i++] = *str;
+    for(;*str && isspace(*str);str++)
+        ;
+    }
+matchStr[i++] = 0;
+return matchStr;
+}
 
-        safef(query, sizeof(query), "select authors, title, citation, abstract from %s where displayId = '%s'", articleTable, lf->name);
-        sr = sqlGetResult(conn, query);
-        if ((row = sqlNextRow(sr)) != NULL)
-            {
-            struct hash *hash = newHash(0);
-            boolean pass = TRUE;
-            struct kxTok *kx;
+struct pubsExtra 
+/* additional info needed for publication blat linked features: author+year and title */
+{
+    char* label;
+    char* mouseOver;
+};
 
-            tokenizeAndAddToHash(hash, row[0]);
-            tokenizeAndAddToHash(hash, row[1]);
-            tokenizeAndAddToHash(hash, row[2]);
-            tokenizeAndAddToHash(hash, row[3]);
+static char* pubsFeatureLabel(char* author, char* year) 
+/* create label <author><year> given authors and year strings */
+{
+char* authorYear = NULL;
 
-            // we pass articles where keywords is a subset of words in article metadata.
-            kx = kxTokenize(keyWords, FALSE);
-            for( ; pass && kx != NULL; kx = kx->next)
-                {
-                toLowerN(kx->string, strlen(kx->string));
-                pass = hashLookup(hash, kx->string) != NULL;
-                }
-            if(pass)
-                slAddTail(&newList, lf);
-            }
-        else
-            errAbort("Couldn't find article with displayId: '%s'", lf->name);
-        sqlFreeResult(&sr);
+if (isEmpty(author))
+    author = "NoAuthor";
+if (isEmpty(year))
+    year = "NoYear";
+authorYear  = catTwoStrings(author, year);
+
+return authorYear;
+}
+
+static struct pubsExtra *pubsMakeExtra(char* articleTable, struct sqlConnection* conn, 
+    struct linkedFeatures* lf)
+{
+char query[LARGEBUF];
+struct sqlResult *sr = NULL;
+char **row = NULL;
+struct pubsExtra *extra = NULL;
+
+safef(query, sizeof(query), "SELECT firstAuthor, year, title FROM %s WHERE articleId = '%s'", 
+    articleTable, lf->name);
+sr = sqlGetResult(conn, query);
+if ((row = sqlNextRow(sr)) != NULL)
+{
+    char* firstAuthor = row[0];
+    char* year    = row[1];
+    char* title   = row[2];
+
+    extra = needMem(sizeof(struct pubsExtra));
+    extra->label = pubsFeatureLabel(firstAuthor, year);
+    if (isEmpty(title))
+        extra->mouseOver = extra->label;
+    else
+        extra->mouseOver = cloneString(title);
+}
+
+sqlFreeResult(&sr);
+return extra;
+}
+
+static void pubsAddExtra(struct track* tg, struct linkedFeatures* lf)
+/* add authorYear and title to linkedFeatures->extra */
+{
+char *articleTable = trackDbSettingClosestToHome(tg->tdb, "pubsArticleTable");
+if(isEmpty(articleTable))
+    return;
+if (lf->extra != NULL)
+    return;
+
+struct sqlConnection *conn = hAllocConn(database);
+struct pubsExtra* extra = pubsMakeExtra(articleTable, conn, lf);
+lf->extra = extra;
+hFreeConn(&conn);
+}
+
+static void pubsLoadKeywordYearItems(struct track *tg)
+/* load items that fulfill keyword and year filter */
+{
+struct sqlConnection *conn = hAllocConn(database);
+char *keywords = cartOptionalStringClosestToHome(cart, tg->tdb, FALSE, "pubsKeywords");
+char *yearFilter = cartOptionalStringClosestToHome(cart, tg->tdb, FALSE, "pubsYear");
+char *articleTable = pubsArticleTable(tg);
+
+if(yearFilter == NULL || sameWord(yearFilter, "anytime"))
+    yearFilter = NULL;
+
+if(isNotEmpty(keywords))
+    keywords = makeMysqlMatchStr(sqlEscapeString(keywords));
+
+if(isEmpty(yearFilter) && isEmpty(keywords))
+{
+    loadGappedBed(tg);
+}
+else
+    {
+    char* oldLabel = tg->longLabel;
+    tg->longLabel = catTwoStrings(oldLabel, " (filter activated)");
+    freeMem(oldLabel);
+
+    char extra[2048], yearWhere[256], keywordsWhere[1024], prefix[256];
+    char **row;
+    struct linkedFeatures *lfList = NULL;
+    struct trackDb *tdb = tg->tdb;
+    int scoreMin = atoi(trackDbSettingClosestToHomeOrDefault(tdb, "scoreMin", "0"));
+    int scoreMax = atoi(trackDbSettingClosestToHomeOrDefault(tdb, "scoreMax", "1000"));
+    boolean useItemRgb = bedItemRgb(tdb);
+
+    safef(prefix, sizeof(prefix),  "name IN (SELECT articleId FROM %s WHERE", articleTable);
+    if(isNotEmpty(keywords))
+        safef(keywordsWhere, sizeof(keywordsWhere), \
+        "MATCH (citation, title, authors, abstract) AGAINST ('%s' IN BOOLEAN MODE)", keywords);
+    if(isNotEmpty(yearFilter))
+        safef(yearWhere, sizeof(yearWhere), "year >= '%s'", sqlEscapeString(yearFilter));
+
+    if(isEmpty(keywords))
+        safef(extra, sizeof(extra), "%s %s)", prefix, yearWhere);
+    else if(isEmpty(yearFilter))
+        safef(extra, sizeof(extra), "%s %s)", prefix, keywordsWhere);
+    else
+        safef(extra, sizeof(extra), "%s %s AND %s)", prefix, yearWhere, keywordsWhere);
+
+    int rowOffset = 0;
+    struct sqlResult *sr = hExtendedRangeQuery(conn, tg->table, chromName, winStart, winEnd, extra,
+                                               FALSE, NULL, &rowOffset);
+    while ((row = sqlNextRow(sr)) != NULL)
+	{
+        struct bed *bed = bedLoad12(row+rowOffset);
+        slAddHead(&lfList, bedMungToLinkedFeatures(&bed, tdb, 12, scoreMin, scoreMax, useItemRgb));
         }
-    tg->items = newList;
+    sqlFreeResult(&sr);
+    slReverse(&lfList);
+    slSort(&lfList, linkedFeaturesCmp);
+    tg->items = lfList;
     }
 hFreeConn(&conn);
 }
 
-static void t2gMapItem(struct track *tg, struct hvGfx *hvg, void *item,
+#define PUBSFILTERNAME "pubsFilterArticleId"
+
+static void activatePslTrackIfCgi(struct track *tg)
+/* the publications hgc creates links back to the browser with 
+ * the cgi param pubsFilterArticleId to show only a single type
+ * of feature for the pubsBlatPsl track. 
+ * If the parameter was supplied, we save this parameter here
+ * into the cart and activate the track.
+ */
+{
+char *articleId = cgiOptionalString(PUBSFILTERNAME);
+//if (articleId==NULL) 
+    //articleId = cartOptionalString(cart, PUBSFILTERNAME);
+
+if (articleId!=NULL) 
+{
+    cartSetString(cart, PUBSFILTERNAME, articleId);
+    tdbSetCartVisibility(tg->tdb, cart, hCarefulTrackOpenVis(database, tg->track));
+    tg->visibility=tvPack;
+}
+}
+
+char *pubsItemName(struct track *tg, void *item)
+/* get author/year from extra field */
+{
+struct linkedFeatures *lf = item;
+pubsAddExtra(tg, lf);
+
+struct pubsExtra* extra = lf->extra;
+if (extra!=NULL)
+    return extra->label;
+else
+    return lf->name;
+
+}
+
+static void pubsMapItem(struct track *tg, struct hvGfx *hvg, void *item,
+				char *itemName, char *mapItemName, int start, int end,
+				int x, int y, int width, int height)
+/* create mouse over with title for pubs blat features. */
+{
+if (!theImgBox || tg->limitedVis != tvDense || !tdbIsCompositeChild(tg->tdb)) 
+{
+    struct linkedFeatures *lf = item;
+    pubsAddExtra(tg, lf);
+    struct pubsExtra* extra = lf->extra;
+    char* mouseOver = NULL;
+    if (extra != NULL) 
+        mouseOver = extra->mouseOver;
+    else
+        mouseOver = itemName;
+
+    mapBoxHc(hvg, start, end, x, y, width, height, tg->track, mapItemName, mouseOver); 
+}
+}
+
+char *pubsMarkerItemName(struct track *tg, void *item)
+/* retrieve article count from score field and return.*/
+{
+struct bed *bed = item;
+char newName[64];
+safef(newName, sizeof(newName), "%d articles", (int) bed->score);
+return cloneString(newName);
+}
+
+static void pubsMarkerMapItem(struct track *tg, struct hvGfx *hvg, void *item,
 				char *itemName, char *mapItemName, int start, int end,
 				int x, int y, int width, int height)
 {
-if(!theImgBox || tg->limitedVis != tvDense || !tdbIsCompositeChild(tg->tdb))
-    {
-    char query[1024], title[4096];
-    char *label = NULL;
-    char *articleTable = trackDbSetting(tg->tdb, "articleTable");
-    if(!isEmpty(articleTable))
-        {
-        struct sqlConnection *conn = hAllocConn(database);
-        safef(query, sizeof(query), "select title from %s where displayId = '%s'", articleTable, mapItemName);
-        label = sqlQuickQuery(conn, query, title, sizeof(title));
-        hFreeConn(&conn);
-        }
-    if(isEmpty(label))
-        label = mapItemName;
-    mapBoxHc(hvg, start, end, x, y, width, height, tg->track, mapItemName, label);
-    }
+struct bed *bed = item;
+genericMapItem(tg, hvg, item,
+		    bed->name, bed->name, start, end,
+		    x, y, width, height);
 }
 
-static void t2gMethods(struct track *tg)
+static struct hash* pubsLookupSequences(struct track *tg, struct sqlConnection* conn, char* articleId, bool getSnippet)
+/* create a hash with a mapping annotId -> snippet or annotId -> shortSeq for an articleId*/
 {
-tg->loadItems = t2gLoadItems;
-tg->mapItem = t2gMapItem;
+    char query[LARGEBUF];
+    char *sequenceTable = trackDbRequiredSetting(tg->tdb, "pubsSequenceTable");
+    char *selectValSql = NULL;
+    if (getSnippet)
+        selectValSql = "replace(replace(snippet, \"<B>\", \"\\n>>> \"), \"</B>\", \" <<<\\n\")";
+    else
+        selectValSql = "concat(substr(sequence,1,4),\"...\",substr(sequence,-4))";
+
+    safef(query, sizeof(query), "SELECT annotId, %s  FROM %s WHERE articleId='%s' ", 
+        selectValSql, sequenceTable, articleId);
+    struct hash *seqIdHash = sqlQuickHash(conn, query);
+    //freeMem(sequenceTable); // XX Why does this crash??
+    return seqIdHash;
 }
 
+static char *pubsArticleDispId(struct track *tg, struct sqlConnection *conn, char* articleId)
+/* given an articleId, lookup author and year and create <author><year> label for it */
+{
+char* dispLabel = NULL;
+char *articleTable = pubsArticleTable(tg);
+char query[LARGEBUF];
+safef(query, sizeof(query), "SELECT firstAuthor, year FROM %s WHERE articleId = '%s'", 
+    articleTable, articleId);
+struct sqlResult *sr = sqlGetResult(conn, query);
+if (sr!=NULL)
+    {
+    char **row = NULL;
+    row = sqlNextRow(sr);
+    if (row != NULL)
+        dispLabel = pubsFeatureLabel(row[0], row[1]);
+    else
+        dispLabel = articleId;
+    }
+else
+    dispLabel = articleId;
+sqlFreeResult(&sr);
+return dispLabel;
+}
+
+static void pubsPslLoadItems(struct track *tg)
+/* load only psl items from a single article */
+{
+// get articleId to filter on
+char *articleId = cartOptionalString(cart, PUBSFILTERNAME);
+if (articleId==NULL)
+    return;
+
+struct sqlConnection *conn = hAllocConn(database);
+char* dispLabel = pubsArticleDispId(tg, conn, articleId);
+struct hash *idToSnip = pubsLookupSequences(tg, conn, articleId, TRUE);
+struct hash *idToSeq = pubsLookupSequences(tg, conn, articleId, FALSE);
+
+// change track label 
+char* oldLabel = tg->longLabel;
+tg->longLabel = catTwoStrings("Individual matches for article ", dispLabel);
+freeMem(oldLabel);
+
+// filter and load items for this articleId
+char where[256];
+safef(where, sizeof(where), " articleId=%s ", articleId);
+
+int rowOffset = 0;
+struct sqlResult *sr = NULL;
+sr = hRangeQuery(conn, tg->table, chromName, winStart, winEnd, where, &rowOffset);
+
+struct linkedFeatures *lfList = NULL;
+char **row = NULL;
+while ((row = sqlNextRow(sr)) != NULL)
+    {
+    struct psl *psl = pslLoad(row+rowOffset);
+    slAddHead(&lfList, lfFromPsl(psl, TRUE));
+    char* shortSeq  = hashFindVal(idToSeq,  lfList->name);
+    char* snip = hashFindVal(idToSnip, lfList->name);
+    struct pubsExtra *extra = needMem(sizeof(struct pubsExtra));
+    extra->mouseOver=snip;
+    extra->label=shortSeq;
+    lfList->extra = extra;
+    }
+sqlFreeResult(&sr);
+slReverse(&lfList);
+slSort(&lfList, linkedFeaturesCmp);
+tg->items = lfList;
+hFreeConn(&conn);
+}
+
+static void pubsBlatPslMethods(struct track *tg)
+/* a track that shows only the indiv matches for one single article */
+{
+activatePslTrackIfCgi(tg);
+tg->loadItems = pubsPslLoadItems;
+tg->itemName  = pubsItemName;
+tg->mapItem   = pubsMapItem;
+}
+
+static void pubsBlatMethods(struct track *tg)
+/* publication blat tracks are bed12+2 tracks of sequences in text, mapped with BLAT */
+{
+//bedMethods(tg);
+tg->loadItems = pubsLoadKeywordYearItems;
+tg->itemName  = pubsItemName;
+tg->mapItem   = pubsMapItem;
+}
+
+static void pubsMarkerMethods(struct track *tg)
+/* publication marker tracks are bed5 tracks of genome marker occurences like rsXXXX found in text*/
+{
+tg->mapItem   = pubsMarkerMapItem;
+tg->itemName  = pubsMarkerItemName;
+}
 
 void fillInFromType(struct track *track, struct trackDb *tdb)
 /* Fill in various function pointers in track from type field of tdb. */
@@ -12256,8 +12555,13 @@ if (sameWord(type, "bed"))
        settings. */
     if (trackDbSetting(track->tdb, GENEPRED_CLASS_TBL) !=NULL)
         track->itemColor = genePredItemClassColor;
-    if (startsWith("t2g", track->table))
-        t2gMethods(track);
+
+    // FIXME: as long as registerTrackHandler doesn't accept wildcards, 
+    // this probably needs to stay here (it's in the wrong function)
+    if (startsWith("pubs", track->track) && stringIn("Marker", track->track))
+        pubsMarkerMethods(track);
+    if (startsWith("pubs", track->track) && stringIn("Blat", track->track))
+        pubsBlatMethods(track);
     }
 /*
 else if (sameWord(type, "bedLogR"))
@@ -12317,6 +12621,12 @@ else if (sameWord(type, "logo"))
 else if (sameWord(type, "psl"))
     {
     pslMethods(track, tdb, wordCount, words);
+
+    // FIXME: registerTrackHandler doesn't accept wildcards, so this might be the only
+    // way to get this done in a general way. If this was in loaded with registerTrackHandler
+    // pslMethods would need the tdb object, which we don't have for these callbacks
+    if (startsWith("pubs", track->track))
+        pubsBlatPslMethods(track);
     }
 else if (sameWord(type, "snake"))
     {
@@ -12375,7 +12685,7 @@ else if (sameWord(type, "encodePeak") || sameWord(type, "narrowPeak") ||
     encodePeakMethods(track);
     }
 else if (sameWord(type, "bed5FloatScore") ||
-         sameWord(type, "bedFloatScoreWithFdr"))
+         sameWord(type, "bed5FloatScoreWithFdr"))
     {
     track->bedSize = 5;
     bedMethods(track);
@@ -12531,7 +12841,7 @@ if (startsWith("wig", tdb->type) || startsWith("bedGraph", tdb->type) ||
         smart = TRUE;
 
 /* setup function handlers for composite track */
-handler = lookupTrackHandler(tdb->table);
+handler = lookupTrackHandlerClosestToHome(tdb);
 if (smart && handler != NULL)
     /* handles it's own load and height */
     handler(track);
@@ -12555,24 +12865,8 @@ for (tdbRef = tdbRefList; tdbRef != NULL; tdbRef = tdbRef->next)
     {
     subTdb = tdbRef->val;
 
-    /* Initialize from composite track settings */
-    if (trackDbSettingClosestToHome(subTdb, "noInherit") == NULL)
-	{
-	/* install parent's track handler */
-	/* TODO JK - rework.  The gencode tracks currently depend on this, wgEncodeGencode in particular,
-	 * but it seems very dangerous in general.  What if the subtracks already have their own handler?
-	 * Waiting to fix until after viewInTheMiddle branch merge since preferred fix involves
-	 * edits to trackDb.ra files - that is putting in an explicit setting when you want
-	 * this behavior rather than relying on absence of an overloaded setting. */
-	subtrack = trackFromTrackDb(tdb);
-	subtrack->tdb = subTdb;
-	handler = lookupTrackHandler(tdb->table);
-	}
-    else
-	{
-	subtrack = trackFromTrackDb(subTdb);
-	handler = lookupTrackHandler(subTdb->table);
-	}
+    subtrack = trackFromTrackDb(subTdb);
+    handler = lookupTrackHandlerClosestToHome(subTdb);
     if (handler != NULL)
         handler(subtrack);
 
@@ -12730,12 +13024,28 @@ else
 // If parents and children put in different handlers, there's no way to know which one
 // the child will get.
 
-TrackHandler lookupTrackHandler(char *name)
+static TrackHandler lookupTrackHandler(char *name)
 /* Lookup handler for track of give name.  Return NULL if none. */
 {
 if (handlerHash == NULL)
     return NULL;
 return hashFindVal(handlerHash, name);
+}
+
+TrackHandler lookupTrackHandlerClosestToHome(struct trackDb *tdb)
+/* Lookup handler for track of give name.  Try parents if
+ * subtrack has a NULL handler.  Return NULL if none. */
+{
+TrackHandler handler = lookupTrackHandler(tdb->table);
+
+// while handler is NULL and we have a parent, use the parent's handler
+for( ; (handler == NULL) && (tdb->parent != NULL);  )
+    {
+    tdb = tdb->parent;
+    handler = lookupTrackHandler(tdb->table);
+    }
+
+return handler;
 }
 
 void registerTrackHandlers()
@@ -12943,6 +13253,7 @@ registerTrackHandler("encodeErgeMethProm",encodeErgeMethods);
 registerTrackHandler("encodeErgeStableTransf",encodeErgeMethods);
 registerTrackHandler("encodeErgeSummary",encodeErgeMethods);
 registerTrackHandler("encodeErgeTransTransf",encodeErgeMethods);
+registerTrackHandler("encodeGencodeGenePolyAMar07",bed9Methods);
 registerTrackHandlerOnFamily("encodeStanfordNRSF",encodeStanfordNRSFMethods);
 registerTrackHandler("cghNci60", cghNci60Methods);
 registerTrackHandler("rosetta", rosettaMethods);
@@ -13027,9 +13338,20 @@ registerTrackHandler("jaxPhenotypeLift", jaxPhenotypeMethods);
 /* ENCODE related */
 registerTrackHandlerOnFamily("wgEncodeGencode", gencodeGeneMethods);
 registerTrackHandlerOnFamily("wgEncodeSangerGencode", gencodeGeneMethods);
+// one per gencode version, after V7 when it was substantially changed
+// FIXME: this is hacky, need a way to register based on pattern
+registerTrackHandlerOnFamily("wgEncodeGencodeV3", gencodeGeneMethods);
+registerTrackHandlerOnFamily("wgEncodeGencodeV4", gencodeGeneMethods);
 registerTrackHandlerOnFamily("wgEncodeGencodeV7", gencodeGeneMethods);
 registerTrackHandlerOnFamily("wgEncodeGencodeV8", gencodeGeneMethods);
 registerTrackHandlerOnFamily("wgEncodeGencodeV9", gencodeGeneMethods);
+registerTrackHandlerOnFamily("wgEncodeGencodeV10", gencodeGeneMethods);
+registerTrackHandlerOnFamily("wgEncodeGencodeV11", gencodeGeneMethods);
+registerTrackHandlerOnFamily("wgEncodeGencodeV12", gencodeGeneMethods);
+registerTrackHandlerOnFamily("wgEncodeGencodeV13", gencodeGeneMethods);
+registerTrackHandlerOnFamily("wgEncodeGencodeV14", gencodeGeneMethods);
+registerTrackHandlerOnFamily("wgEncodeGencodeV15", gencodeGeneMethods);
+
 registerTrackHandlerOnFamily("wgEncodeSangerGencodeGencodeManual20081001", gencodeGeneMethods);
 registerTrackHandlerOnFamily("wgEncodeSangerGencodeGencodeAuto20081001", gencodeGeneMethods);
 registerTrackHandlerOnFamily("encodeGencodeGene", gencodeGeneMethods);

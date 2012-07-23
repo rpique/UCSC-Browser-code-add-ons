@@ -68,48 +68,48 @@ function ajaxWaitCountDown()
     //warn(req.readyState + " waiters:"+ajaxWaitCount);
 }
 
-var formToSubmit = null; // multistate: null, {form}, "COMPLETE", "ONCEONLY"
-var formSubmitPhase = 0;
-function formSubmit()
-{ // This will be called as a callback on timeout or ajaxWaitCallback
-
-    if(formToSubmit != null) {
-        //warn("submitting form:"+$(formToSubmit).attr('name') + ": "+ajaxWaitIsDone());
-        var form = formToSubmit;
-        formToSubmit = "GO"; // Flag to wait no longer
-        $(form).submit();
-    }
-    waitMaskClear(); // clear any outstanding waitMask.  overkill if the form has just been submitted
-}
-function formSubmitRegister(form)
-{ // Registers the form submit to be done by ajaxWaitCallback or timeout
-    if(formToSubmit != null) // Repeated submission got through, so ignore it
-        return false;
-    waitMaskSetup(5000);     // Will prevent repeated submissions, I hope.
-    formToSubmit = form;
-    //warn("Registering form to submit:"+$(form).attr('name'));
-    ajaxWaitCallbackRegister(formSubmit);
-    return false; // Don't submit until ajax is done.
-}
-
-function formSubmitWaiter(e)
-{ // Here we will wait for up to 5 seconds before continuing.
-    if(formToSubmit == null)
-        return formSubmitRegister(e.target); // register on first time through
-
-    if(formToSubmit == "GO") {  // Called again as complete
-        //warn("formSubmitWaiter(): GO");
-        formToSubmit = "STOP";  // Do this only once!
-        return true;
-    }
-    return false;
-}
-
-function formSubmitWaitOnAjax(form)
-{ // Most typically, we block a form submit until all ajax has returned
-    $(form).unbind('submit', formSubmitWaiter ); // prevents multiple bind requests
-    $(form).bind(  'submit', formSubmitWaiter );
-}
+// UNUSED but useful ?
+// var formToSubmit = null; // multistate: null, {form}, "COMPLETE", "ONCEONLY"
+// function formSubmit()
+// { // This will be called as a callback on timeout or ajaxWaitCallback
+//
+//     if(formToSubmit != null) {
+//         //warn("submitting form:"+$(formToSubmit).attr('name') + ": "+ajaxWaitIsDone());
+//         var form = formToSubmit;
+//         formToSubmit = "GO"; // Flag to wait no longer
+//         $(form).submit();
+//     }
+//     waitMaskClear(); // clear any outstanding waitMask.  overkill if the form has just been submitted
+// }
+// function formSubmitRegister(form)
+// { // Registers the form submit to be done by ajaxWaitCallback or timeout
+//     if(formToSubmit != null) // Repeated submission got through, so ignore it
+//         return false;
+//     waitMaskSetup(5000);     // Will prevent repeated submissions, I hope.
+//     formToSubmit = form;
+//     //warn("Registering form to submit:"+$(form).attr('name'));
+//     ajaxWaitCallbackRegister(formSubmit);
+//     return false; // Don't submit until ajax is done.
+// }
+//
+// function formSubmitWaiter(e)
+// { // Here we will wait for up to 5 seconds before continuing.
+//     if(formToSubmit == null)
+//         return formSubmitRegister(e.target); // register on first time through
+//
+//     if(formToSubmit == "GO") {  // Called again as complete
+//         //warn("formSubmitWaiter(): GO");
+//         formToSubmit = "STOP";  // Do this only once!
+//         return true;
+//     }
+//     return false;
+// }
+//
+// function formSubmitWaitOnAjax(form)
+// { // Most typically, we block a form submit until all ajax has returned
+//     $(form).unbind('submit', formSubmitWaiter ); // prevents multiple bind requests
+//     $(form).bind(  'submit', formSubmitWaiter );
+// }
 
 function loadXMLDoc(url)
 {
@@ -153,11 +153,16 @@ function loadXMLDoc(url, callBack)
     }
 }
 
-function setCartVars(names, values)
+function setCartVars(names, values, errFunc, async)
 {
 // Asynchronously sets the array of cart vars with values
     if(names.length <= 0)
         return;
+
+    if (errFunc == null)
+	errFunc = errorHandler;
+    if (async == null)
+	async = true;
 
     // Set up constant portion of url
     var loc = window.location.href;
@@ -186,11 +191,12 @@ function setCartVars(names, values)
     }
     $.ajax({
                type: type,
+               async: async,
                url: loc,
                data: data,
                trueSuccess: function () {},
                success: catchErrorOrDispatch,
-               error: errorHandler,
+               error: errFunc,
                cache: false
            });
 }
@@ -228,10 +234,11 @@ function setAllVars(obj,subtrackName)
     setVarsFromHash(getAllVars(obj,subtrackName));
 }
 
-function setCartVarFromObjId(obj)
-{
-    setCartVar($(obj).attr('id'),$(obj).val());
-}
+// Unused but useful
+// function setCartVarFromObjId(obj)
+// {
+//     setCartVar($(obj).attr('id'),$(obj).val());
+// }
 
 function submitMain()
 {
@@ -251,16 +258,23 @@ function setCartVarAndRefresh(name,val)
 function errorHandler(request, textStatus)
 {
     var str;
+    var tryAgain = true;
     if(textStatus && textStatus.length && textStatus != "error") {
         str = "Encountered network error : '" + textStatus + "'.";
     } else {
-        str = "Encountered a network error."
+        if(request.responseText) {
+            tryAgain = false;
+            str = "Encountered error: '" + request.responseText + "'";
+        } else {
+            str = "Encountered a network error."
+        }
     }
-    str += " Please try again. If the problem persists, please check your network connection.";
-    showWarning(str);
+    if(tryAgain)
+        str += " Please try again. If the problem persists, please check your network connection.";
+    warn(str);
     jQuery('body').css('cursor', '');
     if(this.disabledEle) {
-        this.disabledEle.attr('disabled', '');
+        this.disabledEle.removeAttr('disabled');
     }
     if(this.loadingId) {
 	hideLoadingImage(this.loadingId);
@@ -274,12 +288,6 @@ function catchErrorOrDispatch(obj, textStatus)
         this.trueSuccess(obj, textStatus);
     else
         errorHandler.call(this, obj, textStatus);
-}
-
-function showWarning(str)
-{
-    $("#warningText").text(str);
-    $("#warning").show();
 }
 
 // Specific calls...
@@ -453,3 +461,47 @@ function scrapeVariable(html, name)
     }
     return json;
 }
+
+// The loadingImage module helps you manage a loading image (for a slow upload; e.g. in hgCustom).
+
+var loadingImage = function ()
+{
+    // private vars
+    var imgEle, msgEle, statusMsg;
+
+    // private methods
+    var refreshLoadingImg = function()
+    {
+        // hack to make sure animation continues in IE after form submission
+        // See: http://stackoverflow.com/questions/774515/keep-an-animated-gif-going-after-form-submits
+        // and http://stackoverflow.com/questions/780560/animated-gif-in-ie-stopping
+        imgEle.attr('src', imgEle.attr('src'));
+    };
+
+    // public methods
+    return {
+        init: function(_imgEle, _msgEle, _msg)
+        {
+            // This should be called from the ready method; imgEle and msgEle should be jQuery objects
+            imgEle = _imgEle;
+            msgEle = _msgEle;
+            statusMsg = _msg;
+            // To make the loadingImg visible on FF, we have to make sure it's visible during page load (i.e. in html) otherwise it doesn't get shown by the submitClick code.
+            imgEle.hide();
+        },
+        run: function() {
+            msgEle.append(statusMsg);
+            if(navigator.userAgent.indexOf("Chrome") != -1) {
+                // In Chrome, gif animation and setTimeout's are stopped when the browser receives the first blank line/comment of the next page
+                // (basically, the current page is unloaded). I have found no way around this problem, so we just show a 
+                // simple "Processing..." message (we can't make that blink, b/c Chrome doesn't support blinking text).
+                // 
+                // (Surprisingly, this is NOT true for Safari, so this is apparently not a WebKit issue).
+                imgEle.replaceWith("<span id='loadingBlinker'>&nbsp;&nbsp;<b>Processing...</b></span>");
+            } else {
+                imgEle.show();
+                setTimeout(refreshLoadingImg, 1000);
+            }
+        }
+    }
+}();

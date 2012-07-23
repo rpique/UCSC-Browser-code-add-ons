@@ -21,6 +21,7 @@ use Digest::MD5;
 use threads;
 use threads::shared;
 use Time::HiRes qw(usleep nanosleep);
+use POSIX;
 
 # for debug only, you'll need to find the package on your own
 # use DataBrowser qw(browse);
@@ -34,22 +35,26 @@ use HgDb;
 sub usage {
     # Usage statement
     print STDERR <<END;
-usage: encodeFilesList <db> [options]
+usage: encodeMkFilesList <db> [options]
 
-Creates files.txt and optionally md5sum.txt
+Creates files.txt and optionally md5sum.txt.
+The md5summing function will md5sum the internal contents of any gzipped file, 
+but stores the external md5sum in md5sum.txt and metaDb.
 
 options:
 
     -md5            md5 sums the files in the directory
+    -superfast      use 7 threads instead of 2
     -noupdate       don't update md5sums in metaDb
     -table          selects which metadata table to use
-    -verbose        verbose output (levels 1 - 3)
+    -verbose        verbose output (levels 1 - 2)
+    -quiet          quiet mode, silences all output
     -cv             custom cv directory (default is /data/apache/cgi-bin/encode)
     -directory      custom download directory (default is working directory)
     -fileMask       only allows selected pattern matches (must be in quotes)
-                E.g. -fileMask "*.gz *.tgz *.bam *.bam.bai *.bigWig *.bb" (default)
+                E.g. -fileMask "wgEncode*" (default)
                 Regex Example:  -fileMask "wgEncode\\S+Huvec.* wgEncode\\S+GM\\d+Input"
-                Normal example: -fileMask "*.gz *GM12878* *GM12*Tnfa
+                Normal example: -fileMask "*.gz *GM12878* *GM12*Tnfa"
 
 END
 exit 1;
@@ -139,7 +144,9 @@ sub sortTypeOfTermPriority {
         #multidimensional array sort, @sort is the multidimentional one
         #@array is a secondary array pushed onto the first one (@sort)
         if (${$typeofterms{$key}}{'priority'} =~ m/\D/) {
-            print STDERR "$key has non-numeric characters in the priority field\n";
+            unless ($opt{'quiet'}) {
+                print STDERR "$key has non-numeric characters in the priority field\n";
+            }
             ${$typeofterms{$key}}{'priority'} =~ s/\D//g;
         }
 
@@ -159,7 +166,7 @@ sub sortTypeOfTermPriority {
 
     #sorts the array first according to priority then alphanumerically on value
     @sort = sort {$a->[1] <=> $b->[1] || $a->[0] cmp $b->[0]} @sort;
-    if ($opt{'verbose'} >=3 ) {
+    if ($opt{'verbose'} >= 2 ) {
         print STDERR "\npriority list\n";
         foreach my $sortval (@sort) {
             print STDERR "$$sortval[0] = $$sortval[1]\n";
@@ -182,9 +189,15 @@ sub getMd5Files {
     my $md5hist = $_[2];
     my @statlist = @{$_[3]};
     my %opt = %{$_[4]};
+    my %gzmd5sums;
     my %lastmod;
     my %tempmd5;
-    
+    my %files;
+
+    foreach my $key (@files) {
+        $files{$key} = 1;
+    }
+
     # copy over the filenames to tempmd5 hash for removal purposes
     # also initializes all last modification times to 0
     foreach my $file (@files) {
@@ -204,12 +217,22 @@ sub getMd5Files {
             my $file = $line[0];
             my $md5 = $line[1];
             my $lastmod = $line[2];
-            
+            my $gzmd5;
+            if ($md5 =~ m/(\S+),(\S+)/) {
+                $md5 = $1;
+                $gzmd5 = $2;
+            }
             # make sure file exists, not deleted, etc....
             unless (-e $file) {
                 next;
             }
+            unless (exists $files{$file}) {
+                next;
+            }
             $md5sums{$file} = $md5;
+            if ($gzmd5) {
+                $gzmd5sums{$file} = $gzmd5;
+            }
             if ($lastmod) {
                 $lastmod{$file} = $lastmod;
             } else {
@@ -224,7 +247,7 @@ sub getMd5Files {
         # is made
         foreach my $file (keys %tempmd5) {
             my @stat = stat("$file");
-            if ($opt{'verbose'} >= 4) {
+            if ($opt{'verbose'} >= 3) {
                 my $count = 0;
                 print STDERR "\n";
                 print STDERR "$file statistics:\n";
@@ -251,6 +274,7 @@ sub getMd5Files {
     my @return;
     push @return, \@md5files;
     push @return, \%md5sums;
+    push @return, \%gzmd5sums;
     return (\@return);
 }
 
@@ -278,10 +302,14 @@ sub metaDbUpdate {
         if ($file eq $filename) {
             $inlist = 1;
         }
-        $md5Str = $md5Str . "$md5sums{$file},";
+        if ($md5sums{$file}) {
+            $md5Str = $md5Str . "$md5sums{$file},";
+        }
     }
     unless ($inlist) {
-        print STDERR "$filename is not in fileName field\n";
+        unless ($opt{'quiet'}) {
+            print STDERR "$filename is not in fileName field\n";
+        }
         return (0);
     }
     #remove trailing comma
@@ -319,16 +347,23 @@ sub metaDbUpdate {
 ############
 
 my $user = "$ENV{'USER'}";
+my $nice = POSIX::nice(19);
+
+unless ($nice) {
+    print STDERR "Can't set nice to 19\n";
+}
 my %opt;
 my $goodopts = GetOptions(\%opt,
                     "md5",
                     "fileMask=s",
                     "table=s",
                     "verbose=i",
+                    "quiet",
                     "cv=s",
                     "directory=s",
                     "history=s",
-                    "noupdate"
+                    "noupdate",
+                    "superfast"
 );
 
 #make sure that GetOptions returns 1 and every option is good
@@ -371,6 +406,21 @@ if ($opt{'directory'}) {
 }
 
 unless ($opt{'verbose'}) {
+    $opt{'verbose'} = 1;
+}
+if (!open(TTY, "/dev/tty")) {
+
+} else {
+    my $tpgrp = tcgetpgrp(fileno(*TTY));
+    my $pgrp = getpgrp();
+    if ($tpgrp == $pgrp) {
+        #foreground
+    } else {
+        $opt{'verbose'} = 0;
+        $opt{'quiet'} = 1;
+    }
+}
+if ($opt{'quiet'}) {
     $opt{'verbose'} = 0;
 }
 if ($opt{'verbose'} >= 1) {
@@ -393,7 +443,7 @@ unless ($err) {
 
 # default file Masking, if updated, please update usage statement
 my %fileMask;
-my $fileMask = "*.gz *.tgz *.bam *.bam.bai *.bigWig *.bb";
+my $fileMask = "wgEncode*";
 if ($opt{'fileMask'}) {
     $fileMask = $opt{'fileMask'};
 }
@@ -438,6 +488,7 @@ unless (exists $tables{$metadb}) {
 
 my %md5sums;
 my %seenmd5s;
+my %gzmd5sums;
 
 # structure {fileInfo}->{filename}->{key}
 my %fileInfo;
@@ -478,14 +529,19 @@ if ($opt{'md5'}) {
     my @md5return = @{&getMd5Files(\@files, \%md5sums, $md5hist, \@statlist, \%opt)};
     my @md5files = @{$md5return[0]};
     %md5sums = %{$md5return[1]};
+    %gzmd5sums = %{$md5return[2]};
 
     # process only if there are files to process
+    $db->disconnect;
     if (@md5files) {
         # this launches a subroutine at the bottom, because threadstatus must be encountered
         #by the interpreter before it is seen in a sub
-        %md5sums = %{&doMd5Threads(\%md5sums, \@md5files, \%opt)};
+        my @return = @{&doMd5Threads(\%md5sums, \@md5files, \%opt, \%gzmd5sums)};
+        %md5sums = %{$return[0]};
+        %gzmd5sums = %{$return[1]};
     }
-    
+    $db = HgDb->new(DB => $assm) or die "die: Can't connect to DB: $assm\n";   
+ 
     open MDF, ">md5sum.txt" or die "die: can't open md5sum.txt file to write\n";
     if ($opt{'verbose'} >= 1) {
         print STDERR "\n";
@@ -497,19 +553,17 @@ if ($opt{'md5'}) {
     close MDF;
     
     open MDF, ">md5sum.history" or die "die: can't open md5sum.history to write\n";
-    if ($opt{'verbose'} >= 2) {
+    if ($opt{'verbose'} >= 1) {
         print STDERR "\n";
         print STDERR "writing md5sum.history\n";
     }
     foreach my $file (sort { $a cmp $b } keys %md5sums) {
         my @stat = stat("$file");
-        unless (exists $seenmd5s{$md5sums{$file}}) {
-            $seenmd5s{$md5sums{$file}} = $file;
-        } else {
-            print STDERR "$file and $seenmd5s{$md5sums{$file}}".
-                         " have the same md5sum: $md5sums{$file}\n";
+        my $sum = $md5sums{$file};
+        if (exists $gzmd5sums{$file}) {
+            $sum = "$sum,$gzmd5sums{$file}";
         }
-        print MDF "$file $md5sums{$file} $stat[9]\n";
+        print MDF "$file $sum $stat[9]\n";
     }
     close MDF;
 } else {
@@ -521,7 +575,7 @@ if ($opt{'md5'}) {
     %md5sums = %{$md5return[1]};
 }
 
-if ($opt{'verbose'} >= 3) {
+if ($opt{'verbose'} >= 2) {
     print STDERR "\n";
     print STDERR "files to be processed:\n";
     foreach my $name (@fileMask) {
@@ -544,6 +598,9 @@ foreach my $file (@fileMask) {
     }
     elsif ($test eq 'bai') {
         $type = "bai";
+    }
+    elsif ($test eq 'bam') {
+        $type = 'bam';
     }
     elsif (scalar (@fileparts) == 2) {
         $type = $test;
@@ -591,22 +648,21 @@ foreach my $file (@fileMask) {
             }
         }
 
-        if ($opt{'verbose'} >=4) {
+        if ($opt{'verbose'} >= 3) {
             print STDERR "mdb info for table $tableName:\n";
             foreach my $mdbobj (keys %fileHash) {
                 print STDERR "$mdbobj = $fileHash{$mdbobj}\n";
             }
             print STDERR "\n";
         }
-
-        unless ($objName) {
-            print STDERR "$file is an orphaned file, there is no matching metadata\n";
-        } elsif ($objName && !(exists $fileHash{'fileName'})) {
-            print STDERR "There was metadata found for $file, but no fileName field\n";
+        unless ($opt{'quiet'}) {
+            unless ($objName) {
+                print STDERR "$file is an orphaned file, there is no matching metadata\n";
+            } elsif ($objName && !(exists $fileHash{'fileName'})) {
+                print STDERR "There was metadata found for $file, but no fileName field\n";
+            }
         }
-
         if (exists $md5sums{$file} && $writedb == 1 && exists($fileHash{'fileName'})) {
-            # write in functionality to handle comma delimited lists
             my $localup = &metaDbUpdate(\%md5sums, \%fileHash, \%opt, $db, $file,
                                     $tableName, $metadb, $objName);
             if ($localup && ($updated == 0)) {
@@ -622,6 +678,31 @@ foreach my $file (@fileMask) {
 
     #put hash into fileInfo container
     $fileInfo{$file} = \%fileHash;
+}
+
+
+my %comparemd5;
+foreach my $file (keys %md5sums) {
+    if (exists $gzmd5sums{$file}) {
+        $comparemd5{$file} = $gzmd5sums{$file};
+    } else {
+        $comparemd5{$file} = $md5sums{$file};
+    }
+
+}
+
+for my $file (sort { $a cmp $b } keys %comparemd5) {
+    if (exists $fileInfo{$file} and exists ${$fileInfo{$file}}{'objStatus'} and ${$fileInfo{$file}}{'objStatus'} =~ m/re.*/) {
+        next
+    }
+    unless (exists $seenmd5s{$comparemd5{$file}}) {
+        $seenmd5s{$comparemd5{$file}} = $file;
+    } else {
+        unless ($opt{'quiet'}) {
+            print STDERR "$file and $seenmd5s{$comparemd5{$file}}".
+                     " have the same md5sum: $comparemd5{$file}\n";
+        }
+    }
 }
 
 #if the metaDb was updated, and the species is matching either mm or hg
@@ -641,23 +722,28 @@ if ($updated && (($assm =~ m/hg/) || ($assm =~ m/mm/))) {
         my $rafile = "$kentsrc/$composite.ra";
         if (-e $rafile) {
             `mdbPrint $assm -composite=$composite 1> $rafile 2>/dev/null`;
-            print STDERR "\n\n";
-            print STDERR "Update .ra file, please commit and push out md5sum changes\n";
+            unless ($opt{'quiet'}) {
+                print STDERR "\n\n";
+                print STDERR "Update .ra file, please commit and push out md5sum changes\n";
+            }
         } else {
-            print STDERR "\n\n";
-            print STDERR "Couldn't find composite .ra file, please manually update the .ra file".
+            unless ($opt{'quiet'}) {
+                print STDERR "\n\n";
+                print STDERR "Couldn't find composite .ra file, please manually update the .ra file".
                          " and push out md5sum changes\n";
+            }
         }
     }
 } elsif ($updated == 0) {
 } else {
-
-    #dunno if this will ever be hit, but just in case
-    print STDERR "Could not determine species, please manually update metaDb\n";
+    unless ($opt{'quiet'}) {
+        #dunno if this will ever be hit, but just in case
+        print STDERR "Could not determine species, please manually update metaDb\n";
+    }
 }
 
 open FILE, ">files.txt" or die "die: can't open files.txt to write\n";
-if ($opt{'verbose'} >= 2) {
+if ($opt{'verbose'} >= 1) {
     print STDERR "writing files.txt\n";
 }
 #alphanumeric sort
@@ -683,13 +769,17 @@ close FILE;
 sub doMd5Threads {
     # takes in a list of files and md5sums them two at a time with threads
     my %md5sums = %{$_[0]};
-    my @md5files = @{$_[1]};
+    my @md5files = sort @{$_[1]};
     my %opt = %{$_[2]};
+    my %gzmd5sums = %{$_[3]};
     my %threadContainer;
     # only 2 threads allowed, filesystem limitation, ~ 125 MB/s from disk only
     my $threads = 2;
+    if ($opt{'superfast'}) {
+        $threads = 7;
+    }
     # in case there is only 1 file to md5sum
-    if (scalar @md5files < 2) {
+    if (scalar @md5files < $threads) {
         $threads = scalar @md5files;
     }
     for (my $i = 0; $i < $threads; $i++) {
@@ -701,10 +791,10 @@ sub doMd5Threads {
 
         # unique thread id for verbosity purposes
         my $tid = $threadContainer{$i}->tid();
-        if ($opt{'verbose'} >= 2) {
+        if ($opt{'verbose'} >= 1) {
             print STDERR "Thread $tid started on $file\n";
         }
-        $threadStatus{$i} = "0";
+        #$threadStatus{$i} = 0;
     }
 
     #the loop to check if the threads are done and to spawn another one
@@ -712,41 +802,62 @@ sub doMd5Threads {
         foreach my $thrid (keys %threadContainer) {
 
             # if thread status is 0 still, it means thread is still running
-            if ($threadStatus{$thrid}) {
+            if (exists($threadStatus{$thrid})) {
 
                 #join result back to main
                 my $sum = $threadContainer{$thrid}->join();
-
+                my $gzsum;
+                if ($sum =~ m/(\S+),(\S+)/) {
+                    $sum = $1;
+                    $gzsum = $2;
+                }
                 #thread stat, name of file is the return status
                 $md5sums{$threadStatus{$thrid}} = $sum;
+                if ($gzsum){
+                    $gzmd5sums{$threadStatus{$thrid}} = $gzsum;
+                }
                 delete $threadContainer{$thrid};
-
+                delete $threadStatus{$thrid};
                 #if file list is still populated
                 if (@md5files) {
                     my $file = shift @md5files;
                     $threadContainer{$thrid} = threads->create(\&md5sum, $file, $thrid);
                     my $tid = $threadContainer{$thrid}->tid();
-                    if ($opt{'verbose'} >=2 ) {
+                    if ($opt{'verbose'} >= 1 ) {
                         print STDERR "Thread $tid started on $file\n";
                     }
                 }
             }
         }
         # sleep a certain amount of time determined earlier
-        if ($sleepTime eq "U") {
+        #if ($sleepTime eq "U") {
             usleep(10000);
-        } elsif ($sleepTime eq "U2") {
-            usleep(400000);
-        } else {
-            sleep 2;
-        }
+        #} elsif ($sleepTime eq "U2") {
+        #    usleep(400000);
+        #} else {
+        #    sleep 2;
+        #}
     }
 
     #clean up the remaining threads
     foreach my $thrid (keys %threadContainer) {
-        $md5sums{$threadStatus{$thrid}} = $threadContainer{$thrid}->join();
+        my $sum = $threadContainer{$thrid}->join();
+        my $gzsum;
+        if ($sum =~ m/(\S+),(\S+)/) {
+            $sum = $1;
+            $gzsum = $2;
+        }
+        #thread stat, name of file is the return status
+        $md5sums{$threadStatus{$thrid}} = $sum;
+        if ($gzsum){
+            $gzmd5sums{$threadStatus{$thrid}} = $gzsum;
+        }    
+
     }
-    return (\%md5sums);
+    my @return;
+    push @return, \%md5sums;
+    push @return, \%gzmd5sums;
+    return (\@return);
 }
 
 sub md5sum {
@@ -756,12 +867,27 @@ sub md5sum {
     # returns sum, and modifies status variable to signal doneness
     my $file = $_[0];
     my $id = $_[1];
-    open (FILE, $file) or die "die: Can't open '$file': $!\n";
-    binmode(FILE);
-    my $sum = Digest::MD5->new->addfile(*FILE)->hexdigest;
+    my $sum = "";
+    my $gzsum;
+    if ($file =~ m/\.gz$/) {
+        $gzsum = `zcat $file | md5sum`;
+        chomp $gzsum;
+        $gzsum =~ s/[^0-9a-f]//g;
+    }
+    $sum = `cat $file | md5sum`;
+    chomp $sum;
+    $sum =~ s/[^0-9a-f]//g;
+
+    #open (FILE, $file) or die "die: Can't open '$file': $!\n";
+    #binmode(FILE);
+    #my $sum = Digest::MD5->new->addfile(*FILE)->hexdigest;
 
     # lock shared threadstatus variable for thread-safeness
     lock(%threadStatus);
     $threadStatus{$id} = $file;
+    if ($gzsum) {
+        my $return = "$sum,$gzsum";
+        return ($return);
+    }
     return ($sum);
 }

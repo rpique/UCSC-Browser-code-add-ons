@@ -2,6 +2,7 @@ metaObject wgEncodeSunyRipSeq
 objType composite
 composite wgEncodeSunyRipSeq
 expVars lab,dataType,cell,antibody
+geoSeriesAccession GSE35585
 
 metaObject wgEncodeSunyRipSeqGm12878Elavl1AlnRep1
 objType table
@@ -59,6 +60,7 @@ dateUnrestricted 2011-10-18
 dccAccession wgEncodeEH000796
 expId 796
 fileName wgEncodeSunyRipSeqGm12878Elavl1Pk.broadPeak.gz
+geoSampleAccession GSM944520
 grant Tenenbaum
 lab SunyAlbany
 labVersion SC_5261 antibody
@@ -80,6 +82,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000796
 expId 796
 fileName wgEncodeSunyRipSeqGm12878Elavl1RawDataRep1.fastq.gz
+geoSampleAccession GSM944520
 grant Tenenbaum
 lab SunyAlbany
 labVersion SC_5261 antibody
@@ -101,6 +104,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000796
 expId 796
 fileName wgEncodeSunyRipSeqGm12878Elavl1RawDataRep2.fastq.gz
+geoSampleAccession GSM944520
 grant Tenenbaum
 lab SunyAlbany
 labVersion SC_5261 antibody
@@ -122,6 +126,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000796
 expId 796
 fileName wgEncodeSunyRipSeqGm12878Elavl1SigRep1.bigWig
+geoSampleAccession GSM944520
 grant Tenenbaum
 lab SunyAlbany
 labVersion SC_5261 antibody
@@ -144,6 +149,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000796
 expId 796
 fileName wgEncodeSunyRipSeqGm12878Elavl1SigRep2.bigWig
+geoSampleAccession GSM944520
 grant Tenenbaum
 lab SunyAlbany
 labVersion SC_5261 antibody
@@ -210,6 +216,7 @@ dateUnrestricted 2011-10-18
 dccAccession wgEncodeEH000797
 expId 797
 fileName wgEncodeSunyRipSeqGm12878Pabpc1Pk.broadPeak.gz
+geoSampleAccession GSM944519
 grant Tenenbaum
 lab SunyAlbany
 labVersion Sig_P6246 antibody
@@ -231,6 +238,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000797
 expId 797
 fileName wgEncodeSunyRipSeqGm12878Pabpc1RawDataRep1.fastq.gz
+geoSampleAccession GSM944519
 grant Tenenbaum
 lab SunyAlbany
 labVersion Sig_P6246 antibody
@@ -252,6 +260,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000797
 expId 797
 fileName wgEncodeSunyRipSeqGm12878Pabpc1RawDataRep2.fastq.gz
+geoSampleAccession GSM944519
 grant Tenenbaum
 lab SunyAlbany
 labVersion Sig_P6246 antibody
@@ -273,6 +282,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000797
 expId 797
 fileName wgEncodeSunyRipSeqGm12878Pabpc1SigRep1.bigWig
+geoSampleAccession GSM944519
 grant Tenenbaum
 lab SunyAlbany
 labVersion Sig_P6246 antibody
@@ -295,6 +305,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000797
 expId 797
 fileName wgEncodeSunyRipSeqGm12878Pabpc1SigRep2.bigWig
+geoSampleAccession GSM944519
 grant Tenenbaum
 lab SunyAlbany
 labVersion Sig_P6246 antibody
@@ -359,6 +370,7 @@ dateUnrestricted 2011-10-18
 dccAccession wgEncodeEH000798
 expId 798
 fileName wgEncodeSunyRipSeqGm12878RipinputPk.broadPeak.gz
+geoSampleAccession GSM944525
 grant Tenenbaum
 lab SunyAlbany
 md5sum b671dce6abc995f5e47157f84b6e0226
@@ -379,6 +391,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000798
 expId 798
 fileName wgEncodeSunyRipSeqGm12878RipinputRawDataRep1.fastq.gz
+geoSampleAccession GSM944525
 grant Tenenbaum
 lab SunyAlbany
 md5sum 0b3d478e7011b1104b451ae4de2639ed
@@ -399,6 +412,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000798
 expId 798
 fileName wgEncodeSunyRipSeqGm12878RipinputRawDataRep2.fastq.gz
+geoSampleAccession GSM944525
 grant Tenenbaum
 lab SunyAlbany
 md5sum 4d8a482b7ca29f56bff40bd110d5a431
@@ -419,6 +433,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000798
 expId 798
 fileName wgEncodeSunyRipSeqGm12878RipinputSigRep1.bigWig
+geoSampleAccession GSM944525
 grant Tenenbaum
 lab SunyAlbany
 md5sum 6fc963d37686f8a7ba73b7adeea1f6e7
@@ -440,6 +455,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000798
 expId 798
 fileName wgEncodeSunyRipSeqGm12878RipinputSigRep2.bigWig
+geoSampleAccession GSM944525
 grant Tenenbaum
 lab SunyAlbany
 md5sum e97f1cffaee0f2b9d4c8f2ee7058c6dc
@@ -505,6 +521,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000799
 expId 799
 fileName wgEncodeSunyRipSeqGm12878T7tagRawDataRep1.fastq.gz
+geoSampleAccession GSM944524
 grant Tenenbaum
 lab SunyAlbany
 labVersion Nov_69522 antibody
@@ -526,6 +543,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000799
 expId 799
 fileName wgEncodeSunyRipSeqGm12878T7tagRawDataRep2.fastq.gz
+geoSampleAccession GSM944524
 grant Tenenbaum
 lab SunyAlbany
 labVersion Nov_69522 antibody
@@ -547,6 +565,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000799
 expId 799
 fileName wgEncodeSunyRipSeqGm12878T7tagSigRep1.bigWig
+geoSampleAccession GSM944524
 grant Tenenbaum
 lab SunyAlbany
 labVersion Nov_69522 antibody
@@ -569,6 +588,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000799
 expId 799
 fileName wgEncodeSunyRipSeqGm12878T7tagSigRep2.bigWig
+geoSampleAccession GSM944524
 grant Tenenbaum
 lab SunyAlbany
 labVersion Nov_69522 antibody
@@ -635,6 +655,7 @@ dateUnrestricted 2011-10-18
 dccAccession wgEncodeEH000793
 expId 793
 fileName wgEncodeSunyRipSeqK562Elavl1Pk.broadPeak.gz
+geoSampleAccession GSM944523
 grant Tenenbaum
 lab SunyAlbany
 labVersion SC_5261 antibody
@@ -656,6 +677,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000793
 expId 793
 fileName wgEncodeSunyRipSeqK562Elavl1RawDataRep1.fastq.gz
+geoSampleAccession GSM944523
 grant Tenenbaum
 lab SunyAlbany
 labVersion SC_5261 antibody
@@ -677,6 +699,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000793
 expId 793
 fileName wgEncodeSunyRipSeqK562Elavl1RawDataRep2.fastq.gz
+geoSampleAccession GSM944523
 grant Tenenbaum
 lab SunyAlbany
 labVersion SC_5261 antibody
@@ -698,6 +721,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000793
 expId 793
 fileName wgEncodeSunyRipSeqK562Elavl1SigRep1.bigWig
+geoSampleAccession GSM944523
 grant Tenenbaum
 lab SunyAlbany
 labVersion SC_5261 antibody
@@ -720,6 +744,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000793
 expId 793
 fileName wgEncodeSunyRipSeqK562Elavl1SigRep2.bigWig
+geoSampleAccession GSM944523
 grant Tenenbaum
 lab SunyAlbany
 labVersion SC_5261 antibody
@@ -786,6 +811,7 @@ dateUnrestricted 2011-10-18
 dccAccession wgEncodeEH000794
 expId 794
 fileName wgEncodeSunyRipSeqK562Pabpc1Pk.broadPeak.gz
+geoSampleAccession GSM944522
 grant Tenenbaum
 lab SunyAlbany
 labVersion Sig_P6246 antibody
@@ -807,6 +833,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000794
 expId 794
 fileName wgEncodeSunyRipSeqK562Pabpc1RawDataRep1.fastq.gz
+geoSampleAccession GSM944522
 grant Tenenbaum
 lab SunyAlbany
 labVersion Sig_P6246 antibody
@@ -828,6 +855,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000794
 expId 794
 fileName wgEncodeSunyRipSeqK562Pabpc1RawDataRep2.fastq.gz
+geoSampleAccession GSM944522
 grant Tenenbaum
 lab SunyAlbany
 labVersion Sig_P6246 antibody
@@ -849,6 +877,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000794
 expId 794
 fileName wgEncodeSunyRipSeqK562Pabpc1SigRep1.bigWig
+geoSampleAccession GSM944522
 grant Tenenbaum
 lab SunyAlbany
 labVersion Sig_P6246 antibody
@@ -871,6 +900,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000794
 expId 794
 fileName wgEncodeSunyRipSeqK562Pabpc1SigRep2.bigWig
+geoSampleAccession GSM944522
 grant Tenenbaum
 lab SunyAlbany
 labVersion Sig_P6246 antibody
@@ -935,6 +965,7 @@ dateUnrestricted 2011-10-18
 dccAccession wgEncodeEH000795
 expId 795
 fileName wgEncodeSunyRipSeqK562RipinputPk.broadPeak.gz
+geoSampleAccession GSM944521
 grant Tenenbaum
 lab SunyAlbany
 md5sum 8732a97b404b05e6cdcfc9157e752b10
@@ -955,6 +986,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000795
 expId 795
 fileName wgEncodeSunyRipSeqK562RipinputRawDataRep1.fastq.gz
+geoSampleAccession GSM944521
 grant Tenenbaum
 lab SunyAlbany
 md5sum f6fbf96100718232b38680d6511c87d3
@@ -975,6 +1007,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000795
 expId 795
 fileName wgEncodeSunyRipSeqK562RipinputRawDataRep2.fastq.gz
+geoSampleAccession GSM944521
 grant Tenenbaum
 lab SunyAlbany
 md5sum a64639ff8fa8039446ba0c20c8d25e57
@@ -995,6 +1028,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000795
 expId 795
 fileName wgEncodeSunyRipSeqK562RipinputSigRep1.bigWig
+geoSampleAccession GSM944521
 grant Tenenbaum
 lab SunyAlbany
 md5sum fd05149874e1d5b5716db384295659fc
@@ -1016,6 +1050,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000795
 expId 795
 fileName wgEncodeSunyRipSeqK562RipinputSigRep2.bigWig
+geoSampleAccession GSM944521
 grant Tenenbaum
 lab SunyAlbany
 md5sum 5c4819fc03ae862ad6bcaf28925438be
@@ -1081,6 +1116,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000800
 expId 800
 fileName wgEncodeSunyRipSeqK562T7tagRawDataRep1.fastq.gz
+geoSampleAccession GSM944526
 grant Tenenbaum
 lab SunyAlbany
 labVersion Nov_69522 antibody
@@ -1102,6 +1138,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000800
 expId 800
 fileName wgEncodeSunyRipSeqK562T7tagRawDataRep2.fastq.gz
+geoSampleAccession GSM944526
 grant Tenenbaum
 lab SunyAlbany
 labVersion Nov_69522 antibody
@@ -1123,6 +1160,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000800
 expId 800
 fileName wgEncodeSunyRipSeqK562T7tagSigRep1.bigWig
+geoSampleAccession GSM944526
 grant Tenenbaum
 lab SunyAlbany
 labVersion Nov_69522 antibody
@@ -1145,6 +1183,7 @@ dateUnrestricted 2011-10-20
 dccAccession wgEncodeEH000800
 expId 800
 fileName wgEncodeSunyRipSeqK562T7tagSigRep2.bigWig
+geoSampleAccession GSM944526
 grant Tenenbaum
 lab SunyAlbany
 labVersion Nov_69522 antibody
@@ -1155,4 +1194,4 @@ subId 3407
 tableName wgEncodeSunyRipSeqK562T7tagSigRep2
 view Signal
 
-# MAGIC: -1302786561
+# MAGIC: -1973381800

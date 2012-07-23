@@ -87,7 +87,13 @@ required no
 #The spikeInPool associated for the bam file.
 field spikeInPool
 file ddf
-type int
+type string
+required no
+
+#The donorId
+field donorId
+file ddf
+type string
 required no
 
 # This is replicate number as you would expect
@@ -156,6 +162,12 @@ file ddf
 type string
 required no
 
+field platform
+file ddf
+type string
+required no
+
+
 field readType
 file ddf
 type string
@@ -165,6 +177,21 @@ field mapAlgorithm
 file ddf
 type string
 required no 
+
+field localization
+file ddf
+type string
+required no
+
+field rnaExtract
+file ddf
+type string
+required no
+
+field strain
+file ddf
+type string
+require no
 
 #The bioRep information for the transcriptome lab
 field bioRep
@@ -283,7 +310,11 @@ required yes
 #type string
 #required no
 
-# optional DAF header fields
+# This is a list of other variables expected but not in the name 
+field extraVariables
+file dafHeader
+type string
+required no
 
 # This is a list of variables that will be used in the naming of the file
 # They need to be in the cv.ra???

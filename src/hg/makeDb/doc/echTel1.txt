@@ -4,6 +4,40 @@
 # Tenrec July 2005 Broad Assembly
 #
 
+#	http://www.ncbi.nlm.nih.gov/genome/234
+#       http://www.ncbi.nlm.nih.gov/genome/assembly/229058/
+#	http://www.ncbi.nlm.nih.gov/bioproject/60557
+#	http://www.ncbi.nlm.nih.gov/bioproject/12590 - 2X coverage
+#	http://www.ncbi.nlm.nih.gov/Traces/wgs/?val=AAIY00
+
+#############################################################################
+# /hive/data/genomes/echTel1/echTel1.config.ra created 2012-06-07:
+
+# Config parameters for makeGenomeDb.pl:
+db echTel1
+clade mammal
+scientificName Echinops telfairi
+commonName Tenrec
+assemblyDate Jul. 2005
+assemblyLabel Broad/echTel1
+assemblyShortLabel Broad/echTel1
+orderKey 3370
+mitoAcc none
+fastaFiles /hive/data/genomes/echTel1/echTel1.fa.gz
+agpFiles /hive/data/genomes/echTel1/broad/assembly.agp
+qualFiles /hive/data/genomes/echTel1/broad/scaffolds.qac
+dbDbSpeciesDir tenrec
+photoCreditURL http://www.hobbygarten.com/
+photoCreditName Kathrin Holzer, all rights reserved
+ncbiGenomeId 234
+ncbiAssemblyId 229058
+ncbiAssemblyName echTel1
+ncbiBioProject 12590
+genBankAccessionID GCA_000181355.1
+taxId 9371
+#############################################################################
+
+
 
 # DOWNLOAD SEQUENCE 
     ssh kkstore02
@@ -1051,3 +1085,350 @@ by a single Makefile. This is available from:
 
 see doc/builds.txt for specific details.
 ############################################################################
+# cpgIslands - (DONE - 2011-04-23 - Hiram)
+    mkdir /hive/data/genomes/echTel1/bed/cpgIslands
+    cd /hive/data/genomes/echTel1/bed/cpgIslands
+    time doCpgIslands.pl echTel1 > do.log 2>&1
+    #   real    958m28.796s
+    # fixing the broken command:
+    time ./doLoadCpg.csh
+    #   real    2m19.103s
+    # continuing:
+    time doCpgIslands.pl -continue=cleanup echTel1 > cleanup.log 2>&1
+    #   real    93m19.493s
+
+    cat fb.echTel1.cpgIslandExt.txt
+    #   15870914 bases of 2111581369 (0.752%) in intersection
+
+#########################################################################
+# genscan - (DONE - 2011-04-26 - Hiram)
+    mkdir /hive/data/genomes/echTel1/bed/genscan
+    cd /hive/data/genomes/echTel1/bed/genscan
+    time doGenscan.pl echTel1 > do.log 2>&1
+    # recovering from power failure, kluster run had just finished
+    # and it had just started on makeBed:
+    time ./doMakeBed.csh
+    #   real    514m42.545s
+    # continuing:
+    time doGenscan.pl -continue=load echTel1 > load.log 2>&1
+    # broken small clusters
+    time doGenscan.pl -workhorse=hgwdev -continue=cleanup echTel1 \
+        > cleanup.log 2>&1
+    #   real    20m24.981s
+
+    cat fb.echTel1.genscan.txt
+    #   76152256 bases of 2111581369 (3.606%) in intersection
+    cat fb.echTel1.genscanSubopt.txt
+    #   90237546 bases of 2111581369 (4.273%) in intersection
+
+#########################################################################
+# windowMasker - (DONE - 2012-05-02 - Hiram)
+    screen -S echTel1
+    mkdir /hive/data/genomes/echTel1/bed/windowMasker
+    cd /hive/data/genomes/echTel1/bed/windowMasker
+    # trying out new version of the script that does all the usual steps
+    #   that used to be performed manually after it was done
+    time /cluster/home/hiram/kent/src/hg/utils/automation/doWindowMasker.pl \
+        -workhorse=hgwdev -buildDir=`pwd` -dbHost=hgwdev echTel1 > do.log 2>&1
+    #   real    0m4.498s
+    # it was looking for echTel1.unmasked.2bit file, changed the doCount.csh
+    #   file to use echTel1.2bit and running that:
+    time ./doCount.csh
+    #   real    53m39.844s
+    # continuing: (with symlink in place for the unmasked.2bit file)
+    time /cluster/home/hiram/kent/src/hg/utils/automation/doWindowMasker.pl \
+        -continue=mask -workhorse=hgwdev -buildDir=`pwd` -dbHost=hgwdev \
+        echTel1 > mask.log 2>&1
+    #   real    1341m14.485s
+    # fixing a broken command in the doLoad step:
+    time ./lastLoad.csh
+    #   real    11m31.215s
+
+    time /cluster/home/hiram/kent/src/hg/utils/automation/doWindowMasker.pl \
+        -continue=cleanup -workhorse=hgwdev -buildDir=`pwd` -dbHost=hgwdev \
+        echTel1 > cleanup.log 2>&1
+    #   real    1m43.171s
+
+    sed -e 's/^/    #\t/' fb.echTel1.windowmaskerSdust.beforeClean.txt
+    #   2467260039 bases of 3823724728 (64.525%) in intersection
+    sed -e 's/^/    #\t/' fb.echTel1.windowmaskerSdust.clean.txt
+    #   755116680 bases of 3823724728 (19.748%) in intersection
+    sed -e 's/^/    #\t/' fb.echTel1.rmsk.windowmaskerSdust.txt
+    #   139935514 bases of 3823724728 (3.660%) in intersection
+
+#########################################################################
+# update repeat masker (DONE - 2012-05-09 - Hiram)
+    mkdir /hive/data/genomes/echTel1/bed/repeatMasker
+    cd /hive/data/genomes/echTel1/bed/repeatMasker
+    time doRepeatMasker.pl -buildDir=`pwd` -noSplit \
+	-bigClusterHub=swarm -dbHost=hgwdev -workhorse=hgwdev \
+	-stop=mask -smallClusterHub=encodek echTel1 > do.log 2>&1 &
+    #   real    3512m26.535s
+    # run debug to see how nestedRepeats are loaded:
+    time doRepeatMasker.pl -buildDir=`pwd` -noSplit \
+	-bigClusterHub=swarm -dbHost=hgwdev -workhorse=hgwdev -debug \
+        -stop=install -continue=install -smallClusterHub=encodek echTel1 \
+        > install.debug.log 2>&1 &
+    # using this command from doLoad.csh
+    hgLoadBed echTel1 nestedRepeats echTel1.nestedRepeats.bed \
+        -sqlTable=$HOME/kent/src/hg/lib/nestedRepeats.sql
+    #   RepeatMasker version development-$Id: RepeatMasker,v 1.26 2011/09/26
+    #   16:19:44 angie Exp $
+    grep RELEASE /hive/data/staging/data/RepeatMasker110426/Libraries/RepeatMaskerLib.embl
+    # Library version:  CC   RELEASE 20110920; 
+
+    cat faSize.rmsk.txt
+# 3823724728 bases (1712143359 N's 2111581369 real 1541218499 upper 570362870 lower) in 325491 sequences in 1 files
+# Total size: mean 11747.6 sd 25476.7 min 80 (scaffold_153914) max 739734 (scaffold_324606) median 3912
+# %14.92 masked total, %27.01 masked real
+
+    # what is currently loaded:
+    time featureBits echTel1 rmsk
+    #   291821962 bases of 2111581369 (13.820%) in intersection
+    #   real    10m21.908s
+
+    # Is this run different:
+    hgLoadOut -table=rmskTest -nosplit echTel1 echTel1.sorted.fa.out
+    time featureBits echTel1 rmskTest
+    #   573346920 bases of 2111581369 (27.152%) in intersection
+    #   real    6m30.717s
+
+    # the original was run with -species tenrec
+    # this new one is with -species 'Echinops telfairi'
+    # which does have a few more repeat definitions, but not that many
+    grep "^>" /hive/data/staging/data/RepeatMasker110426/Libraries/20110920/tenrec/* | wc
+    #   1295    1295  127870
+    grep "^>" /hive/data/staging/data/RepeatMasker110426/Libraries/20110920/echinops_telfairi/* | wc
+    #   1410    1410  154902
+
+    # since the new one has significant more masking, going to replace
+    # the old one:
+    time doRepeatMasker.pl -buildDir=`pwd` -noSplit \
+	-bigClusterHub=swarm -dbHost=hgwdev -workhorse=hgwdev \
+        -continue=install -smallClusterHub=encodek echTel1 > install.log 2>&1 &
+    #   real    21m23.234s
+
+    # and then, masking the genome with this new rmsk business,
+    # add trfMask to rmsk:
+    cd /hive/data/genomes/echTel1
+    twoBitMask echTel1.rmsk.2bit \
+	-add bed/simpleRepeat/trfMask.bed echTel1.2bit
+    #	you can safely ignore the warning about fields >= 13
+
+    twoBitToFa echTel1.2bit stdout | faSize stdin > faSize.echTel1.2bit.txt
+    cat faSize.echTel1.2bit.txt
+    #   3823724728 bases (1712143359 N's 2111581369 real 1540894161 upper
+    #   570687208 lower) in 325491 sequences in 1 files
+    #   Total size: mean 11747.6 sd 25476.7 min 80 (scaffold_153914) max 739734 (scaffold_324606) median 3912
+    #   %14.92 masked total, %27.03 masked real
+
+    # the original masked 2bit file was:
+    #   3823724728 bases (1712143359 N's 2111581369 real 1819400226 upper
+    #   292181143 lower) in 325491 sequences in 1 files
+    #   Total size: mean 11747.6 sd 25476.7 min 80 (scaffold_153914)
+    #   max 739734 (scaffold_324606) median 3912
+    #   %7.64 masked total, %13.84 masked real
+
+    # verify gbdb symlink is correct:
+    ls -ogL /gbdb/echTel1/echTel1.2bit
+# -rw-rw-r-- 1 993224202 May 24 14:04 /gbdb/echTel1/echTel1.2bit
+    # if it is not correct, reset it:
+    rm /gbdb/echTel1/echTel1.2bit
+    ln -s `pwd`/echTel1.2bit /gbdb/echTel1/echTel1.2bit
+
+#########################################################################
+# construct gc5Base track (DONE - 2012-05-24 - Hiram)
+    # from the automation script template:
+export topDir=../..
+export db=echTel1
+
+hgGcPercent -wigOut -doGaps -file=stdout -win=5 -verbose=0 $db \
+  $topDir/$db.2bit | gzip -c > $db.gc5Base.wigVarStep.gz 
+wigToBigWig $db.gc5Base.wigVarStep.gz ../../chrom.sizes $db.gc5Base.bw
+    #   real    19m21.718s
+
+    mkdir /gbdb/echTel1/bbi
+    ln -s /cluster/data/echTel1/bed/gc5Base/echTel1.gc5Base.bw \
+        /gbdb/echTel1/bbi/gc5Base.bw
+    hgsql echTel1 -e 'drop table if exists gc5BaseBw;
+            create table gc5BaseBw (fileName varchar(255) not null);
+            insert into gc5BaseBw values ("/gbdb/echTel1/bbi/gc5Base.bw");'
+
+#########################################################################
+# create downloads and pushQ entry (DONE - 2012-05-24 - Hiram)
+    # first make sure all.joiner is up to date and has this new organism
+    # a keys check should be clean:
+    cd ~/kent/src/hg/makeDb/schema
+    joinerCheck -database=echTel1 -keys all.joiner
+
+    cd /hive/data/genomes/echTel1
+    time makeDownloads.pl -workhorse hgwdev echTel1 > download.log 2>&1
+    #   real    26m13.940s
+
+    mkdir /hive/data/genomes/echTel1/pushQ
+    cd /hive/data/genomes/echTel1/pushQ
+    time makePushQSql.pl echTel1 > echTel1.sql 2> stderr.out
+    #   real    4m1.136s
+    # check stderr.out for no significant problems, it is common to see:
+WARNING: hgwdev does not have /gbdb/echTel1/wib/gc5Base.wib
+WARNING: hgwdev does not have /gbdb/echTel1/wib/quality.wib
+WARNING: hgwdev does not have /gbdb/echTel1/bbi/quality.bw
+WARNING: echTel1 does not have seq
+WARNING: echTel1 does not have extFile
+WARNING: echTel1 does not have estOrientInfo
+WARNING: echTel1 does not have gbMiscDiff
+WARNING: echTel1 does not have gbWarn
+WARNING: echTel1 does not have mrnaOrientInfo
+WARNING: hgwdev does not have chain/net download /gbdb/echTel1/liftOver/echTel1ToMm7.over.chain.gz !
+
+WARNING: Could not tell (from trackDb, all.joiner and hardcoded lists of
+supporting and genbank tables) which tracks to assign these tables to:
+  tableList
+
+    # Remove the Mm7 references from echTel1.sql and tableList is not
+    # important, in fact, drop that table
+
+    scp -p echTel1.sql hgwbeta:/tmp
+    ssh hgwbeta
+    cd /tmp
+    hgsql qapushq < echTel1.sql
+
+#########################################################################
+# quality table loaded (DONE - 2008-11-24 - Hiram)
+    mkdir /hive/data/genomes/echTel1/bed/qual
+    cd /hive/data/genomes/echTel1/bed/qual
+    qacToWig -fixed ../../broad/scaffolds.qac stdout \
+        | wigEncode stdin qual.wig qual.wib
+    ln -s `pwd`/qual.wib /gbdb/echTel1/wib
+    hgLoadWiggle -pathPrefix=/gbdb/echTel1/wib echTel1 quality qual.wig
+    wigTableStats.sh  echTel1 quality
+# db.table      min max mean count sumData stdDev viewLimits
+echTel1.quality 0 68 24.872 3823724728 9.51037e+10 23.6258 viewLimits=0:68
+
+#########################################################################
+# fixup search rules for the gold track (DONE - 2012-06-04 - Hiram)
+    # scan the names to see if there is a pattern:
+    hgsql -N -e "select frag from gold;" echTel1 | sort | head
+contig_0
+    hgsql -N -e "select frag from gold;" echTel1 | sort | tail
+contig_99990
+    # the pattern appears to be: contig_[0-9]+
+    # this search rule in trackDb/tenrec/trackDb.ra seems to work:
+searchTable gold
+searchMethod exact
+searchType gold
+shortCircuit 1
+termRegex contig_[0-9]+
+searchPriority 8
+
+#########################################################################
+# fixup search rules for the ensemblGeneScaffold (DONE - 2012-06-04 - Hiram)
+    # scan the names to see if there is a pattern:
+    hgsql -N -e "select name from ensemblGeneScaffold;" echTel1 | sort | head
+GS_1.1
+    hgsql -N -e "select name from ensemblGeneScaffold;" echTel1 | sort | tail
+GS_999.6
+    # the pattern appears to be: GS_[0-9]+(\.[0-9]+)?
+    # to get the option of searching for GS_999 or GS_999.6
+    # this search rule in trackDb/tenrec/trackDb.ra seems to work:
+searchTable ensemblGeneScaffold
+searchMethod exact
+searchType bed
+shortCircuit 1
+termRegex GS_[0-9]+(\.[0-9]+)?
+searchPriority 18
+
+#########################################################################
+# MAKE 11.OOC FILE FOR BLAT/GENBANK (DONE - 2012-06-07 - Hiram)
+    cd /hive/data/genomes/echTel1
+    twoBitToFa echTel1.2bit stdout | faSize stdin
+# 3823724728 bases (1712143359 N's 2111581369 real 1540894161 upper
+#       570687208 lower) in 325491 sequences in 1 files
+# Total size: mean 11747.6 sd 25476.7 min 80 (scaffold_153914)
+#       max 739734 (scaffold_324606) median 3912
+# %14.92 masked total, %27.03 masked real
+
+    # Use -repMatch=900, based on size -- for human we use 1024
+    # use the "real" number from the faSize measurement,
+    # hg19 is 2897316137, calculate the ratio factor for 1024:
+    calc \( 2111581369 / 2897316137 \) \* 1024
+    #   ( 2111581369 / 2897316137 ) * 1024 = 746.297339
+
+    # round up to 800
+
+    cd /hive/data/genomes/echTel1
+    time blat echTel1.2bit /dev/null /dev/null -tileSize=11 \
+      -makeOoc=jkStuff/echTel1.11.ooc -repMatch=800
+    #   Wrote 19852 overused 11-mers to jkStuff/echTel1.11.ooc
+    #   real    3m3.527s
+
+    # there are no non-bridged gaps, no lift file needed for genbank
+    hgsql -N -e "select bridge from gap;" echTel1 | sort | uniq -c
+    #   495481 yes
+#    cd /hive/data/genomes/echTel1/jkStuff
+#    gapToLift echTel1 echTel1.nonBridged.lift -bedFile=echTel1.nonBridged.bed
+    # largest non-bridged contig:
+#    awk '{print $3-$2,$0}' echTel1.nonBridged.bed | sort -nr | head
+    #   123773608 chrX  95534   123869142       chrX.01
+
+
+#########################################################################
+# AUTO UPDATE GENBANK (DONE - 2012-06-07 - 2012-06-22 - Hiram)
+    # since the original genbank run was done in 2005 and daily updates
+    #   were never run, start over with an initial run.
+    # examine the file:
+    /cluster/data/genbank/data/organism.lst
+    # for your species to see what counts it has for:
+# organism       mrnaCnt estCnt  refSeqCnt
+# Echinops telfairi       4       0       0
+    # to decide which "native" mrna or ests you want to specify in genbank.conf
+
+    ssh hgwdev
+    cd $HOME/kent/src/hg/makeDb/genbank
+    git pull
+    # fixup existing entry:
+# echTel1 (tenrec)
+echTel1.serverGenome = /hive/data/genomes/echTel1/echTel1.2bit
+echTel1.clusterGenome = /scratch/data/echTel1/echTel1.2bit
+echTel1.ooc = /hive/data/genomes/echTel1/jkStuff/echTel1.11.ooc
+echTel1.lift = no
+echTel1.refseq.mrna.native.pslCDnaFilter  = ${lowCover.refseq.mrna.native.pslCDnaFilter}
+echTel1.refseq.mrna.xeno.pslCDnaFilter    = ${lowCover.refseq.mrna.xeno.pslCDnaFilter}
+echTel1.genbank.mrna.native.pslCDnaFilter = ${lowCover.genbank.mrna.native.pslCDnaFilter}
+echTel1.genbank.mrna.xeno.pslCDnaFilter   = ${lowCover.genbank.mrna.xeno.pslCDnaFilter}
+echTel1.genbank.est.native.pslCDnaFilter  = ${lowCover.genbank.est.native.pslCDnaFilter}
+echTel1.refseq.mrna.native.load = no
+echTel1.refseq.mrna.xeno.load = yes
+echTel1.genbank.mrna.xeno.load = yes
+echTel1.genbank.est.native.load = no
+echTel1.downloadDir = echTel1
+echTel1.perChromTables = no
+
+    git commit -m "add ooc file for tenrec/echTel1" etc/genbank.conf
+    git push
+    make etc-update
+
+    ssh hgwdev			# used to do this on "genbank" machine
+    screen -S echTel1           # long running job managed in screen
+    cd /cluster/data/genbank
+    time nice -n +19 ./bin/gbAlignStep -initial echTel1 &
+    #   var/build/logs/2012.06.22-12:25:58.echTel1.initalign.log
+    #   real    277m20.096s
+
+    # load database when finished
+    ssh hgwdev
+    cd /cluster/data/genbank
+    time nice -n +19 ./bin/gbDbLoadStep -drop -initialLoad echTel1 &
+    #	logFile:  var/dbload/hgwdev/logs/2012.06.22-21:34:18.dbload.log
+    real    47m54.296s
+
+    # enable daily alignment and update of hgwdev
+    cd ~/kent/src/hg/makeDb/genbank
+    git pull
+    # add echTel1 to:
+    vi etc/align.dbs etc/hgwdev.dbs
+    git commit -m "Added echTel1." etc/align.dbs etc/hgwdev.dbs
+    git push
+    make etc-update
+
+#########################################################################

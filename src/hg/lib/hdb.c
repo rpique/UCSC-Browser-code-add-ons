@@ -98,6 +98,8 @@ struct hash *infoHash = NULL;
 struct hashEl *dHel = NULL;
 struct chromInfo *ci = NULL;
 char upcName[HDB_MAX_CHROM_STRING];
+if (strlen(chrom) >= HDB_MAX_CHROM_STRING)
+    return NULL;
 safef(upcName, sizeof(upcName), "%s", chrom);
 touppers(upcName);
 
@@ -3831,11 +3833,8 @@ struct trackDb *hTrackDbForTrackAndAncestors(char *db, char *track)
  * is actually faster if being called on lots of tracks.  This function
  * though is faster on one or two tracks. */
 {
-#define HGAPI_NEEDS_THIS
-#ifdef HGAPI_NEEDS_THIS
-if (isHubTrack(track))
+if (isHubTrack(track))    // hgApi needs this
     return tdbForTrack(db, track,NULL);
-#endif///def HGAPI_NEEDS_THIS
 
 struct sqlConnection *conn = hAllocConn(db);
 struct trackDb *tdb = loadTrackDbForTrack(conn, track);
@@ -4743,6 +4742,42 @@ else
 return buffer;
 }
 
+INLINE boolean isAllDigits(char *str)
+/* Return TRUE if every character in str is a digit. */
+{
+char *p = str;
+while (*p != '\0')
+    if (!isdigit(*p++))
+	return FALSE;
+return TRUE;
+}
+
+boolean parsePosition(char *position, char **retChrom, uint *retStart, uint *retEnd)
+/* If position is word:number-number (possibly with commas & whitespace),
+ * set retChrom, retStart (subtracting 1) and retEnd, and return TRUE.
+ * Otherwise return FALSE and leave rets unchanged. */
+{
+char *chrom = cloneString(position);
+stripChar(chrom, ',');
+eraseWhiteSpace(chrom);
+char *startStr = strchr(chrom, ':');
+if (startStr == NULL)
+    return FALSE;
+*startStr++ = '\0';
+char *endStr = strchr(startStr, '-');
+if (endStr == NULL)
+    return FALSE;
+*endStr++ = '\0';
+if (!isAllDigits(startStr))
+    return FALSE;
+if (!isAllDigits(endStr))
+    return FALSE;
+*retChrom = chrom;
+*retStart = sqlUnsigned(startStr) - 1;
+*retEnd = sqlUnsigned(endStr);
+return TRUE;
+}
+
 static struct grp* loadGrps(char *db, char *confName, char *defaultTbl)
 /* load all of the grp rows from a table.  The table name is first looked up
  * in hg.conf with confName. If not there, use defaultTbl.  If the table
@@ -5056,17 +5091,54 @@ boolean hIsBigBed(char *database, char *table, struct trackDb *parent, struct cu
 return trackIsType(database, table, parent, "bigBed", ctLookupName);
 }
 
-char *bbiNameFromSettingOrTable(struct trackDb *tdb, struct sqlConnection *conn, char *table)
-/* Return file name from bigDataUrl or little table. */
+static char *bbiNameFromTableChrom(struct sqlConnection *conn, char *table, char *seqName)
+/* Return file name from table.  If table has a seqName column, then grab the
+ * row associated with chrom (which can be e.g. '1' not 'chr1' if that is the
+ * case in the big remote file). */
 {
-char *fileName = cloneString(trackDbSetting(tdb, "bigDataUrl"));
+boolean checkSeqName = (sqlFieldIndex(conn, table, "seqName") >= 0);
+if (checkSeqName && seqName == NULL)
+    errAbort("bamFileNameFromTable: table %s has seqName column, but NULL seqName passed in",
+	     table);
+char query[512];
+if (checkSeqName)
+    safef(query, sizeof(query), "select fileName from %s where seqName = '%s'",
+	  table, seqName);
+else
+    safef(query, sizeof(query), "select fileName from %s", table);
+char *fileName = sqlQuickString(conn, query);
+if (fileName == NULL && checkSeqName)
+    {
+    if (startsWith("chr", seqName))
+	safef(query, sizeof(query), "select fileName from %s where seqName = '%s'",
+	      table, seqName+strlen("chr"));
+    else
+	safef(query, sizeof(query), "select fileName from %s where seqName = 'chr%s'",
+	      table, seqName);
+    fileName = sqlQuickString(conn, query);
+    }
 if (fileName == NULL)
     {
-    char query[256];
-    safef(query, sizeof(query), "select fileName from %s", table);
-    fileName = sqlQuickString(conn, query);
-    if (fileName == NULL)
+    if (checkSeqName)
+	errAbort("Missing fileName for seqName '%s' in %s table", seqName, table);
+    else
 	errAbort("Missing fileName in %s table", table);
     }
 return fileName;
+}
+
+char *bbiNameFromSettingOrTableChrom(struct trackDb *tdb, struct sqlConnection *conn, char *table,
+				     char *seqName)
+/* Return file name from bigDataUrl or little table (which might have a seqName column). */
+{
+char *fileName = cloneString(trackDbSetting(tdb, "bigDataUrl"));
+if (fileName == NULL)
+    fileName = bbiNameFromTableChrom(conn, table, seqName);
+return fileName;
+}
+
+char *bbiNameFromSettingOrTable(struct trackDb *tdb, struct sqlConnection *conn, char *table)
+/* Return file name from bigDataUrl or little table. */
+{
+return bbiNameFromSettingOrTableChrom(tdb, conn, table, NULL);
 }
