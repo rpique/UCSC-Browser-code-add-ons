@@ -25,6 +25,19 @@ scripts:
 
 alpha: scripts all
 
+docs:
+	@echo Type ^D enter and \q to make it
+	cd $(BINDIR); \
+	for file in *; do \
+	  echo ======================================; \
+	  echo + $$file; \
+	  echo --------------------------------------; \
+	  ./$$file; \
+	done &>~/ucscDoc.txt
+	grep -A2 '^---------' ~/ucscDoc.txt | grep -v '^--' | grep -v 'usage' > ~/ucscDocSummary.txt
+	scp ~/ucscDocSummary.txt $WEBWOLFY
+	scp ~/ucscDoc.txt $WEBWOLFY
+
 test:
 	cd faToTwoBit && ${MAKE} test
 	cd twoBitToFa && ${MAKE} test
