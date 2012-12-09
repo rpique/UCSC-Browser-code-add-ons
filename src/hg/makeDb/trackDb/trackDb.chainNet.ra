@@ -876,6 +876,57 @@ html chainNet
         type netAlign fr1 chainFr1
         html chainNet
 
+track chainNetLatCha1
+compositeTrack on
+shortLabel $o_Organism Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 245.3
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 91,-90,-25,-100,-90,100,-100,-25,-25,-100,100,-90,-100,-25,-90,91
+matrixHeader A, C, G, T
+otherDb latCha1
+chainMinScore 2000
+chainLinearGap medium
+spectrum on
+html chainNet
+
+    track chainNetLatCha1Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetLatCha1
+    spectrum on
+
+        track chainLatCha1
+        parent chainNetLatCha1Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain latCha1
+        html chainNet
+
+    track chainNetLatCha1Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetLatCha1
+
+        track netLatCha1
+        parent chainNetLatCha1Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment Net
+        type netAlign latCha1 chainLatCha1
+        html chainNet
+
 track chainNetTetNig2
 compositeTrack on
 shortLabel $o_Organism Chain/Net
@@ -976,6 +1027,57 @@ html chainNet
         shortLabel $o_Organism Net
         longLabel $o_Organism ($o_date) Alignment Net
         type netAlign tetNig1 chainTetNig1
+        html chainNet
+
+track chainNetGadMor1
+compositeTrack on
+shortLabel $o_Organism Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 235.3
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 91,-90,-25,-100,-90,100,-100,-25,-25,-100,100,-90,-100,-25,-90,91
+matrixHeader A, C, G, T
+otherDb gadMor1
+chainMinScore 2000
+chainLinearGap medium
+spectrum on
+html chainNet
+
+    track chainNetGadMor1Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetGadMor1
+    spectrum on
+
+        track chainGadMor1
+        parent chainNetGadMor1Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain gadMor1
+        html chainNet
+
+    track chainNetGadMor1Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetGadMor1
+
+        track netGadMor1
+        parent chainNetGadMor1Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment Net
+        type netAlign gadMor1 chainGadMor1
         html chainNet
 
 track chainNetDanRer7
@@ -1488,6 +1590,57 @@ html chainNet
         type netAlign xenTro1 chainXenTro1
         html chainNet
 
+track chainNetOreNil2
+compositeTrack on
+shortLabel $o_db Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 215.3
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 91,-90,-25,-100,-90,100,-100,-25,-25,-100,100,-90,-100,-25,-90,91
+matrixHeader A, C, G, T
+otherDb oreNil2
+chainMinScore 2000
+chainLinearGap medium
+spectrum on
+html chainNet
+
+    track chainNetOreNil2Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetOreNil2
+    spectrum on
+
+        track chainOreNil2
+        parent chainNetOreNil2Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain oreNil2
+        html chainNet
+
+    track chainNetOreNil2Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetOreNil2
+
+        track netOreNil2
+        parent chainNetOreNil2Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment Net
+        type netAlign oreNil2 chainOreNil2
+        html chainNet
+
 track chainNetOreNil1
 compositeTrack on
 shortLabel $o_Organism Chain/Net
@@ -1701,6 +1854,57 @@ html chainNet
         type netAlign gasAcu1 chainGasAcu1
         html chainNet
 
+track chainNetGalGal4
+compositeTrack on
+shortLabel $o_Organism Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 181
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 91,-114,-31,-123,-114,100,-125,-31,-31,-125,100,-114,-123,-31,-114,91
+matrixHeader A, C, G, T
+otherDb galGal4
+chainMinScore 3000
+chainLinearGap medium
+spectrum on
+html chainNet
+
+    track chainNetGalGal4Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetGalGal4
+    spectrum on
+
+        track chainGalGal4
+        parent chainNetGalGal4Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain galGal4
+        html chainNet
+
+    track chainNetGalGal4Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetGalGal4
+
+        track netGalGal4
+        parent chainNetGalGal4Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment Net
+        type netAlign galGal4 chainGalGal4
+        html chainNet
+
 track chainNetGalGal3
 compositeTrack on
 shortLabel $o_Organism Chain/Net
@@ -1907,6 +2111,108 @@ html chainNet
         type netAlign taeGut1 chainTaeGut1
         html chainNet
 
+track chainNetMelUnd1
+compositeTrack on
+shortLabel $o_Organism Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 181
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 91,-90,-25,-100,-90,100,-100,-25,-25,-100,100,-90,-100,-25,-90,91
+matrixHeader A, C, G, T
+otherDb melUnd1
+chainMinScore 5000
+chainLinearGap loose
+spectrum on
+html chainNet
+
+    track chainNetMelUnd1Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetMelUnd1
+    spectrum on
+
+        track chainMelUnd1
+        parent chainNetMelUnd1Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain melUnd1
+        html chainNet
+
+    track chainNetMelUnd1Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetMelUnd1
+
+        track netMelUnd1
+        parent chainNetMelUnd1Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment Net
+        type netAlign melUnd1 chainMelUnd1
+        html chainNet
+
+track chainNetGeoFor1
+compositeTrack on
+shortLabel $o_Organism Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 181
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 91,-90,-25,-100,-90,100,-100,-25,-25,-100,100,-90,-100,-25,-90,91
+matrixHeader A, C, G, T
+otherDb geoFor1
+chainMinScore 5000
+chainLinearGap loose
+spectrum on
+html chainNet
+
+    track chainNetGeoFor1Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetGeoFor1
+    spectrum on
+
+        track chainGeoFor1
+        parent chainNetGeoFor1Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain geoFor1
+        html chainNet
+
+    track chainNetGeoFor1Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetGeoFor1
+
+        track netGeoFor1
+        parent chainNetGeoFor1Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment Net
+        type netAlign geoFor1 chainGeoFor1
+        html chainNet
+
 track chainNetOrnAna1
 compositeTrack on
 shortLabel $o_Organism Chain/Net
@@ -2060,7 +2366,15 @@ html chainNet
         type netAlign anoCar1 chainAnoCar1
         html chainNet
 
-track chainNetPetMar1
+# changes to perMar[12] here need to also correspond to
+# the same tags in mouse/mm10/trackDb.vertebrateChainNet.ra
+# and the chainNetPetMar1 override in medaka/trackDb.chainNet.ra
+
+include chainNetPetMar2.ra alpha
+
+include chainNetPetMar1.ra beta,public
+
+track chainNetBraFlo2
 compositeTrack on
 shortLabel $o_Organism Chain/Net
 longLabel $o_Organism ($o_date), Chain and Net Alignments
@@ -2069,46 +2383,46 @@ dragAndDrop subTracks
 visibility hide
 group compGeno
 noInherit on
-priority 191
+priority 660.3
 color 0,0,0
 altColor 100,50,0
 type bed 3
 sortOrder view=+
 matrix 16 91,-90,-25,-100,-90,100,-100,-25,-25,-100,100,-90,-100,-25,-90,91
 matrixHeader A, C, G, T
-otherDb petMar1
+otherDb braFlo2
 chainMinScore 5000
 chainLinearGap loose
 spectrum on
 html chainNet
 
-    track chainNetPetMar1Viewchain
+    track chainNetBraFlo2Viewchain
     shortLabel Chain
     view chain
     visibility pack
-    parent chainNetPetMar1
+    parent chainNetBraFlo2
     spectrum on
 
-        track chainPetMar1
-        parent chainNetPetMar1Viewchain
+        track chainBraFlo2
+        parent chainNetBraFlo2Viewchain
         subGroups view=chain
         shortLabel $o_Organism Chain
         longLabel $o_Organism ($o_date) Chained Alignments
-        type chain petMar1
+        type chain braFlo2
         html chainNet
 
-    track chainNetPetMar1Viewnet
+    track chainNetBraFlo2Viewnet
     shortLabel Net
     view net
     visibility full
-    parent chainNetPetMar1
+    parent chainNetBraFlo2
 
-        track netPetMar1
-        parent chainNetPetMar1Viewnet
+        track netBraFlo2
+        parent chainNetBraFlo2Viewnet
         subGroups view=net
         shortLabel $o_Organism Net
         longLabel $o_Organism ($o_date) Alignment Net
-        type netAlign petMar1 chainPetMar1
+        type netAlign braFlo2 chainBraFlo2
         html chainNet
 
 track chainNetBraFlo1
@@ -2120,7 +2434,7 @@ dragAndDrop subTracks
 visibility hide
 group compGeno
 noInherit on
-priority 191
+priority 660.3
 color 0,0,0
 altColor 100,50,0
 type bed 3
@@ -2959,6 +3273,58 @@ html chainNet
     type netAlign mm5 chainMm5
     html chainNet
 
+
+track chainNetRn5
+compositeTrack on
+shortLabel $o_Organism Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 209
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 91,-114,-31,-123,-114,100,-125,-31,-31,-125,100,-114,-123,-31,-114,91
+matrixHeader A, C, G, T
+otherDb rn5
+chainMinScore 3000
+chainLinearGap medium
+spectrum on
+html chainNet
+
+    track chainNetRn5Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetRn5
+    spectrum on
+
+        track chainRn5
+        parent chainNetRn5Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain rn5
+        html chainNet
+
+    track chainNetRn5Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetRn5
+
+        track netRn5
+        parent chainNetRn5Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment Net
+        type netAlign rn5 chainRn5
+        html chainNet
+
 track chainNetRn4
 compositeTrack on
 shortLabel $o_Organism Chain/Net
@@ -3526,6 +3892,210 @@ html chainNet
         type netAlign dasNov1 chainDasNov1
         html chainNet
 
+track chainNetTurTru2
+compositeTrack on
+shortLabel $o_Organism Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 460.3
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 91,-114,-31,-123,-114,100,-125,-31,-31,-125,100,-114,-123,-31,-114,91
+matrixHeader A, C, G, T
+otherDb turTru2
+chainMinScore 3000
+chainLinearGap medium
+spectrum on
+html chainNet
+
+    track chainNetTurTru2Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetTurTru2
+    spectrum on
+
+        track chainTurTru2
+        parent chainNetTurTru2Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain turTru2
+        html chainNet
+
+    track chainNetTurTru2Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetTurTru2
+
+        track netTurTru2
+        parent chainNetTurTru2Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment Net
+        type netAlign turTru2 chainTurTru2
+        html chainNet
+
+track chainNetTurTru1
+compositeTrack on
+shortLabel $o_Organism Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 460.3
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 91,-114,-31,-123,-114,100,-125,-31,-31,-125,100,-114,-123,-31,-114,91
+matrixHeader A, C, G, T
+otherDb turTru1
+chainMinScore 3000
+chainLinearGap medium
+spectrum on
+html chainNet
+
+    track chainNetTurTru1Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetTurTru1
+    spectrum on
+
+        track chainTurTru1
+        parent chainNetTurTru1Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain turTru1
+        html chainNet
+
+    track chainNetTurTru1Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetTurTru1
+
+        track netTurTru1
+        parent chainNetTurTru1Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment Net
+        type netAlign turTru1 chainTurTru1
+        html chainNet
+
+track chainNetVicPac1
+compositeTrack on
+shortLabel $o_Organism Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 470.3
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 91,-114,-31,-123,-114,100,-125,-31,-31,-125,100,-114,-123,-31,-114,91
+matrixHeader A, C, G, T
+otherDb vicPac1
+chainMinScore 3000
+chainLinearGap medium
+spectrum on
+html chainNet
+
+    track chainNetVicPac1Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetVicPac1
+    spectrum on
+
+        track chainVicPac1
+        parent chainNetVicPac1Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain vicPac1
+        html chainNet
+
+    track chainNetVicPac1Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetVicPac1
+
+        track netVicPac1
+        parent chainNetVicPac1Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment Net
+        type netAlign vicPac1 chainVicPac1
+        html chainNet
+
+track chainNetSusScr3
+compositeTrack on
+shortLabel $o_Organism Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 475.3
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 91,-114,-31,-123,-114,100,-125,-31,-31,-125,100,-114,-123,-31,-114,91
+matrixHeader A, C, G, T
+otherDb susScr3
+chainMinScore 3000
+chainLinearGap medium
+spectrum on
+html chainNet
+
+    track chainNetSusScr3Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetSusScr3
+    spectrum on
+
+        track chainSusScr3
+        parent chainNetSusScr3Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain susScr3
+        html chainNet
+
+    track chainNetSusScr3Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetSusScr3
+
+        track netSusScr3
+        parent chainNetSusScr3Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment Net
+        type netAlign susScr3 chainSusScr3
+        html chainNet
+
 track chainNetSusScr2
 compositeTrack on
 shortLabel $o_Organism Chain/Net
@@ -4037,6 +4607,57 @@ html chainNet
         type netAlign ailMel1 chainAilMel1
         html chainNet
 
+track chainNetCanFam3
+compositeTrack on
+shortLabel $o_Organism Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 240
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 91,-114,-31,-123,-114,100,-125,-31,-31,-125,100,-114,-123,-31,-114,91
+matrixHeader A, C, G, T
+otherDb canFam3
+chainMinScore 3000
+chainLinearGap medium
+spectrum on
+html chainNet
+
+    track chainNetCanFam3Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetCanFam3
+    spectrum on
+
+        track chainCanFam3
+        parent chainNetCanFam3Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain canFam3
+        html chainNet
+
+    track chainNetCanFam3Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetCanFam3
+
+        track netCanFam3
+        parent chainNetCanFam3Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment Net
+        type netAlign canFam3 chainCanFam3
+        html chainNet
+
 track chainNetCanFam2
 compositeTrack on
 shortLabel $o_Organism Chain/Net
@@ -4189,6 +4810,58 @@ html chainNet
         longLabel $o_Organism ($o_date) Alignment Net
         type netAlign felCat3 chainFelCat3
         html chainNet
+
+track chainNetCerSim1
+compositeTrack on
+shortLabel $o_Organism Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 435.3
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 91,-114,-31,-123,-114,100,-125,-31,-31,-125,100,-114,-123,-31,-114,91
+matrixHeader A, C, G, T
+otherDb cerSim1
+chainMinScore 3000
+chainLinearGap medium
+spectrum on
+html chainNet
+
+    track chainNetCerSim1Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetCerSim1
+    spectrum on
+
+        track chainCerSim1
+        parent chainNetCerSim1Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain cerSim1
+        html chainNet
+
+    track chainNetCerSim1Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetCerSim1
+
+        track netCerSim1
+        parent chainNetCerSim1Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment Net
+        type netAlign cerSim1 chainCerSim1
+        html chainNet
+
 
 track chainNetMicMur1
 compositeTrack on
@@ -4537,6 +5210,56 @@ html chainNet
         shortLabel $o_Organism Net
         longLabel $o_Organism ($o_date) Alignment net
         type netAlign hg17 chainHg17
+        html chainNet
+
+track chainNetPanTro4
+compositeTrack on
+shortLabel $o_Organism Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 498
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 90,-330,-236,-356,-330,100,-318,-236,-236,-318,100,-330,-356,-236,-330,90
+matrixHeader A, C, G, T
+otherDb panTro4
+chainMinScore 5000
+chainLinearGap medium
+html chainNet
+
+    track chainNetPanTro4Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetPanTro4
+    spectrum on
+
+        track chainPanTro4
+        parent chainNetPanTro4Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain panTro4
+        html chainNet
+
+    track chainNetPanTro4Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetPanTro4
+
+        track netPanTro4
+        parent chainNetPanTro4Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment net
+        type netAlign panTro4 chainPanTro4
         html chainNet
 
 track chainNetPanTro3
@@ -5138,6 +5861,57 @@ html chainNet
         longLabel $o_Organism ($o_date) Alignment net
         type netAlign papHam1 chainPapHam1
         html chainNet
+
+track chainNetRheMac3
+compositeTrack on
+shortLabel $o_Organism Chain/Net
+longLabel $o_Organism ($o_date), Chain and Net Alignments
+subGroup1 view Views chain=Chain net=Net
+dragAndDrop subTracks
+visibility hide
+group compGeno
+noInherit on
+priority 498
+color 0,0,0
+altColor 100,50,0
+type bed 3
+sortOrder view=+
+matrix 16 91,-114,-31,-123,-114,100,-125,-31,-31,-125,100,-114,-123,-31,-114,91
+matrixHeader A, C, G, T
+otherDb rheMac3
+chainMinScore 3000
+chainLinearGap medium
+html chainNet
+
+    track chainNetRheMac3Viewchain
+    shortLabel Chain
+    view chain
+    visibility pack
+    parent chainNetRheMac3
+    spectrum on
+
+       track chainRheMac3
+        parent chainNetRheMac3Viewchain
+        subGroups view=chain
+        shortLabel $o_Organism Chain
+        longLabel $o_Organism ($o_date) Chained Alignments
+        type chain rheMac3
+        html chainNet
+
+    track chainNetRheMac3Viewnet
+    shortLabel Net
+    view net
+    visibility full
+    parent chainNetRheMac3
+
+        track netRheMac3
+        parent chainNetRheMac3Viewnet
+        subGroups view=net
+        shortLabel $o_Organism Net
+        longLabel $o_Organism ($o_date) Alignment net
+        type netAlign rheMac3 chainRheMac3
+        html chainNet
+
 
 track chainNetRheMac2
 compositeTrack on

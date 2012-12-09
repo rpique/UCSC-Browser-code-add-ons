@@ -67,7 +67,8 @@ CREATE TABLE GroupVersions (
 	location_count int NOT NULL ,
 	ccds_status_val_uid int NOT NULL ,
 	ccds_version int NULL ,
-	was_public tinyint(1) NOT NULL 
+	was_public tinyint(1) NOT NULL ,
+        build_uid int NOT NULL 
 ) 
 ;
 
@@ -193,7 +194,8 @@ CREATE TABLE CcdsStatistics (
         tax_id int NOT NULL ,
         ncbi_build_number int NOT NULL ,
         ncbi_build_version int NOT NULL ,
-        statistics_html text NULL
+        statistics_html text NULL ,
+        build_uid int NOT NULL 
 ) 
 ;
 
@@ -203,10 +205,13 @@ CREATE TABLE Builds (
         tax_id int NOT NULL ,
         ncbi_build_number int NOT NULL ,
         ncbi_build_version int NOT NULL,
-        ensembl_build_number int NULL ,
+        ensembl_build_number int NOT NULL ,
         assembly_acc varchar (16) NOT NULL ,
         assembly_version int NOT NULL ,
-        assembly_name varchar (16) NOT NULL
+        assembly_name varchar (16) NOT NULL ,
+        prev_build_uid int NULL ,
+        date_created datetime NOT NULL ,
+        date_made_public datetime NULL
 
 ) 
 ;
@@ -240,7 +245,6 @@ CREATE TABLE ProspectiveGroups (
         chr_start int NOT NULL ,
         chr_stop int NOT NULL ,
         prospective_status_val_uid int NOT NULL
-
 ) 
 ;
 

@@ -20,17 +20,19 @@ set testingDir = $scratchDir/ucscGenes
 
 # Databases
 set db = mm10
+set Db = Mm10
+set oldDb = mm9
 set xdb = hg19
 set Xdb = Hg19
 set ydb = canFam3
-set zdb = rn5
+set zdb = rn4
 set spDb = sp120323 
 #set pbDb = proteins111004
-set ratDb = rn5
-set RatDb = Rn5
+set ratDb = rn4
+set RatDb = Rn4
 set fishDb = danRer7
 set flyDb = dm3
-set wormDb = ce10
+set wormDb = ce6
 set yeastDb = sacCer3
 
 # The net alignment for the closely-related species indicated in $xdb
@@ -60,8 +62,8 @@ set tempDb = mm10
 #set snpTable = snp130
 
 # Public version number
-#set lastVer = 5
-set curVer = 1
+set lastVer = 5
+set curVer = 6
 
 # Database to rebuild visiGene text from.  Should include recent mouse and human
 # but not the one you're rebuilding if you're rebuilding. (Use tempDb instead).
@@ -69,18 +71,16 @@ set vgTextDbs = (mm8 mm9 hg18 hg19 $tempDb)
 
 # Proteins in various species
 set tempFa = $dir/ucscGenes.faa
-set xdbFa = $genomes/$xdb/bed/ucsc.12/ucscGenes.faa
-set ratFa = $genomes/$ratDb/bed/blastp/rn5.refGenePep.faa
+set xdbFa = $genomes/$xdb/bed/ucsc.13/ucscGenes.faa
+set ratFa = $genomes/$ratDb/bed/blastpRgdGene2/rgdGene2Pep.faa
 set fishFa = $genomes/$fishDb/bed/blastp/ensembl.faa
 set flyFa = $genomes/$flyDb/bed/hgNearBlastp/100806/$flyDb.flyBasePep.faa
-set wormFa = $genomes/$wormDb/bed/blastp/ensPep.faa
+set wormFa = $genomes/$wormDb/bed/blastp/wormPep190.faa
 set yeastFa = $genomes/$yeastDb/bed/sgdAnnotations/blastTab/sacCer3.sgd.faa
 
 # Other files needed
-  # For bioCyc pathways - best to update these following build instructions in
-  # mm9.txt
-set bioCycPathways = /hive/data/outside/bioCyc/100514/download/14.0/data/pathways.col
-set bioCycGenes = /hive/data/outside/bioCyc/100514/download/14.0/data/genes.col
+set bioCycPathways = /hive/data/outside/bioCyc/120801/1.7/data/pathways.col
+set bioCycGenes = /hive/data/outside/bioCyc/120801/1.7/data/genes.col
 set rfam = /hive/data/outside/Rfam/111130
 
 
@@ -104,14 +104,9 @@ set cpuFarm = swarm
 set kent = ~/kent
 
 # Create initial dir
-set scriptDir = `pwd`
+#set scriptDir = `pwd`
 mkdir -p $dir
 cd $dir
-
-#	this section is completed, look for the corresponding endif
-#	to find the next section that is running.
-
-
 
 # Get Genbank info
 txGenbankData $db
@@ -735,6 +730,35 @@ txGeneCdsMap weeded.bed weeded.info pick.picks refTweaked.psl \
 	rnaToGenome.psl
 pslMap cdsToRna.psl rnaToGenome.psl cdsToGenome.psl
 
+# map mm9 knownGene to mm10
+cd $dir
+set lift = "/gbdb/$oldDb/liftOver/${oldDb}To${Db}.over.chain.gz"
+genePredToFakePsl $oldDb knownGene $oldDb.kg.psl $oldDb.kg.cds
+
+# only keep those id's that uniquely map to mm10
+zcat $lift | pslMap -chainMapFile -swapMap $oldDb.kg.psl stdin stdout | pslCDnaFilter -uniqueMapped stdin stdout |  sort -k 14,14 -k 16,16n | pslToBed -cds=$oldDb.kg.cds stdin $oldDb.$db.kg.bed 
+
+#     drop nonUnique:     112     285
+
+#TODO:  figure out better wayto deal with txLastId
+set oldGeneBed=$oldDb.$db.kg.bed
+txGeneAccession $oldGeneBed ~kent/src/hg/txGene/txGeneAccession/txLastId \
+	weeded.bed txToAcc.tab oldToNew.tab
+
+tawk '{print $4}' oldToNew.tab | sort | uniq -c
+#   5108 compatible
+#  48739 exact
+#   1460 lost
+#   5274 new
+
+echo "select * from knownGene" | hgsql mm9 | sort > mm9.knownGene.gp
+grep lost oldToNew.tab | awk '{print $2}' | sort > lost.txt
+join lost.txt mm9.knownGene.gp > mm9.lost.gp
+
+awk '{if ($7 == $6) print}' mm9.lost.gp | wc -l
+# non-coding 762
+awk '{if ($7 != $6) print}' mm9.lost.gp | wc -l
+# coding 698
 
 # Assign permanent accessions to each transcript, and make up a number
 # of our files with this accession in place of the temporary IDs we've been
@@ -798,11 +822,11 @@ ssh $cpuFarm "cd $dir/blat/uniprotVsUcsc; para time > run.time"
 
 cat run.time
 # Completed: 97 of 97 jobs
-# CPU time in finished jobs:       1813s      30.22m     0.50h    0.02d  0.000 y
-# IO & Wait Time:                   413s       6.88m     0.11h    0.00d  0.000 y
-# Average job time:                  23s       0.38m     0.01h    0.00d
-# Longest finished job:              84s       1.40m     0.02h    0.00d
-# Submission to last job:            96s       1.60m     0.03h    0.00d
+# CPU time in finished jobs:       1167s      19.45m     0.32h    0.01d  0.000 y
+# IO & Wait Time:                   405s       6.75m     0.11h    0.00d  0.000 y
+# Average job time:                  16s       0.27m     0.00h    0.00d
+# Longest finished job:              60s       1.00m     0.02h    0.00d
+# Submission to last job:            62s       1.03m     0.02h    0.00d
 
 pslCat raw/*.psl > ../../ucscVsUniprot.psl
 rm -r raw
@@ -888,7 +912,9 @@ hgsql --skip-column-names -e "select mrnaAcc,locusLinkId from refLink" $db > ref
 hgMapToGene -exclude=abGenes.txt -tempDb=$tempDb $db refGene knownGene knownToLocusLink -lookup=refToLl.txt
 
 # Make up kgXref table.  Takes about 3 minutes.
-txGeneXref $db $tempDb $spDb ucscGenes.gp ucscGenes.info ucscGenes.picks ucscGenes.ev ucscGenes.xref
+time txGeneXref $db $tempDb $spDb ucscGenes.gp ucscGenes.info ucscGenes.picks ucscGenes.ev ucscGenes.xref
+# 5.078u 4.871s 1:45.41 9.4%      0+0k 0+0io 0pf+0w
+
 hgLoadSqlTab $tempDb kgXref $kent/src/hg/lib/kgXref.sql ucscGenes.xref
 
 # Update knownToRefSeq to make it consistent with ucscGenes.xref.  Prior to
@@ -921,7 +947,7 @@ hgLoadSqlTab $tempDb kgProtAlias $kent/src/hg/lib/kgProtAlias.sql ucscGenes.prot
 hgLoadPsl $tempDb ucscProtMap.psl -table=kgProtMap2
 
 # Create a bunch of knownToXxx tables.  Takes about 3 minutes:
-#if 0 # didn't do this
+#if 0 # didn't do this, no Allen Brain, no gnfAtlas, no Tree Fam
 # TODO
 hgMapToGene -exclude=abGenes.txt -tempDb=$tempDb $db allenBrainAli -type=psl knownGene knownToAllenBrain
 
@@ -975,7 +1001,12 @@ endif
 # Update visiGene stuff
 knownToVisiGene $tempDb -probesDb=$db
 hgsql $tempDb -e "delete k from knownToVisiGene k, kgXref x where k.name = x.kgID and x.geneSymbol = 'abParts'"
+
 vgGetText /usr/local/apache/cgi-bin/visiGeneData/visiGene.text $vgTextDbs
+# probe has 26611 rows
+# gene has 20413 rows
+# imageProbe has 125765 rows
+
 cd /usr/local/apache/cgi-bin/visiGeneData
 ixIxx visiGene.text visiGene.ix visiGene.ixx
 cd $dir
@@ -1017,6 +1048,7 @@ scratchDir $scratchDir/brHgNearBlastp
 _EOF_
 
 
+rm -rf  $scratchDir/brHgNearBlastp
 doHgNearBlastp.pl -noLoad -clusterHub=swarm -distrHost=hgwdev -dbHost=hgwdev -workhorse=hgwdev config.ra |& tee do.log 
 # *** All done!
 # *** -noLoad was specified -- you can run this script manually to load mm10 tables:
@@ -1041,7 +1073,7 @@ doHgNearBlastp.pl -noLoad -clusterHub=swarm -distrHost=hgwdev -dbHost=hgwdev -wo
 
 # Load self
 cd $dir/hgNearBlastp/run.$tempDb.$tempDb
-loadPairwise.csh
+./loadPairwise.csh
 
 # Load human and rat
 cd $dir/hgNearBlastp/run.$tempDb.$xdb
@@ -1058,10 +1090,30 @@ ln -s $genomes/$db/bed/liftOver/${db}To$RatDb.over.chain.gz \
 ln -s $genomes/$db/bed/liftOver/${db}To${Xdb}.over.chain.gz \
     /gbdb/$tempDb/liftOver/${tempDb}To$Xdb.over.chain.gz
 
-#if 0 TODO
+# delete non-syntenic genes from rat and human blastp tables
 cd $dir/hgNearBlastp
 synBlastp.csh $tempDb $xdb
-synBlastp.csh $tempDb $ratDb
+# old number of unique query values: 43096
+# old number of unique target values 22667
+# new number of unique query values: 39713
+# new number of unique target values 22032
+
+hgsql -e "select  count(*) from hgBlastTab\G" $oldDb | tail -n +2
+# count(*): 47124
+hgsql -e "select  count(*) from hgBlastTab\G" $db | tail -n +2
+# count(*): 39713
+
+synBlastp.csh $tempDb $ratDb rgdGene2
+# old number of unique query values: 38112
+# old number of unique target values 10526
+# new number of unique query values: 17901
+# new number of unique target values 8085
+
+hgsql -e "select  count(*) from rnBlastTab\G" $oldDb | tail -n +2
+# count(*): 17832
+hgsql -e "select  count(*) from rnBlastTab\G" $db | tail -n +2
+# count(*): 17901
+
 
 # Make reciprocal best subset for the blastp pairs that are too
 # Far for synteny to help
@@ -1075,6 +1127,10 @@ cat $bToA/out/*.tab > $bToA/all.tab
 blastRecipBest $aToB/all.tab $bToA/all.tab $aToB/recipBest.tab $bToA/recipBest.tab
 hgLoadBlastTab $tempDb drBlastTab $aToB/recipBest.tab
 hgLoadBlastTab $fishDb tfBlastTab $bToA/recipBest.tab
+hgsql -e "select  count(*) from drBlastTab\G" $oldDb | tail -n +2
+# count(*): 12904
+hgsql -e "select  count(*) from drBlastTab\G" $db | tail -n +2
+# count(*): 12881
 
 # Us vs. fly
 cd $dir/hgNearBlastp
@@ -1085,6 +1141,10 @@ cat $bToA/out/*.tab > $bToA/all.tab
 blastRecipBest $aToB/all.tab $bToA/all.tab $aToB/recipBest.tab $bToA/recipBest.tab
 hgLoadBlastTab $tempDb dmBlastTab $aToB/recipBest.tab
 hgLoadBlastTab $flyDb tfBlastTab $bToA/recipBest.tab
+hgsql -e "select  count(*) from dmBlastTab\G" $oldDb | tail -n +2
+# count(*): 5923
+hgsql -e "select  count(*) from dmBlastTab\G" $db | tail -n +2
+# count(*): 5951
 
 # Us vs. worm
 cd $dir/hgNearBlastp
@@ -1096,6 +1156,10 @@ blastRecipBest $aToB/all.tab $bToA/all.tab $aToB/recipBest.tab $bToA/recipBest.t
 hgLoadBlastTab $tempDb ceBlastTab $aToB/recipBest.tab
 hgLoadBlastTab $wormDb tfBlastTab $bToA/recipBest.tab
 
+hgsql -e "select  count(*) from ceBlastTab\G" $oldDb | tail -n +2
+# count(*): 4955
+hgsql -e "select  count(*) from ceBlastTab\G" $db | tail -n +2
+# count(*): 4957
 
 # Us vs. yeast
 cd $dir/hgNearBlastp
@@ -1107,13 +1171,17 @@ blastRecipBest $aToB/all.tab $bToA/all.tab $aToB/recipBest.tab $bToA/recipBest.t
 hgLoadBlastTab $tempDb scBlastTab $aToB/recipBest.tab
 hgLoadBlastTab $yeastDb tfBlastTab $bToA/recipBest.tab
 
+hgsql -e "select  count(*) from scBlastTab\G" $oldDb | tail -n +2
+# count(*): 20619
+# Don't know why scBlastTab is so big on mm9 on dev, it's 2,224 on RR.
+hgsql -e "select  count(*) from scBlastTab\G" $db | tail -n +2
+# count(*): 2398
+
 
 # Clean up
 cd $dir/hgNearBlastp
 cat run.$tempDb.$tempDb/out/*.tab | gzip -c > run.$tempDb.$tempDb/all.tab.gz
 gzip run.*/all.tab
-#endif
-
 
 # MAKE FOLDUTR TABLES 
 # First set up directory structure and extract UTR sequence on hgwdev
@@ -1152,9 +1220,6 @@ ssh $cpuFarm "cd $dir/rnaStruct/utr5; para make jobList"
     hgLoadRnaFold $tempDb foldUtr5 fold
     cd ../utr3
     hgLoadRnaFold -warnEmpty $tempDb foldUtr3 fold
-# There are a five warnings on empty files.  Seems to be a problem in
-# RNAfold, so not easy for us to fix. Consequence is not too bad, just a
-# few 3' UTRs will be missing annotation.
 
 # Clean up
     rm -r split fold err batch.bak
@@ -1197,12 +1262,11 @@ ssh $cpuFarm "cd $dir/pfam; para make jobList"
 ssh $cpuFarm "cd $dir/pfam; para time > run.time"
 cat run.time
 
-# Completed: 9671 of 9671 jobs
-# CPU time in finished jobs:    2507411s   41790.18m   696.50h   29.02d  0.080 y
-# IO & Wait Time:               2797331s   46622.19m   777.04h   32.38d  0.089 y
-# Average job time:                 549s       9.14m     0.15h    0.01d
-# Longest finished job:            3917s      65.28m     1.09h    0.05d
-# Submission to last job:         16029s     267.15m     4.45h    0.19d
+# CPU time in finished jobs:    2538170s   42302.84m   705.05h   29.38d  0.080 y
+# IO & Wait Time:                415746s    6929.10m   115.48h    4.81d  0.013 y
+# Average job time:                 305s       5.09m     0.08h    0.00d
+# Longest finished job:            1737s      28.95m     0.48h    0.02d
+# Submission to last job:         17004s     283.40m     4.72h    0.20d
 
 # Make up pfamDesc.tab by converting pfam to a ra file first
 cat << '_EOF_' > makePfamRa.awk
@@ -1254,12 +1318,13 @@ gensub2 prot.list single template jobList
 ssh $cpuFarm "cd $dir/scop; para make jobList"
 ssh $cpuFarm "cd $dir/scop; para time > run.time"
 cat run.time
+
 # Completed: 9671 of 9671 jobs
-# CPU time in finished jobs:    2713367s   45222.78m   753.71h   31.40d  0.086 y
-# IO & Wait Time:               3992929s   66548.82m  1109.15h   46.21d  0.127 y
-# Average job time:                 693s      11.56m     0.19h    0.01d
-# Longest finished job:            4503s      75.05m     1.25h    0.05d
-# Submission to last job:         22778s     379.63m     6.33h    0.26d
+# CPU time in finished jobs:    2718190s   45303.16m   755.05h   31.46d  0.086 y
+# IO & Wait Time:                594796s    9913.27m   165.22h    6.88d  0.019 y
+# Average job time:                 343s       5.71m     0.10h    0.00d
+# Longest finished job:            2411s      40.18m     0.67h    0.03d
+# Submission to last job:         13659s     227.65m     3.79h    0.16d
 
 # Convert scop output to tab-separated files
 cd $dir
@@ -1276,15 +1341,13 @@ hgLoadSqlTab $tempDb ucscScop $kent/src/hg/lib/ucscScop.sql ucscScop.tab
 #if 0 TODO
 # Regenerate ccdsKgMap table
 $kent/src/hg/makeDb/genbank/bin/x86_64/mkCcdsGeneMap  -db=$tempDb -loadDb $db.ccdsGene knownGene ccdsKgMap
-
-# Map old to new mapping
-# XXX TODO - haven't figured out how to do this when old genes were on old assembly
-hgsql $db -N -e 'select * from knownGene' > knownGeneOld.gp
-genePredToBed knownGeneOld.gp >knownGeneOld.bed
-txGeneExplainUpdate2 knownGeneOld.bed ucscGenes.bed kgOldToNew.tab
-hgLoadSqlTab $tempDb kg${lastVer}ToKg${curVer} $kent/src/hg/lib/kg1ToKg2.sql kgOldToNew.tab
-
 #endif
+
+cd $dir
+# Map old to new mapping
+set oldGeneBed=$oldDb.$db.kg.bed
+txGeneExplainUpdate2 $oldGeneBed ucscGenes.bed kgOldToNew.tab
+hgLoadSqlTab $tempDb kg${lastVer}ToKg${curVer} $kent/src/hg/lib/kg1ToKg2.sql kgOldToNew.tab
 
 # Build kgSpAlias table, which combines content of both kgAlias and kgProtAlias tables.
 
@@ -1327,9 +1390,9 @@ hgLoadSqlTab $tempDb kgSpAlias $kent/src/hg/lib/kgSpAlias.sql kgSpAlias.tab
     # to LocusLink IDs and to KEGG pathways.  First, make a table that maps 
     # LocusLink IDs to KEGG pathways from the downloaded data.  Store it temporarily
     # in the keggPathway table, overloading the schema.
-    cp /cluster/data/hg19/bed/ucsc.13/kegg/hsa_pathway.list .
-    # wget --timestamping ftp://ftp.genome.jp/pub/kegg/genes/organisms/hsa/hsa_pathway.list
-    cat hsa_pathway.list| sed -e 's/path://'|sed -e 's/:/\t/' > j.tmp
+    cp /cluster/data/mm9/bed/ucsc.12/kegg/mmu_pathway.list .
+
+    cat mmu_pathway.list| sed -e 's/path://'|sed -e 's/:/\t/' > j.tmp
     hgLoadSqlTab $tempDb keggPathway $kent/src/hg/lib/keggPathway.sql j.tmp
 
     # Next, use the temporary contents of the keggPathway table to join with
@@ -1338,7 +1401,8 @@ hgLoadSqlTab $tempDb kgSpAlias $kent/src/hg/lib/kgSpAlias.sql kgSpAlias.tab
     hgsql $tempDb -B -N -e \
     'select distinct name, locusID, mapID from keggPathway p, knownToLocusLink l where p.locusID=l.value' \
     >keggPathway.tab
-    hgLoadSqlTab $tempDb keggPathway $kent/src/hg/lib/keggPathway.sql keggPathway.tab
+    hgLoadSqlTab $tempDb \
+	keggPathway $kent/src/hg/lib/keggPathway.sql  keggPathway.tab
 
    # Finally, update the knownToKeggEntrez table from the keggPathway table.
    hgsql $tempDb -B -N -e 'select kgId, mapID, mapID, "+", locusID from keggPathway' \
@@ -1358,8 +1422,8 @@ hgLoadSqlTab $tempDb kgSpAlias $kent/src/hg/lib/kgSpAlias.sql kgSpAlias.tab
     mkdir -p $dir/cgap
     cd $dir/cgap
     
-    wget --timestamping -O Hs_GeneData.dat "ftp://ftp1.nci.nih.gov/pub/CGAP/Hs_GeneData.dat"
-    hgCGAP Hs_GeneData.dat
+    wget --timestamping -O Mm_GeneData.dat "ftp://ftp1.nci.nih.gov/pub/CGAP/Mm_GeneData.dat"
+    hgCGAP Mm_GeneData.dat
         
     cat cgapSEQUENCE.tab cgapSYMBOL.tab cgapALIAS.tab|sort -u > cgapAlias.tab
     hgLoadSqlTab $tempDb cgapAlias $kent/src/hg/lib/cgapAlias.sql ./cgapAlias.tab
@@ -1384,10 +1448,10 @@ hgsql $tempDb -N -e 'select kgId,geneSymbol from kgXref' \
 #    Convert that file to TwoBit format and soft-link it into /gbdb/hg19/targetDb/
 subColumn 4 ucscGenes.bed idSub.txt ucscGenesIdSubbed.bed
 sequenceForBed -keepName -db=$db -bedIn=ucscGenesIdSubbed.bed -fastaOut=stdout \
-    | faToTwoBit stdin kgTargetSeq.2bit 
+    | faToTwoBit stdin kgTargetSeq${curVer}.2bit 
 mkdir -p /gbdb/$db/targetDb/
-rm -f /gbdb/$db/targetDb/kgTargetSeq.2bit
-ln -s $dir/kgTargetSeq.2bit /gbdb/$db/targetDb/
+rm -f /gbdb/$db/targetDb/kgTargetSeq${curVer}.2bit 
+ln -s $dir/kgTargetSeq${curVer}.2bit /gbdb/$db/targetDb/
 # Load the table kgTargetAli, which shows where in the genome these targets are.
 cut -f 1-10 ucscGenes.gp | genePredToFakePsl $tempDb stdin kgTargetAli.psl /dev/null
 hgLoadPsl $tempDb kgTargetAli.psl
@@ -1433,7 +1497,7 @@ ln -s $dir/index/knownGene.ixx /gbdb/$db/knownGene.ixx
 
 
 # 3. Ask cluster-admin to start an untranslated, -stepSize=5 gfServer on       
-# /gbdb/$db/targetDb/kgTargetSeq.2bit .          
+# /gbdb/$db/targetDb/kgTargetSeq${curVer}.2bit
 
 # 4. On hgwdev, insert new records into blatServers and targetDb, using the 
 # host (field 2) and port (field 3) specified by cluster-admin.  Identify the
@@ -1446,8 +1510,6 @@ hgsql hgcentraltest -e \
          "/gbdb/mm10/targetDb/kgTargetSeq.2bit", 1, now(), "");'
 
 
-# move this endif statement past business that has successfully been completed
-endif # BRACKET		
 cd $dir
 
 
@@ -1472,12 +1534,6 @@ synBlastp.csh $ratDb $db
 rm -r run.*/out
 
 
-if (0) then  # BRACKET
-# move this exit statement to the end of the section to be done next
-exit $status # BRACKET
-
-
-#
 # Last step in setting up isPCR: after the new UCSC Genes with the new Known Gene isPcr
 # is released, take down the old isPcr gfServer  
 #

@@ -128,7 +128,7 @@ while ( $i <= $#files )
 	echo "error in cvs commit of merge $r into $dir/$f"
 	echo "cvs patch commmit failure for $r into $dir/$f " >> $BUILDDIR/v${BRANCHNN}_branch/branchMoves.log
 	echo "YOU NEED TO RESOLVE THIS MANUALLY AND COMMIT IT IN $BUILDDIR/v${BRANCHNN}_branch/"
-	echo "YOU MAY THEN NEED TO GO TO 32-BIT SANDBOX AND DO CVS UPDATE"
+#9403# 	echo "YOU MAY THEN NEED TO GO TO 32-BIT SANDBOX AND DO CVS UPDATE"
 	exit 1
     endif
     
@@ -142,11 +142,11 @@ while ( $i <= $#files )
 	exit 1
     endif
 
-    # update 32-bit sandbox on $BOX32 too
-    set cmd32 = "cd /scratch/releaseBuild/v${BRANCHNN}_branch/kent/src/$f:h;cvs up $f:t"
-    echo "$cmd32"
-    #old way: ssh $BOX32 "$cmd32"
-    ssh $BOX32 "/bin/tcsh -c '"$cmd32"'"
+#9403#     # update 32-bit sandbox on $BOX32 too
+#9403#     set cmd32 = "cd /scratch/releaseBuild/v${BRANCHNN}_branch/kent/src/$f:h;cvs up $f:t"
+#9403#     echo "$cmd32"
+#9403#     #old way: ssh $BOX32 "$cmd32"
+#9403#     ssh $BOX32 "/bin/tcsh -c '"$cmd32"'"
     
     set msg = "$msg $f $p : patched-in $r\n"
     @ i++
@@ -154,7 +154,7 @@ end
 
 set mailMsg = "The v${BRANCHNN} branch has been patched as follows:\n$msg"
 set subject = '"'"Branch patch complete."'"'
-echo "$mailMsg" | mail -s "$subject" $USER galt browser-qa
+echo "$mailMsg" | mail -s "$subject" $USER ${BUILDMEISTER} galt browser-qa
 
 date +%Y-%m-%d   >> $BUILDDIR/v${BRANCHNN}_branch/branchMoves.log
 echo "$msg"    >> $BUILDDIR/v${BRANCHNN}_branch/branchMoves.log

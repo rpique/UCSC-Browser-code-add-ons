@@ -259,6 +259,16 @@ ALTER TABLE [dbo].[GroupVersions] ADD
 	)
 GO
 
+ALTER TABLE [dbo].[GroupVersions] ADD
+        CONSTRAINT [FK_GroupVersions_Builds] FOREIGN KEY
+        (
+                [build_uid]
+        ) REFERENCES [dbo].[Builds] (
+                [build_uid]
+        )
+
+GO
+
 ALTER TABLE [dbo].[GroupVersions_ChromosomeAccessions] ADD 
 	CONSTRAINT [FK_GroupVersions_chromosomeAccessions_ChromosomeAccessions] FOREIGN KEY 
 	(
@@ -385,6 +395,25 @@ ALTER TABLE [dbo].[CcdsStatistics] ADD
                 [statistics_type_uid]
         ) REFERENCES [dbo].[StatisticsTypes] (
                 [statistics_type_uid]
+        )
+go
+
+ALTER TABLE [dbo].[CcdsStatistics] ADD
+        CONSTRAINT [FK_CcdsStatistics_Builds] FOREIGN KEY
+        (
+                [build_uid]
+        ) REFERENCES [dbo].[Builds] (
+                [build_uid]
+        )
+
+GO
+
+ALTER TABLE [dbo].[Builds] ADD
+        CONSTRAINT [FK_Builds_prev_build_uid] FOREIGN KEY
+        (
+                [prev_build_uid]
+        ) REFERENCES [dbo].[Builds] (
+                [build_uid]
         )
 go
 

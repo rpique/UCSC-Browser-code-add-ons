@@ -890,5 +890,85 @@ CREATE TABLE ucscToEnsembl (
     md5sum bosTau6ToBosTau7.over.chain.gz >> md5sum.txt
     popd
 
+
+##############################################################################
+# SWAP mm10 LASTZ (DONE - 2012-06-19 - Chin)
+
+    #   original alignment done at mm10.txt
+    cd /hive/data/genomes/mm10/bed/lastzBosTau6.2012-06-19
+    cat fb.mm10.chainBosTau6Link.txt
+    #   700039696 bases of 2652783500 (26.389%) in intersection
+
+    # set sym link to indicate this is the lastz for this genome:
+    cd /hive/data/genomes/mm10/bed
+    ln -s lastzBosTau6.2012-06-19 lastz.bosTau6
+
+    # swap
+    mkdir /hive/data/genomes/bosTau6/bed/blastz.mm10.swap
+    cd /hive/data/genomes/bosTau6/bed/blastz.mm10.swap
+    time nice -n +19 doBlastzChainNet.pl -verbose=2 \
+    /hive/data/genomes/mm10/bed/lastzBosTau6.2012-06-19/DEF \
+    -swap -syntenicNet \
+    -workhorse=hgwdev -smallClusterHub=encodek -bigClusterHub=swarm \
+    -chainMinScore=3000 -chainLinearGap=medium > swap.log 2>&1 &
+    #   real    72m13.925s
+    cat fb.bosTau6.chainMm10Link.txt
+    #   688651806 bases of 2649682029 (25.990%) in intersection
+    # set sym link to indicate this is the lastz for this genome:
+    cd /hive/data/genomes/bosTau6/bed
+    ln -s blastz.mm10.swap lastz.mm10
+
+#########################################################################
+# SWAP dog canFam3 LASTZ  (DONE - 2012-06-24 - Chin)
+    mkdir /hive/data/genomes/canFam3/bed/lastzBosTau6.2012-06-24
+    cd /hive/data/genomes/canFam3/bed/lastzBosTau6.2012-06-24
+
+    cat fb.canFam3.chainBosTau6Link.txt
+    # 1387159926 bases of 2392715236 (57.974%) in intersection
+    # Create link
+    cd /hive/data/genomes/canFam3/bed
+    ln -s  lastzBosTau6.2012-06-24 lastz.bosTau6
+
+    #   and the swap
+    mkdir /hive/data/genomes/bosTau6/bed/blastz.canFam3.swap
+    cd /hive/data/genomes/bosTau6/bed/blastz.canFam3.swap
+    time nice -n +19 doBlastzChainNet.pl -verbose=2 \
+        /hive/data/genomes/canFam3/bed/lastzBosTau6.2012-06-24/DEF \
+        -swap -syntenicNet  \
+        -noLoadChainSplit \
+        -workhorse=hgwdev -smallClusterHub=memk -bigClusterHub=swarm \
+        -chainMinScore=3000 -chainLinearGap=medium > swap.log 2>&1 &
+    #   real      119m54.003s
+    cat fb.bosTau6.chainCanFam3Link.txt
+    #   1399687351 bases of 2649682029 (52.825%) in intersection
+    cd /hive/data/genomes/bosTau6/bed
+    ln -s blastz.canFam3.swap lastz.canFam3
+
+############################################################################
+# NUMTS TRACK (working 2012-10-31 - Chin)
+
+# copy and unzip
+# http://193.204.182.50/files/tracks.zip and 
+# http://193.204.182.50/files/other%20NumtS%20tracks.zip
+# to /hive/data/outside/NumtS/2012/tracks
+
+    mkdir /hive/data/genomes/bosTau6/bed/NumtS
+    cd /hive/data/genomes/bosTau6/bed/NumtS
+    cp /hive/data/outside/NumtS/2012/tracks/Bos_taurus_6/* .
+    cat Tracks_nuclear_NumtS_BosTau6 | grep -v "^track" > bosTau6NumtS.bed
+    cat tracks_NumtS_BT6_assembled | grep -v "^track" > bosTau6NumtSAssembled.bed
+    cat Tracks_mit_NumtS_BosTau6 | grep -v "^track" >  bosTau6NumtSMitochondrion.bed
+
+    # load the 3 bed files to bosTau6
+    hgLoadBed bosTau6  numtSAssembled  bosTau6NumtSAssembled.bed
+    hgLoadBed bosTau6 numtS bosTau6NumtS.bed
+    hgLoadBed bosTau6 numtSMitochondrion bosTau6NumtSMitochondrion.bed
+    # Make /gbdb/ links and load bam
+    mkdir /gbdb/bosTau6/NumtS
+    ln -s `pwd`/BT-6_NumtS_seqs.sorted.bam{,.bai} /gbdb/bosTau6/NumtS/
+    hgBbiDbLink bosTau6 bamAllNumtSSorted /gbdb/bosTau6/NumtS/BT-6_NumtS_seqs.sorted.bam
+    # setup trackDb for bosTau6
+
+
 ############################################################################
 

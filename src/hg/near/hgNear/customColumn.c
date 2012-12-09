@@ -40,11 +40,9 @@ return cartString(cart, customFileVarName);
 void doCustomPage(struct sqlConnection *conn, struct column *colList)
 /* Put up page to input custom columns. */
 {
+makeTitle("Setup Custom Columns for Gene Sorter", "hgNearHelp.html#Custom");
 hPrintf("<FORM ACTION=\"../cgi-bin/hgNear\">\n");
 cartSaveSession(cart);
-makeTitle("Setup Custom Columns for Gene Sorter", 
-	"hgNearHelp.html#Custom");
-
 
 /* Put up descriptive text. */
 controlPanelStart();
@@ -90,9 +88,9 @@ hPrintf("</TD></TR></TABLE>");
 void doCustomUpload(struct sqlConnection *conn, struct column *colList)
 /* Put up page to upload custom columns. */
 {
+makeTitle("Upload Custom Columns", "hgNearHelp.html#Custom");
 hPrintf("<FORM ACTION=\"../cgi-bin/hgNear\" METHOD=\"POST\" ENCTYPE=\"multipart/form-data\">\n");
 cartSaveSession(cart);
-makeTitle("Upload Custom Columns", "hgNearHelp.html#Custom");
 
 controlPanelStart();
 hPrintf(
@@ -111,9 +109,9 @@ hPrintf("</FORM>");
 void doCustomPaste(struct sqlConnection *conn, struct column *colList)
 /* Put up page to paste custom columns. */
 {
+makeTitle("Paste in Custom Columns", "hgNearHelp.html#Custom");
 hPrintf("<FORM ACTION=\"../cgi-bin/hgNear\" METHOD=\"POST\">\n");
 cartSaveSession(cart);
-makeTitle("Paste in Custom Columns", "hgNearHelp.html#Custom");
 
 controlPanelStart();
 hPrintf(
@@ -131,9 +129,9 @@ hPrintf("</FORM>");
 void doCustomFromUrl(struct sqlConnection *conn, struct column *colList)
 /* Put up page to paste in URLS with custom columns. */
 {
+makeTitle("Paste in Custom Columns", "hgNearHelp.html#Custom");
 hPrintf("<FORM ACTION=\"../cgi-bin/hgNear\" METHOD=\"POST\">\n");
 cartSaveSession(cart);
-makeTitle("Paste in Custom Columns", "hgNearHelp.html#Custom");
 
 controlPanelStart();
 hPrintf(
@@ -449,6 +447,10 @@ uniqHash = hashColumns(*pColList);
 /* Loop through and add columns from each URL. */
 while ((url = nextWord(&urlList)) != NULL)
     {
+    if (!(startsWith("http://" , url)
+       || startsWith("https://", url)
+       || startsWith("ftp://"  , url)))
+	errAbort("Invalid url [%s]. URLs must start with http://, https://, or ftp://", url);
     struct lineFile *lf = netLineFileOpen(url);
     struct column *newList = verifyCopyColumns(conn, lf, f, *pColList, uniqHash);
     customCols = slCat(newList, customCols);

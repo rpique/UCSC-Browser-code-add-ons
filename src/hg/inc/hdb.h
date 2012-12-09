@@ -189,10 +189,6 @@ boolean hgNearOk(char *database);
 /* Return TRUE if ok to put up familyBrowser (hgNear)
  * on this database. */
 
-boolean hgPbOk(char *database);
-/* Return TRUE if ok to put up Proteome Browser (pbTracks)
- * on this database. */
-
 boolean hgPcrOk(char *database);
 /* Return TRUE if ok to put up hgPcr on this database. */
 
@@ -895,6 +891,7 @@ char *bbiNameFromSettingOrTable(struct trackDb *tdb, struct sqlConnection *conn,
 
 char *bbiNameFromSettingOrTableChrom(struct trackDb *tdb, struct sqlConnection *conn, char *table,
 				     char *seqName);
-/* Return file name from bigDataUrl or little table (which might have a seqName column). */
+/* Return file name from bigDataUrl or little table that might have a seqName column.
+ * If table does have a seqName column, return NULL if there is no file for seqName. */
 
 #endif /* HDB_H */

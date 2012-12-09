@@ -903,101 +903,6 @@ visibility hide
 type bed 3 +
 otherDb panTro1
 
-track snp131Clinical
-shortLabel Clin SNPs (131)
-longLabel Clinically Associated Simple Nucleotide Polymorphisms (dbSNP build 131)
-group varRep
-priority 100.092
-visibility hide
-url http://www.ncbi.nlm.nih.gov/SNP/snp_ref.cgi?type=rs&rs=$$
-urlLabel dbSNP: 
-defaultGeneTracks knownGene
-maxWindowToDraw 10000000
-type bed 6 +
-chimpOrangMacOrthoTable snp131OrthoPt2Pa2Rm2
-chimpDb panTro2
-orangDb ponAbe2
-macaqueDb rheMac2
-hapmapPhase III
-codingAnnotations snp131CodingDbSnp,
-codingAnnoLabel_snp131CodingDbSnp dbSNP
-snpExceptions snp131Exceptions
-snpExceptionDesc snp131ExceptionDesc
-snpSeq snp131Seq
-
-track snp131NonClinical
-shortLabel SNPs (131)
-longLabel Simple Nucleotide Polymorphisms (dbSNP build 131) Not Clinically Associated
-group varRep
-priority 100.093
-visibility hide
-url http://www.ncbi.nlm.nih.gov/SNP/snp_ref.cgi?type=rs&rs=$$
-urlLabel dbSNP: 
-defaultGeneTracks knownGene
-maxWindowToDraw 10000000
-type bed 6 +
-chimpOrangMacOrthoTable snp131OrthoPt2Pa2Rm2
-chimpDb panTro2
-orangDb ponAbe2
-macaqueDb rheMac2
-hapmapPhase III
-codingAnnotations snp131CodingDbSnp,
-codingAnnoLabel_snp131CodingDbSnp dbSNP
-snpExceptions snp131Exceptions
-snpExceptionDesc snp131ExceptionDesc
-snpSeq snp131Seq
-
-track snp131Composite
-compositeTrack on
-shortLabel SNPs (131) Comp
-longLabel Simple Nucleotide Polymorphisms (dbSNP build 131) -- Composite version
-group varRep
-priority 99.093
-visibility hide
-url http://www.ncbi.nlm.nih.gov/SNP/snp_ref.cgi?type=rs&rs=$$
-urlLabel dbSNP: 
-defaultGeneTracks knownGene
-maxWindowToDraw 10000000
-type bed 6 +
-chimpOrangMacOrthoTable snp131OrthoPt2Pa2Rm2
-chimpDb panTro2
-orangDb ponAbe2
-macaqueDb rheMac2
-hapmapPhase III
-codingAnnotations snp131CodingDbSnp,
-codingAnnoLabel_snp131CodingDbSnp dbSNP
-snpExceptions snp131Exceptions
-snpExceptionDesc snp131ExceptionDesc
-snpSeq snp131Seq
-subGroup1 view Views common=Common_SNPs misc=Misc_SNPs nonu=Non-Unique_SNPs
-dimensions dimX=view
-#configurable on
-
-    track snp131Common
-    parent snp131Composite
-    shortLabel Common SNPs (131)
-    longLabel Simple Nucleotide Polymorphisms (dbSNP build 131) from HapMap and/or 1000Genomes
-    subGroups view=common
-    visibility pack
-    priority 1
-
-    track snp131Misc
-    parent snp131Composite
-    shortLabel Misc SNPs (131)
-    longLabel Simple Nucleotide Polymorphisms (dbSNP build 131) not from HapMap and/or 1000Genomes
-    subGroups view=misc
-    visibility dense
-    priority 2
-
-    track snp131NonUnique
-    parent snp131Composite
-    shortLabel Non-Unique SNPs
-    longLabel Non-uniquely Mapped Simple Nucleotide Polymorphisms (dbSNP build 131)
-    subGroups view=nonu
-    visibility hide
-    priority 3
-
-
 track hgdpGeo
 shortLabel HGDP Allele Freq
 longLabel Human Genome Diversity Project SNP Population Allele Frequencies
@@ -1265,21 +1170,22 @@ exonArrows off
 urlLabel DGV Browser and Report:
 url http://projects.tcag.ca/cgi-bin/variation/xview?source=$D&view=variation&id=Variation_$$
 dataVersion v10
+release beta,public
 
-track dgvBeta
-shortLabel DGV Beta
-longLabel Database of Genomic Variants: Structural Variation (CNV, Inversion, In/del) -- Beta Site
+track dgv
+shortLabel DGV
+longLabel Database of Genomic Variants: Structural Variation (CNV, Inversion, In/del)
 group varRep
 priority 144.8
 visibility hide
-color 0,100,0
 itemRgb on
 type bed 9 +
 noScoreFilter .
 exonArrows off
 urlLabel DGV Browser and Report:
 url http://dgvbeta.tcag.ca/dgv/app/variant?id=$$&ref=$D
-dataVersion beta
+dataVersion beta (Nov. 14, 2012)
+release alpha
 
 track covMask1kGPilotLowCov
 compositeTrack on
@@ -1409,6 +1315,51 @@ type bed 3
 	shortLabel Union
 	longLabel Union of all masks
 	subGroups view=sum pop=all
+
+track tgpRecombRate
+compositeTrack on
+shortLabel 1000G Recomb Rt
+longLabel 1000 Genomes Pilot Project Recombination Rates and Genetic Map
+priority 99.12
+visibility hide
+group varRep
+chromosomes chr1,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr2,chr20,chr21,chr22,chr3,chr4,chr5,chr6,chr7,chr8,chr9
+type bigWig 0 1000
+autoScale off
+viewLimits 0:20
+maxHeightPixels 128:40:11
+
+    track tgpRecombRateCeu
+    subTrack tgpRecombRate
+    shortLabel 1000G Recomb CEU
+    longLabel 1000 Genomes Pilot Project Recombination Rates (CEU)
+    type bigWig 0.0 108.0
+
+    track tgpRecombRateChbJpt
+    subTrack tgpRecombRate
+    shortLabel 1000GRecmb CHBJPT
+    longLabel 1000 Genomes Pilot Project Recombination Rates (CHB+JPT)
+    type bigWig 0.0 97.0
+
+    track tgpRecombRateYri
+    subTrack tgpRecombRate
+    shortLabel 1000G Recomb YRI
+    longLabel 1000 Genomes Pilot Project Recombination Rates (YRI)
+    type bigWig 0.0 62.0
+
+    track tgpRecombRateAvg
+    subTrack tgpRecombRate
+    shortLabel 1000G Recomb AVG
+    longLabel 1000 Genomes Pilot Project Recombination Rates (average)
+    type bigWig 0.0 108.0
+
+    track tgpRecombAvgMap
+    subTrack tgpRecombRate
+    shortLabel 1000G Genetic Map
+    longLabel 1000 Genomes Pilot Project Average Genetic Map Position (cM)
+    type bigWig 0.0 286.788605
+    viewLimits 0:286.788605
+    autoScale on
 
 
 track kiddEichlerDisc
@@ -3061,7 +3012,7 @@ searchMethod exact
 searchType bed
 searchPriority 10
 query select chrom, chromStart, chromEnd, name from %s where name like '%s%%'
-termiRegex COSM*
+termRegex COSM[0-9]+
 
 searchTable wgRnaOld
 searchMethod fuzzy
@@ -3811,7 +3762,7 @@ type bed 3
 track cpgIslandExt override
 priority 0
 
-track snpArray
+track genotypeArrays
 compositeTrack on
 shortLabel SNP Arrays
 longLabel SNP Genotyping Arrays
@@ -3822,84 +3773,84 @@ configureByPopup off
 type bed 4 .
 
     track snpArrayAffy6
-    parent snpArray
+    parent genotypeArrays
     shortLabel Affy SNP 6.0
     longLabel Affymetrix SNP 6.0
     type bed 6 +
     priority 1
 
     track snpArrayAffy6SV
-    parent snpArray
+    parent genotypeArrays
     shortLabel Affy SNP 6.0 SV
     longLabel Affymetrix SNP 6.0 Structural Variation
     type bed 6 +
     priority 2
 
     track snpArrayAffy5
-    parent snpArray off
+    parent genotypeArrays off
     shortLabel Affy SNP 5.0
     longLabel Affymetrix SNP 5.0
     type bed 6 +
     priority 3
 
     track snpArrayAffy250Nsp
-    parent snpArray off
+    parent genotypeArrays off
     shortLabel Affy 250KNsp
     longLabel Affymetrix GeneChip Human Mapping 250K Nsp
     type bed 6 +
     priority 4
 
     track snpArrayAffy250Sty
-    parent snpArray off
+    parent genotypeArrays off
     shortLabel Affy 250KSty
     longLabel Affymetrix GeneChip Human Mapping 250K Sty
     type bed 6 +
     priority 5
 
     track snpArrayIllumina650
-    parent snpArray off
+    parent genotypeArrays off
     shortLabel Illumina 650
     longLabel Illumina Human Hap 650v3
     type bed 6 +
     priority 6
 
     track snpArrayIllumina550
-    parent snpArray off
+    parent genotypeArrays off
     shortLabel Illumina 550
     longLabel Illumina Human Hap 550v3
     type bed 6 +
     priority 7
 
     track snpArrayIllumina300
-    parent snpArray off
+    parent genotypeArrays off
     shortLabel Illumina 300
     longLabel Illumina Human Hap 300v3
     type bed 6 +
     priority 8
 
     track snpArrayIllumina1M
-    parent snpArray
+    parent genotypeArrays
     shortLabel Illumina 1M-Duo
     longLabel Illumina Human1M-Duo
     type bed 6 +
     priority 9
 
     track snpArrayIlluminaHumanCytoSNP_12
-    parent snpArray
+    parent genotypeArrays
     shortLabel Illumina Cyto-12
     longLabel Illumina Human CytoSNP-12
     type bed 6 +
     priority 10
 
     track snpArrayIlluminaHuman660W_Quad
-    parent snpArray
+    parent genotypeArrays
     shortLabel Illumina 660W-Q
     longLabel Illumina Human 660W-Quad
     type bed 6 +
     priority 11
 
     track snpArrayIlluminaHumanOmni1_Quad
-    parent snpArray
+    parent genotypeArrays
     shortLabel Illumina Omni1-Q
     longLabel Illumina Human Omni1-Quad
     type bed 6 +
@@ -3915,6 +3866,17 @@ type gvf
 noScoreFilter .
 release beta,public
 
+track coriellDelDup
+shortLabel Coriell Del Dup
+longLabel Coriell Cell Line Deletions and Duplications
+spectrum on
+origAssembly hg18
+group varRep
+priority 111
+visibility hide
+type bedDetail 7
+pennantIcon 18.jpg ../goldenPath/help/hg18ToHg19LiftOver.html "lifted from hg18"
+
 track iscaComposite
 compositeTrack on
 shortLabel ISCA
@@ -3922,98 +3884,89 @@ longLabel International Standards for Cytogenomic Arrays Consortium
 group phenDis
 priority 110
 visibility hide
-type bed
-noInherit on
-urlLabel ISCA details: 
+subGroup1 view Views atot=Total cnv=CNVs
+subGroup2 phen Phenotype ben=Benign path=Pathogenic unk=Unknown
+subGroup3 level Confidence cur=Curated det=Determined lik=Likely unc=Uncertain
+dimensions dimensionY=phen dimensionX=level
+sortOrder phen=+ level=+ view=+
+type bed 3
 
-    track iscaPathGainCum
+    track iscaViewTotal
+    shortLabel Total (Graphical)
+    view atot
+    visibility full
     parent iscaComposite
-    shortLabel ISCA Path Gain
-    longLabel ISCA CNVs: Pathogenic Gain Total
+    viewUi on
     type bedGraph 4
     maxHeightPixels 128:57:16
     viewLimits 0:100
     alwaysZero on
-    color 0,0,200
-    visibility full
-    priority 1
 
-    track iscaPathLossCum
-    parent iscaComposite
-    shortLabel ISCA Path Loss
-    longLabel ISCA CNVs: Pathogenic Loss Total
-    type bedGraph 4
-    maxHeightPixels 128:57:16
-    viewLimits 0:100
-    alwaysZero on
-    color 200,0,0
-    visibility full
-    priority 2
+	track iscaPathGainCum
+	parent iscaViewTotal
+	shortLabel ISCA Path Gain
+	longLabel ISCA CNVs: Pathogenic Gain Total
+	color 0,0,200
+        subGroups view=atot phen=path level=det
 
-    track iscaCuratedPathogenic
-    parent iscaComposite
-    shortLabel ISCA Curated Path
-    longLabel ISCA CNVs: Curated Pathogenic
-    type gvf
-    noScoreFilter .
-    url https://www.iscaconsortium.org/isca/ucsc/$D/DetailsPages/$$.html
-    visibility hide
-    priority 3
+	track iscaPathLossCum
+	parent iscaViewTotal
+	shortLabel ISCA Path Loss
+	longLabel ISCA CNVs: Pathogenic Loss Total
+	color 200,0,0
+        subGroups view=atot phen=path level=det
 
-    track iscaCuratedBenign
-    parent iscaComposite
-    shortLabel ISCA Curated Ben
-    longLabel ISCA CNVs: Curated Benign
-    type gvf
-    noScoreFilter .
-    url https://www.iscaconsortium.org/isca/ucsc/$D/DetailsPages/$$.html
-    priority 4
-
-    track iscaPathogenic
-    parent iscaComposite
-    shortLabel ISCA Pathogenic
-    longLabel ISCA CNVs: Pathogenic
-    type gvf
-    noScoreFilter .
-    url https://www.iscaconsortium.org/isca/ucsc/$D/DetailsPages/$$.html
+    track iscaViewDetail
+    shortLabel CNVs
+    view cnv
     visibility pack
-    priority 5
-
-    track iscaLikelyPathogenic
     parent iscaComposite
-    shortLabel ISCA Uncert Path
-    longLabel ISCA CNVs: Uncertain: Likely Pathogenic
     type gvf
     noScoreFilter .
     url https://www.iscaconsortium.org/isca/ucsc/$D/DetailsPages/$$.html
-    priority 6
+    urlLabel ISCA details: 
 
-    track iscaUncertain
-    parent iscaComposite
-    shortLabel ISCA Uncertain
-    longLabel ISCA CNVs: Uncertain
-    type gvf
-    noScoreFilter .
-    url https://www.iscaconsortium.org/isca/ucsc/$D/DetailsPages/$$.html
-    priority 7
+	track iscaCuratedPathogenic
+	parent iscaViewDetail off
+	shortLabel ISCA Curated Path
+	longLabel ISCA CNVs: Curated Pathogenic
+        subGroups view=cnv phen=path level=cur
 
-    track iscaLikelyBenign
-    parent iscaComposite
-    shortLabel ISCA Uncert Ben
-    longLabel ISCA CNVs: Uncertain: Likely Benign
-    type gvf
-    noScoreFilter .
-    url https://www.iscaconsortium.org/isca/ucsc/$D/DetailsPages/$$.html
-    priority 8
+	track iscaCuratedBenign
+	parent iscaViewDetail off
+	shortLabel ISCA Curated Ben
+	longLabel ISCA CNVs: Curated Benign
+        subGroups view=cnv phen=ben level=cur
 
-    track iscaBenign
-    parent iscaComposite
-    shortLabel ISCA Benign
-    longLabel ISCA CNVs: Benign
-    type gvf
-    noScoreFilter .
-    url https://www.iscaconsortium.org/isca/ucsc/$D/DetailsPages/$$.html
-    priority 9
+	track iscaPathogenic
+	parent iscaViewDetail
+	shortLabel ISCA Pathogenic
+	longLabel ISCA CNVs: Pathogenic
+        subGroups view=cnv phen=path level=det
+
+	track iscaLikelyPathogenic
+	parent iscaViewDetail off
+	shortLabel ISCA Uncert Path
+	longLabel ISCA CNVs: Uncertain: Likely Pathogenic
+        subGroups view=cnv phen=path level=lik
+
+	track iscaUncertain
+	parent iscaViewDetail off
+	shortLabel ISCA Uncertain
+	longLabel ISCA CNVs: Uncertain
+        subGroups view=cnv phen=unk level=unc
+
+	track iscaLikelyBenign
+	parent iscaViewDetail off
+	shortLabel ISCA Uncert Ben
+	longLabel ISCA CNVs: Uncertain: Likely Benign
+        subGroups view=cnv phen=ben level=lik
+
+	track iscaBenign
+	parent iscaViewDetail off
+	shortLabel ISCA Benign
+	longLabel ISCA CNVs: Benign
+        subGroups view=cnv phen=ben level=det
 
 searchName decipherId
 searchTable decipher
@@ -4208,34 +4161,34 @@ html numtSeq
 searchTable numtSMitochondrionChrPlacement
 searchMethod exact
 searchType bed
-#shortCircuit 1
+semiShortCircuit 1
 searchPriority 15
 query select chrom, chromStart, chromEnd, name from %s where name like '%s%%'
-termiRegex HSA_NumtS_*
+termRegex HSA_NumtS_.*
 
 searchTable numtSMitochondrion
 searchMethod exact
 searchType bed
-#shortCircuit 1
+semiShortCircuit 1
 searchPriority 15
 query select chrom, chromStart, chromEnd, name from %s where name like '%s%%'
-termiRegex HSA_NumtS_*
+termRegex HSA_NumtS_.*
 
 searchTable numtS
 searchMethod exact
 searchType bed 
-#shortCircuit 1
+semiShortCircuit 1
 searchPriority 15
 query select chrom, chromStart, chromEnd, name from %s where name like '%s%%'
-termiRegex HSA_NumtS_*
-    
+termRegex HSA_NumtS_.*
+
 searchTable numtSAssembled
 searchMethod exact
 searchType bed
-#shortCircuit 1
+semiShortCircuit 1
 searchPriority 15
 query select chrom, chromStart, chromEnd, name from %s where name like '%s%%'
-termiRegex HSA_NumtS_*
+termRegex HSA_NumtS_.*
 
 include decode.rmap.ra
 
@@ -4257,3 +4210,9 @@ searchPriority 50
 xrefTable geneReviewsRefGene
 xrefQuery select geneSymbol,diseaseName from %s where diseaseName like '%%%s%%'
 searchBoth on
+
+searchTable dgv
+searchType bed
+searchPriority 50
+termRegex [en]ss?v[0-9]+
+release alpha

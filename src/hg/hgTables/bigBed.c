@@ -244,7 +244,63 @@ freeMem(fieldArray);
 freeMem(columnArray);
 }
 
-void showSchemaBigBed(char *table)
+static unsigned slCountAtMost(const void *list, unsigned max)
+// return the length of the list, but only count up to max
+{
+struct slList *pt = (struct slList *)list;
+int len = 0;
+
+while (pt != NULL)
+    {
+    len += 1;
+    pt = pt->next;
+    if (len == max)
+	break;
+    }
+return len;
+}
+
+static struct bigBedInterval *getTenElements(struct bbiFile *bbi, 
+    struct bbiChromInfo *chromList, struct lm *lm)
+// get up to ten sample rows from the first chrom listed in the bigBed.
+// will return less than ten if there are less than ten on the first chrom.
+{
+struct bigBedInterval *ivList = NULL;
+// start out requesting only 10k bp so we don't hang if the bigBed is huge
+int currentLen = 10000;
+// look about 2/3 of the way through the chrom to avoid the telomeres
+// and the centromere
+int startAddr = 2 * chromList->size / 3;
+int endAddr;
+
+while ((slCountAtMost(ivList,10)) < 10)
+    {
+    endAddr = startAddr + currentLen;
+
+    // if we're pointing beyond the end of the chromosome
+    if (endAddr > chromList->size)
+	{
+	// move the start address back
+	startAddr -= (endAddr - chromList->size);
+	endAddr = chromList->size;
+	}
+
+    // if we're pointing to before the start of the chrom
+    if (startAddr < 0)
+	startAddr = 0;
+
+    // ask for ten items
+    ivList = bigBedIntervalQuery(bbi, chromList->name, startAddr, endAddr, 10, lm);
+    currentLen *= 2;
+
+    if ((startAddr == 0) && (endAddr == chromList->size))
+	break;
+    }
+
+return  ivList;
+}
+
+void showSchemaBigBed(char *table, struct trackDb *tdb)
 /* Show schema on bigBed. */
 {
 /* Figure out bigBed file name and open it.  Get contents for first chromosome as an example. */
@@ -253,8 +309,7 @@ char *fileName = bigBedFileName(table, conn);
 struct bbiFile *bbi = bigBedFileOpen(fileName);
 struct bbiChromInfo *chromList = bbiChromList(bbi);
 struct lm *lm = lmInit(0);
-struct bigBedInterval *ivList = bigBedIntervalQuery(bbi, chromList->name, 0,
-					 	    chromList->size, 10, lm);
+struct bigBedInterval *ivList = getTenElements(bbi, chromList, lm);
 
 /* Get description of columns, making it up from BED records if need be. */
 struct asObject *as = bigBedAsOrDefault(bbi);
@@ -264,7 +319,7 @@ hPrintf("&nbsp;&nbsp;&nbsp;&nbsp;<B>Primary Table:</B> %s<br>", table);
 hPrintf("<B>Big Bed File:</B> %s", fileName);
 if (bbi->version >= 2)
     {
-    hPrintf("&nbsp;&nbsp;&nbsp;&nbsp;<B>Item Count:</B> ");
+    hPrintf("<BR><B>Item Count:</B> ");
     printLongWithCommas(stdout, bigBedItemCount(bbi));
     }
 hPrintf("<BR>\n");
@@ -273,20 +328,25 @@ hPrintf("<B>Format description:</B> %s<BR>", as->comment);
 /* Put up table that describes fields. */
 hTableStart();
 hPrintf("<TR><TH>field</TH>");
-hPrintf("<TH>example</TH>");
+if (ivList != NULL)
+    hPrintf("<TH>example</TH>");
 hPrintf("<TH>description</TH> ");
 puts("</TR>\n");
 struct asColumn *col;
 int colCount = 0;
 char *row[bbi->fieldCount];
 char startBuf[16], endBuf[16];
-char *dupeRest = lmCloneString(lm, ivList->rest);	/* Manage rest-stomping side-effect */
-bigBedIntervalToRow(ivList, chromList->name, startBuf, endBuf, row, bbi->fieldCount);
-ivList->rest = dupeRest;
+if (ivList != NULL)
+    {
+    char *dupeRest = lmCloneString(lm, ivList->rest);	/* Manage rest-stomping side-effect */
+    bigBedIntervalToRow(ivList, chromList->name, startBuf, endBuf, row, bbi->fieldCount);
+    ivList->rest = dupeRest;
+    }
 for (col = as->columnList; col != NULL; col = col->next)
     {
     hPrintf("<TR><TD><TT>%s</TT></TD>", col->name);
-    hPrintf("<TD>%s</TD>", row[colCount]);
+    if (ivList != NULL)
+	hPrintf("<TD>%s</TD>", row[colCount]);
     hPrintf("<TD>%s</TD></TR>", col->comment);
     ++colCount;
     }
@@ -295,42 +355,46 @@ for (col = as->columnList; col != NULL; col = col->next)
 for ( ; colCount < bbi->fieldCount; ++colCount)
     {
     hPrintf("<TR><TD><TT>column%d</TT></TD>", colCount+1);
-    hPrintf("<TD>%s</TD>", row[colCount]);
+    if (ivList != NULL)
+	hPrintf("<TD>%s</TD>", row[colCount]);
     hPrintf("<TD>n/a</TD></TR>\n");
     }
 hTableEnd();
 
 
-/* Put up another section with sample rows. */
-webNewSection("Sample Rows");
-hTableStart();
-
-/* Print field names as column headers for example */
-hPrintf("<TR>");
-int colIx = 0;
-for (col = as->columnList; col != NULL; col = col->next)
+if (ivList != NULL)
     {
-    hPrintf("<TH>%s</TH>", col->name);
-    ++colIx;
-    }
-for (; colIx < colCount; ++colIx)
-    hPrintf("<TH>column%d</TH>", colIx+1);
-hPrintf("</TR>\n");
+    /* Put up another section with sample rows. */
+    webNewSection("Sample Rows");
+    hTableStart();
 
-/* Print sample lines. */
-struct bigBedInterval *iv;
-for (iv=ivList; iv != NULL; iv = iv->next)
-    {
-    bigBedIntervalToRow(iv, chromList->name, startBuf, endBuf, row, bbi->fieldCount);
+    /* Print field names as column headers for example */
     hPrintf("<TR>");
-    for (colIx=0; colIx<colCount; ++colIx)
-        {
-	writeHtmlCell(row[colIx]);
+    int colIx = 0;
+    for (col = as->columnList; col != NULL; col = col->next)
+	{
+	hPrintf("<TH>%s</TH>", col->name);
+	++colIx;
 	}
+    for (; colIx < colCount; ++colIx)
+	hPrintf("<TH>column%d</TH>", colIx+1);
     hPrintf("</TR>\n");
-    }
-hTableEnd();
 
+    /* Print sample lines. */
+    struct bigBedInterval *iv;
+    for (iv=ivList; iv != NULL; iv = iv->next)
+	{
+	bigBedIntervalToRow(iv, chromList->name, startBuf, endBuf, row, bbi->fieldCount);
+	hPrintf("<TR>");
+	for (colIx=0; colIx<colCount; ++colIx)
+	    {
+	    writeHtmlCell(row[colIx]);
+	    }
+	hPrintf("</TR>\n");
+	}
+    hTableEnd();
+    }
+printTrackHtml(tdb);
 /* Clean up and go home. */
 lmCleanup(&lm);
 bbiFileClose(&bbi);

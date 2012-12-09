@@ -39,7 +39,7 @@ char *organism = NULL;
 
 static void ourCellStart()
 {
-puts("<TD>");
+fputs("<TD>", stdout);  // do not add a newline
 }
 
 static void ourCellEnd()
@@ -51,7 +51,7 @@ static void ourPrintCell(char *str)
 {
 ourCellStart();
 if (str != NULL)
-    puts(str);
+    fputs(str, stdout); // do not add a newline -- was causing trailing blanks get copied in cut and paste 
 ourCellEnd();
 }
 
@@ -67,21 +67,16 @@ if (string != NULL)
 return string;
 }
 
-static void addGenomesToHash(struct hubConnectStatus *hub, struct hash *hash)
-/* add supported assembly names from trackHub to hash */
+static void printGenomes(struct trackHub *thub)
+/* print supported assembly names from trackHub */
 {
-if (hub == NULL)
-    return;
+/* List of associated genomes. */
+struct trackHubGenome *genomes = thub->genomeList;	
+struct dyString *dy = newDyString(100);
 
-struct trackHub *thub = hub->trackHub;
-if (thub != NULL)
-    {
-    /* List of associated genomes. */
-    struct trackHubGenome *genomes = thub->genomeList;	
-
-    for(; genomes; genomes = genomes->next)
-	hashStore(hash, genomes->name);
-    }
+for(; genomes; genomes = genomes->next)
+    dyStringPrintf(dy,"%s,", genomes->name);
+ourPrintCell(removeLastComma( dyStringCannibalize(&dy)));
 }
 
 static void hgHubConnectUnlisted(struct hubConnectStatus *hubList, 
@@ -91,24 +86,23 @@ static void hgHubConnectUnlisted(struct hubConnectStatus *hubList,
 /* NOTE: Destroys hubList */
 {
 // put out the top of our page
-printf("<div id=\"unlistedHubs\" class=\"hubList\"> "
-    "<table id=\"unlistedHubsTable\"> "
-    "<thead><tr> "
-	"<th colspan=\"6\" id=\"addHubBar\"><label for=\"hubUrl\">URL:</label> "
+printf("<div id=\"unlistedHubs\" class=\"hubList\"> \n"
+    "<table id=\"unlistedHubsTable\"> \n"
+    "<thead><tr> \n"
+	"<th colspan=\"6\" id=\"addHubBar\"><label for=\"hubUrl\">URL:</label> \n"
 	"<input name=\"hubText\" id=\"hubUrl\" class=\"hubField\""
-	    "type=\"text\" size=\"65\"> "
+	    "type=\"text\" size=\"65\"> \n"
 	"<input name=\"hubAddButton\""
-	    "onClick=\"if(validateUrl($('#hubUrl').val())) { document.addHubForm.elements['hubUrl'].value=hubText.value;"
+	    "onClick=\"hubText.value=$.trim(hubText.value);if(validateUrl($('#hubUrl').val())) { document.addHubForm.elements['hubUrl'].value=hubText.value;"
 		"document.addHubForm.submit();return true;} else { return false;}\" "
-		"class=\"hubField\" type=\"button\" value=\"Add Hub\">"
-	"</th> "
-    "</tr> ");
+		"class=\"hubField\" type=\"button\" value=\"Add Hub\">\n"
+	"</th> \n"
+    "</tr> \n");
 
 // count up the number of unlisted hubs we currently have
 int unlistedHubCount = 0;
 struct hubConnectStatus *unlistedHubList = NULL;
 struct hubConnectStatus *hub, *nextHub;
-struct hash *assHash = newHash(5);
 
 for(hub = hubList; hub; hub = nextHub)
     {
@@ -116,7 +110,6 @@ for(hub = hubList; hub; hub = nextHub)
     // if url is not in publicHash, it's unlisted */
     if (!((publicHash != NULL) && hashLookup(publicHash, hub->hubUrl)))
 	{
-	addGenomesToHash(hub, assHash);
 	unlistedHubCount++;
 	slAddHead(&unlistedHubList, hub);
 	}
@@ -124,27 +117,11 @@ for(hub = hubList; hub; hub = nextHub)
 
 hubList = NULL;  // hubList no longer valid
 
-struct hashCookie cookie = hashFirst(assHash);
-struct dyString *dy = newDyString(100);
-struct hashEl *hel;
-int numAssemblies = 0;
-while ((hel = hashNext(&cookie)) != NULL)
-    {
-    dyStringPrintf(dy,"%s,", hel->name);
-    numAssemblies++;
-    }
-
-char *dbList = NULL;
-if (numAssemblies)   
-    dbList = dyStringCannibalize(&dy);
-
 if (unlistedHubCount == 0)
     {
     // nothing to see here
-    printf(
-	"<tr><td>No Unlisted Track Hubs</td></tr>"
-	"</td>");
-    printf("</table></thead></div>");
+    printf("<tr><td>No Unlisted Track Hubs</td></tr>");
+    printf("</thead></table></div>");
     return;
     }
 
@@ -157,7 +134,8 @@ printf(
 	"<th>Assemblies</th> "
 	"<th>URL</th> "
 	"<th>Disconnect</th> "
-    "</tr></thead>\n");
+    "</tr>\n"
+    "</thead>\n");
 
 // start first row
 printf("<tbody><tr>");
@@ -186,7 +164,7 @@ for(hub = unlistedHubList; hub; hub = hub->next)
 	"<input name=\"hubClearButton\""
 	    "onClick=\"document.resetHubForm.elements['hubUrl'].value='%s';"
 		"document.resetHubForm.submit();return true;\" "
-		"class=\"hubField\" type=\"button\" value=\"check hub\">"
+		"class=\"hubField\" type=\"button\" value=\"check hub\">\n"
 		, hub->hubUrl);
 	ourCellEnd();
 	}
@@ -197,14 +175,17 @@ for(hub = unlistedHubList; hub; hub = hub->next)
 
     if (!isEmpty(hub->errorMessage))
 	printf("<TD><span class=\"hubError\">ERROR: %s </span>"
-	    "<a href=\"../goldenPath/help/hgTrackHubHelp.html#Debug\">Debug</a></TD>", 
+	    "<a href=\"../goldenPath/help/hgTrackHubHelp.html#Debug\">Debug</a></TD>\n", 
 	    hub->errorMessage);
     else if (hub->trackHub != NULL)
 	ourPrintCell(hub->trackHub->longLabel);
     else
 	ourPrintCell("");
 
-    ourPrintCell(removeLastComma(dbList));
+    if (hub->trackHub != NULL)
+	printGenomes(hub->trackHub);
+    else
+	ourPrintCell("");
     ourPrintCell(hub->hubUrl);
 
     ourCellStart();
@@ -212,7 +193,7 @@ for(hub = unlistedHubList; hub; hub = hub->next)
     "<input name=\"hubDisconnectButton\""
 	"onClick=\"document.disconnectHubForm.elements['hubId'].value='%d';"
 	    "document.disconnectHubForm.submit();return true;\" "
-	    "class=\"hubField\" type=\"button\" value=\"X\">"
+	    "class=\"hubField\" type=\"button\" value=\"X\">\n"
 	    , hub->id);
     ourCellEnd();
     }
@@ -297,6 +278,7 @@ while ((row = sqlNextRow(sr)) != NULL)
 
     ourPrintCell(removeLastComma(dbList));
     ourPrintCell(url);
+
     hashStore(publicHash, url);
     }
 sqlFreeResult(&sr);
@@ -463,7 +445,7 @@ printf(
    "<A HREF=\"../goldenPath/help/hgTrackHubHelp.html\" TARGET=_blank>"
    "User's Guide</A>.</P>\n"
    "<P><B>NOTE: Because Track Hubs are created and maintained by external sources,"
-   " UCSC cannot be held responsible for their content.</B></P>"
+   " UCSC is not responsible for their content.</B></P>"
    );
 printf("</div>\n");
 

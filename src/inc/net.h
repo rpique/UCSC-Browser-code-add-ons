@@ -10,6 +10,10 @@
 #include "linefile.h"
 #include "dystring.h"
 
+#define DEFAULTCONNECTTIMEOUTMSEC 10000  /* default connect timeout for tcp in milliseconds */
+
+/* add a failure to connFailures[]
+ *  which can save time and avoid more timeouts */
 int netConnect(char *hostName, int port);
 /* Start connection with a server having resolved port. Return < 0 if error. */
 

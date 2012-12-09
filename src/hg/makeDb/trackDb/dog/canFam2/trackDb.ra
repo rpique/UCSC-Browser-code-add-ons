@@ -1,5 +1,8 @@
 include trackDb.chainNet.ra
 
+track quality override
+type wig 0 50
+
 track bacEndPairs
 #replaces record bacEndPairs in parent dir missing/extra color,altColor
 shortLabel BAC End Pairs
@@ -185,3 +188,5 @@ track nscanGene override
 visibility dense
 informant Dog N-SCAN uses human (hg17) as the informant and iterative pseudogene masking.
 
+track snp131 override
+visibility dense

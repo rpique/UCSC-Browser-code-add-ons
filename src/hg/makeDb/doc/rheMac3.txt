@@ -561,7 +561,6 @@ done | ./agpToCtgPos2.pl /dev/stdin > ctgPos2.tab
     # based on result of
     # hgsql -N -e "select type from ctgPos2;" rheMac3 | sort | uniq
     # W
-XXXX TODO: html
     # prepare the src/hg/makeDb/trackDb/cow/rheMac3/ctgPos2.html 
 
 ############################################################################
@@ -659,4 +658,548 @@ printf("%s\t%d\t%s\t%s %s\t%s\t%s\t%0.0f\t%0.1f\t%s\t%s\n",
     #   cleanup
     rm -fr hardMaskedFa
 
-########################################################################
+##############################################################################
+# LASTZ Mouse mm10 Swap (DONE - 2012-03-08 - Hiram)
+    cd /hive/data/genomes/mm10/bed/lastzRheMac3.2012-03-08
+    cat fb.mm10.chainRheMac3Link.txt
+    #   900117108 bases of 2652783500 (33.931%) in intersection
+
+    mkdir /hive/data/genomes/rheMac3/bed/blastz.mm10.swap
+    cd /hive/data/genomes/rheMac3/bed/blastz.mm10.swap
+    time nice -n +19 doBlastzChainNet.pl -verbose=2 \
+    /hive/data/genomes/mm10/bed/lastzRheMac3.2012-03-08/DEF \
+    -swap -syntenicNet \
+    -workhorse=hgwdev -smallClusterHub=encodek -bigClusterHub=swarm \
+    -chainMinScore=3000 -chainLinearGap=medium > swap.log 2>&1 &
+    #   real    69m5.839s
+    cat fb.rheMac3.chainMm10Link.txt
+    #   883164992 bases of 2639145830 (33.464%) in intersection
+    # set sym link to indicate this is the lastz for this genome:
+    cd /hive/data/genomes/rheMac3/bed
+    ln -s blastz.mm10.swap lastz.mm10
+
+#########################################################################
+# LASTZ Human Swap (DONE - 2012-03-15 - Chin)
+    cd /hive/data/genomes/hg19/bed/lastzRheMac3.2012-03-15
+    cat fb.hg19.chainRheMac3Link.txt
+    #   2400694407 bases of 2897316137 (82.859%) in intersection
+
+    #   running the swap - DONE - 20i12-03-16
+    mkdir /hive/data/genomes/rheMac3/bed/blastz.hg19.swap
+    cd /hive/data/genomes/rheMac3/bed/blastz.hg19.swap
+    time nice -n +19 doBlastzChainNet.pl -verbose=2 \
+        /hive/data/genomes/hg19/bed/lastzRheMac3.2012-03-15/DEF \
+        -swap \
+        -noLoadChainSplit -chainMinScore=5000 -chainLinearGap=medium \
+        -workhorse=hgwdev -smallClusterHub=memk -bigClusterHub=swarm \
+        > swap.log 2>&1 &
+    #    58m38.594s
+    cat fb.rheMac3.chainHg19Link.txt
+    #   2313806886 bases of 2646704109 (87.422%) in intersection
+    cd /hive/data/genomes/rheMac3/bed
+    ln -s blastz.hg19.swap lastz.hg19
+
+##########################################################################
+# LASTZ  Orangutan ponAbe2 (DONE - 2012-04-18 - Chin)
+    screen # use screen to control this job
+    mkdir /hive/data/genomes/rheMac3/bed/blastzPonAbe2.2012-04-18
+    cd /hive/data/genomes/rheMac3/bed/blastzPonAbe2.2012-04-18
+
+    cat << '_EOF_' > DEF
+# Rhesus vs Orangutan
+BLASTZ_M=50
+
+# TARGET: Rhesus RheMac3
+SEQ1_DIR=/scratch/data/rheMac3/rheMac3.2bit
+SEQ1_LEN=/scratch/data/rheMac3/chrom.sizes
+SEQ1_CHUNK=10000000
+SEQ1_LAP=10000
+
+# QUERY: Orangutan ponAbe2
+SEQ2_DIR=/scratch/data/ponAbe2/ponAbe2.2bit
+SEQ2_LEN=/scratch/data/ponAbe2/chrom.sizes
+SEQ2_CHUNK=10000000
+SEQ2_LAP=0
+
+BASE=/hive/data/genomes/rheMac3/bed/blastzPonAbe2.2012-04-18
+TMPDIR=/scratch/tmp
+'_EOF_'
+    # << happy emacs
+
+    time nice -n +19 doBlastzChainNet.pl -verbose=2 \
+      -workhorse=hgwdev -smallClusterHub=memk -bigClusterHub=swarm \
+      -chainMinScore=3000 -chainLinearGap=medium \
+      -syntenicNet `pwd`/DEF > do.log 2>&1 &
+    #   real    9679m37.253
+
+    cat fb.rheMac3.chainPonAbe2Link.txt
+    #   2354152230 bases of 2639145830 (89.201%) in intersection
+
+    #   and, for the swap
+    mkdir /hive/data/genomes/ponAbe2/bed/blastz.rheMac3.swap
+    cd /hive/data/genomes/ponAbe2/bed/blastz.rheMac3.swap
+    time nice -n +19 doBlastzChainNet.pl -verbose=2 \
+        /hive/data/genomes/rheMac3/bed/blastzPonAbe2.2012-04-18/DEF \
+       -workhorse=hgwdev -smallClusterHub=memk -bigClusterHub=swarm \
+        -swap -chainMinScore=3000 -chainLinearGap=medium  > swap.log 2>&1 &
+    #   real    289m9.479s
+    cat fb.ponAbe2.chainRheMac3Link.txt
+    #   2565157739 bases of 3093572278 (82.919%) in intersection
+    cd /hive/data/genomes/ponAbe2/bed
+    ln -s blastz.rheMac3.swap lastz.rheMac3
+
+##########################################################################
+# LASTZ Gorilla gorGor3 (DONE - 2012-04-18 - Chin)
+    screen # use screen to control this job
+    mkdir /hive/data/genomes/rheMac3/bed/blastzGorGor3.2012-04-18
+    cd /hive/data/genomes/rheMac3/bed/blastzGorGor3.2012-04-18
+
+    cat << '_EOF_' > DEF
+# Rhesus vs Gorilla
+BLASTZ_M=50
+
+# TARGET: Rhesus RheMac3
+SEQ1_DIR=/scratch/data/rheMac3/rheMac3.2bit
+SEQ1_LEN=/scratch/data/rheMac3/chrom.sizes
+SEQ1_CHUNK=10000000
+SEQ1_LAP=10000
+
+# QUERY: Gorilla gorGor3
+SEQ2_DIR=/scratch/data/gorGor3/gorGor3.2bit
+SEQ2_LEN=/scratch/data/gorGor3/chrom.sizes
+SEQ2_CHUNK=10000000
+SEQ2_LAP=0
+
+BASE=/hive/data/genomes/rheMac3/bed/blastzGorGor3.2012-04-18
+TMPDIR=/scratch/tmp
+'_EOF_'
+    # << happy emacs
+
+    time nice -n +19 doBlastzChainNet.pl -verbose=2 \
+      -workhorse=hgwdev -smallClusterHub=memk -bigClusterHub=swarm \
+      -chainMinScore=3000 -chainLinearGap=medium \
+      -syntenicNet `pwd`/DEF > do.log 2>&1 &
+    #   real    9670m18.338s
+
+    cat fb.rheMac3.chainGorGor3Link.txt
+    #   2279633399 bases of 2639145830 (86.378%) in intersection
+
+    #   and, for the swap
+    mkdir /hive/data/genomes/gorGor3/bed/blastz.rheMac3.swap
+    cd /hive/data/genomes/gorGor3/bed/blastz.rheMac3.swap
+    time nice -n +19 doBlastzChainNet.pl -verbose=2 \
+        /hive/data/genomes/rheMac3/bed/blastzGorGor3.2012-04-18/DEF \
+       -workhorse=hgwdev -smallClusterHub=memk -bigClusterHub=swarm \
+        -swap -chainMinScore=3000 -chainLinearGap=medium  > swap.log 2>&1 &
+    #   real    289m9.479s
+    cat fb.gorGor3.chainRheMac3Link.txt
+    #   2335269818 bases of 2822760080 (82.730%) in intersection
+    cd /hive/data/genomes/gorGor3/bed
+    ln -s blastz.rheMac3.swap lastz.rheMac3
+
+
+#########################################################################
+# LASTZ Rat rn5 Swap (DONE - 2012-07-10 - Chin)
+    cd /cluster/data/rn5/bed/lastz.rheMac3.2012-07-10
+    cat fb.rn5.chainRheMac3Link.txt
+    # 896256761 bases of 2572853723 (34.835%) in intersection
+
+    # then swap
+    mkdir /cluster/data/rheMac3/bed/blastz.rn5.swap
+    cd /cluster/data/rheMac3/bed/blastz.rn5.swap
+    time nice -n +19 doBlastzChainNet.pl -verbose=2 \
+        /cluster/data/rn5/bed/lastz.rheMac3.2012-07-10/DEF \
+        -workhorse=hgwdev -smallClusterHub=memk -bigClusterHub=swarm \      
+        -chainMinScore=3000 -chainLinearGap=medium \
+        -swap -syntenicNet > swap.log 2>&1 &
+    #   real    69m12.752s
+    cat fb.rheMac3.chainRn5Link.txt
+    # 858153767 bases of 2639145830 (32.516%) in intersection
+    cd /hive/data/genomes/rheMac3/bed
+    ln -s blastz.rn5.swap lastz.rn5
+
+############################################################################
+# LASTZ Opossum monDom5 (DONE - 2012-07-19 - Chin)
+    mkdir /hive/data/genomes/monDom5/bed/lastzRheMac3.2012-07-19
+    cd /hive/data/genomes/monDom5/bed/lastzRheMac3.2012-07-19
+
+    # adjust the SEQ2_LIMIT with -stop=partition to get a reasonable
+    #   number of jobs, 50,000 to something under 100,000
+
+    cat << '_EOF_' > DEF
+# opossum vs rhesus
+BLASTZ=/cluster/bin/penn/lastz-distrib-1.03.02/bin/lastz
+# TARGET: Opossum MonDom5
+SEQ1_DIR=/scratch/data/monDom5/monDom5.2bit
+SEQ1_LEN=/scratch/data/monDom5/chrom.sizes
+SEQ1_CHUNK=20000000
+SEQ1_LAP=10000
+
+# QUERY: Rhesus RheMac3
+SEQ2_DIR=/scratch/data/rheMac3/rheMac3.2bit
+SEQ2_LEN=/scratch/data/rheMac3/chrom.sizes
+SEQ2_CHUNK=10000000
+SEQ2_LAP=0
+SEQ2_LIMIT=1000
+
+BASE=/hive/data/genomes/monDom5/bed/lastzRheMac3.2012-07-19
+TMPDIR=/scratch/tmp
+'_EOF_'
+    # << happy emacs
+
+    #   establish a screen to control this job
+    screen -S monDom5RheMac3
+    time nice -n +19 doBlastzChainNet.pl -verbose=2 \
+    `pwd`/DEF \
+    -syntenicNet \
+    -workhorse=hgwdev -smallClusterHub=encodek -bigClusterHub=swarm \
+    -chainMinScore=3000 -chainLinearGap=medium > do.log 2>&1 &
+    #   real    2473m43.189s
+    cat fb.monDom5.chainRheMac3Link.txt
+    #   221659579 bases of 3501660299 (6.330%) in intersection
+    # set sym link to indicate this is the lastz for this genome:
+    cd /hive/data/genomes/monDom5/bed
+    ln -s lastzRheMac3.2012-07-19 lastz.rheMac3
+
+    mkdir /hive/data/genomes/rheMac3/bed/blastz.monDom5.swap
+    cd /hive/data/genomes/rheMac3/bed/blastz.monDom5.swap
+    time nice -n +19 doBlastzChainNet.pl -verbose=2 \
+    /hive/data/genomes/monDom5/bed/lastzRheMac3.2012-07-19/DEF \
+    -swap -syntenicNet \
+    -workhorse=hgwdev -smallClusterHub=encodek -bigClusterHub=swarm \
+    -chainMinScore=3000 -chainLinearGap=medium > swap.log 2>&1 &
+    #   real    106m24.321s
+    cat fb.rheMac3.chainMonDom5Link.txt
+    #   214801189 bases of 2639145830 (8.139%) in intersection
+    # set sym link to indicate this is the lastz for this genome:
+    cd /hive/data/genomes/rheMac3/bed
+    ln -s blastz.monDom5.swap lastz.monDom5
+
+############################################################################
+# LASTZ Chimp panTro4 Swap (DONE 2012-07-12 - Chin)
+    cd /hive/data/genomes/panTro4/bed/lastzRheMac3.2012-07-19
+    cat fb.panTro4.chainRheMac3Link.txt
+    #   2362219217 bases of 2902338967 (81.390%) in intersection
+    cd /hive/data/genomes/panTro4/bed
+    ln -s lastzRheMac3.2012-07-19 lastz.rheMac3
+
+    #   running the swap  
+    mkdir /hive/data/genomes/rheMac3/bed/blastz.panTro4.swap
+    cd /hive/data/genomes/rheMac3/bed/blastz.panTro4.swap
+    time nice -n +19 doBlastzChainNet.pl -verbose=2 \
+    -swap /hive/data/genomes/panTro4/bed/lastzRheMac3.2012-07-19/DEF \
+    -noLoadChainSplit -chainMinScore=5000 -chainLinearGap=medium \
+    -syntenicNet -workhorse=hgwdev -smallClusterHub=encodek \
+    -bigClusterHub=swarm > swap.log 2>&1 &
+    #   real    82m21.660s
+    cat fb.rheMac3.chainPanTro4Link.txt
+    #   2278587464 bases of 2639145830 (86.338%) in intersection
+   # set sym link to indicate this is the lastz for this genome:
+    cd /hive/data/genomes/rheMac3/bed
+    ln -s blastz.panTro4.swap lastz.panTro4
+
+############################################################################
+# LASTZ Marmoset calJac3 (DONE - 2012-07-19 - Chin)
+    screen -S rhesus_vs_marmoset # use a screen to manage this multi-day job
+    mkdir /hive/data/genomes/rheMac3/bed/lastzCalJac3.2012-07-19
+    cd /hive/data/genomes/rheMac3/bed/lastzCalJac3.2012-07-19
+
+    #   same kind of parameters as used in human<->marmoset
+    cat << '_EOF_' > DEF
+# Rhesus vs. marmoset
+BLASTZ=lastz
+# maximum M allowed with lastz is only 254
+BLASTZ_M=254
+BLASTZ_Q=/scratch/data/blastz/human_chimp.v2.q
+# and place those items here
+BLASTZ_O=600
+BLASTZ_E=150
+BLASTZ_K=4500
+BLASTZ_Y=15000
+BLASTZ_T=2
+
+# TARGET: Rhesus RheMac3
+SEQ1_DIR=/scratch/data/rheMac3/rheMac3.2bit
+SEQ1_LEN=/scratch/data/rheMac3/chrom.sizes
+SEQ1_CHUNK=20000000
+SEQ1_LAP=10000
+SEQ1_LIMIT=5
+
+# QUERY: Marmoset (calJac3)
+SEQ2_DIR=/scratch/data/calJac3/calJac3.2bit
+SEQ2_LEN=/scratch/data/calJac3/chrom.sizes
+SEQ2_LIMIT=50
+SEQ2_CHUNK=10000000
+SEQ2_LAP=0
+
+BASE=/hive/data/genomes/rheMac3/bed/lastzCalJac3.2012-07-19
+TMPDIR=/scratch/tmp
+'_EOF_'
+    # << this line keeps emacs coloring happy
+
+    time nice -n +19 doBlastzChainNet.pl -verbose=2 \
+    `pwd`/DEF \
+    -syntenicNet \
+    -chainMinScore=5000 -chainLinearGap=medium \
+    -workhorse=hgwdev -smallClusterHub=memk -bigClusterHub=swarm \
+    > do.log 2>&1 &
+    #   real    5720m34.726s
+    cat fb.rheMac3.chainCalJac3Link.txt
+    #   1893656467 bases of 2639145830 (71.753%) in intersection
+
+    cd /hive/data/genomes/rheMac3/bed
+    ln -s lastzCalJac3.2012-07-19 lastz.calJac3
+
+    #   running the swap 
+    mkdir /hive/data/genomes/calJac3/bed/blastz.rheMac3.swap
+    cd /hive/data/genomes/calJac3/bed/blastz.rheMac3.swap
+    time nice -n +19 doBlastzChainNet.pl -verbose=2 \
+    /hive/data/genomes/rheMac3/bed/lastzCalJac3.2012-07-19/DEF \
+    -swap -syntenicNet \
+    -workhorse=hgwdev -smallClusterHub=memk -bigClusterHub=swarm \
+    -chainMinScore=5000 -chainLinearGap=medium > swap.log 2>&1 &
+    #   real    84m31.344s
+    cat fb.calJac3.chainRheMac3Link.txt
+    #   1931533122 bases of 2752505800 (70.174%) in intersection
+
+    cd /hive/data/genomes/calJac3/bed
+    ln -s blastz.rheMac3.swap lastz.rheMac3
+
+
+***********************************************************************
+* TODOain/net 
+ *** Make sure that goldenPath/ponAbe2/vsRheMac3/README.txt is accurate.
+ *** Add {chain,net}RheMac3 tracks to trackDb.ra if necessary.
+
+***********************************************************************
+
+############################################################################
+# set default position to RHO gene displays  (DONE - 2012-07-24 - Hiram)
+    hgsql -e \
+'update dbDb set defaultPos="chr3:132959918-132967918" where name="rheMac3";' \
+	hgcentraltest
+
+############################################################################
+# pushQ entry (DONE - 2012-07-24 - Hiram)
+    mkdir /hive/data/genomes/rheMac3/pushQ
+    cd /hive/data/genomes/rheMac3/pushQ
+    # Mark says don't let the transMap track get there
+    time makePushQSql.pl rheMac3 2> stderr.txt | grep -v transMap > rheMac3.sql
+    #   real    4m8.890s
+    # check the stderr.txt for bad stuff, these kinds of warnings are OK:
+# WARNING: hgwdev does not have /gbdb/rheMac3/wib/gc5Base.wib
+# WARNING: hgwdev does not have /gbdb/rheMac3/wib/quality.wib
+# WARNING: hgwdev does not have /gbdb/rheMac3/bbi/quality.bw
+# WARNING: rheMac3 does not have seq
+# WARNING: rheMac3 does not have extFile
+# WARNING: rheMac3 does not have estOrientInfo
+
+    # eliminated the chainMm9 and chainRn4 chainNet tracks from the .sql
+    # and the rheMac3 chainNet tracks on mm9 and rn4
+    # the mm10 and rn5 tracks are the new ones
+
+    scp -p rheMac3.sql hgwbeta:/tmp
+    ssh hgwbeta "hgsql qapushq < /tmp/rheMac3.sql"
+
+############################################################################
+# LIFTOVER TO rheMac2 (DONE - 2012-08-28 - Hiram )
+    mkdir /hive/data/genomes/rheMac3/bed/blat.rheMac2.2012-08-28
+    cd /hive/data/genomes/rheMac3/bed/blat.rheMac2.2012-08-28
+    # -debug run to create run dir, preview scripts...
+    doSameSpeciesLiftOver.pl -debug \
+        -ooc /hive/data/genomes/rheMac3/jkStuff/rheMac3.11.ooc rheMac3 rheMac2
+    # Real run:
+    time nice -n +19 doSameSpeciesLiftOver.pl -verbose=2 \
+        -ooc /hive/data/genomes/rheMac3/jkStuff/rheMac3.11.ooc \
+	-bigClusterHub=swarm -dbHost=hgwdev -workhorse=hgwdev \
+	 rheMac3 rheMac2 > do.log 2>&1
+    #   real    99m53.205s
+
+
+#########################################################################
+# GENSCAN GENE PREDICTIONS (DONE 2012-10-15 - Chin)
+
+    mkdir /hive/data/genomes/rheMac3/bed/genscan
+    cd /hive/data/genomes/rheMac3/bed/genscan
+    time doGenscan.pl rheMac3 > do.log 2>&1
+    #   real    284m5.600s
+
+    #   This is not working.  Need to run these split
+    mkdir /hive/data/genomes/rheMac3/bed/genscan/splitRun
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun
+    cp ../../../jkStuff/rheMac3.nonBridged.lift .
+    gapToLift rheMac3 rheMac3.nonBridged.lift -bedFile=rheMac3.nonBridged.bed
+
+    for C in 3 8 13 14 19 20 X
+do
+    echo chr${C}
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun
+    grep -w "chr${C}" rheMac3.nonBridged.lift | grep -v random \
+        | sed -e "s/chr${C}./chr${C}_/" > chr${C}.nonBridged.lift
+    mkdir chr${C}
+    faToTwoBit ../hardMaskedFa/00?/chr${C}.fa chr${C}/chr${C}.2bit
+    ~/kent/src/hg/utils/lft2BitToFa.pl chr${C}/chr${C}.2bit \
+        chr${C}.nonBridged.lift > chr${C}/chr${C}.nonBridged.fa
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun/chr${C}
+    mkdir split${C}
+    faSplit sequence chr${C}.nonBridged.fa 100 split${C}/chr${C}_
+done
+    # verify lift files are sane:
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun
+    awk '{print $4}' chr*.nonBridged.lift | sort | uniq -c
+    # should see the list of chroms:
+    #    246 chr13
+    #    127 chr14
+    #    139 chr19
+    #     98 chr20
+    #    317 chr3
+    #    169 chr8
+    #    330 chrX
+
+   for C in 3 8 13 14 19 20 X
+do
+    echo chr${C}
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun/chr${C}
+    echo '#!/bin/sh' > cmdList.sh
+    export NL=-1
+    ls split${C} | while read F
+  do
+  NL=`echo $NL | awk '{print $1+1}'`
+  if [ "${NL}" -gt 7 ]; then
+    NL=0
+    echo "echo waiting before $F" >> cmdList.sh
+    echo wait >> cmdList.sh
+  fi
+  echo "/cluster/bin/x86_64/gsBig split${C}/${F} gtf/${F}.gtf -trans=pep/${F}.pep -subopt=subopt/${F}.bed -exe=/scratch/data/genscan/genscan -par=/scratch/data/genscan/HumanIso.smat -tmp=/dev/shm -window=2400000 &"
+  done >> cmdList.sh
+    echo "echo waiting at end" >> cmdList.sh
+    echo "wait" >> cmdList.sh
+    chmod +x cmdList.sh
+    rm -fr gtf pep subopt
+    mkdir gtf pep subopt
+done
+
+    # run chr20 first to test script
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun/chr20
+    time ./cmdList.sh > ../chr20.log 2>&1
+    # real    6m59.465s
+# running the rest: 3 8 13 14 19 X
+for C in chr3  chr8 chr13 chr14 chr19 chrX
+do
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun/${C}
+    time ./cmdList.sh > ../${C}.log 2>&1
+done
+    # chr3 real    9m41.925s
+    # chr8 real    18m50.934s
+    # chr13 real    11m1.742s
+    # chr14 real    16m32.590s
+    # chr19 real    5m8.588s
+    # chrX real    8m48.507s
+
+    # collecting the results:
+    # run chr20 first:
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun/chr20
+    cat gtf/chr20_*.gtf | liftUp -type=.gtf stdout ../chr20.nonBridged.lift error stdin \
+        | sed -e "s/chr20_0\([0-4]\)\./chr20.\1/g" > chr20.gtf
+cat subopt/chr20_*.bed | liftUp -type=.bed stdout ../chr20.nonBridged.lift error stdin \
+        | sed -e "s/chr20_0\([0-4]\)\./chr20.\1/g" > chr20.subopt.bed
+cat pep/chr20_*.pep | sed -e "s/chr20_0\([0-4]\)\./chr20.\1/g" > chr20.pep
+ls -l ../../gtf/00?/chr20.gtf ../../pep/00?/chr20.pep ../../subopt/00?/chr20.bed
+ls -l chr20.gtf chr20.pep chr20.subopt.bed
+
+    # run the rest
+for C in chr3  chr8 chr13 chr14 chr19 chrX
+do
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun/${C}
+    cat gtf/${C}_*.gtf | liftUp -type=.gtf stdout ../${C}.nonBridged.lift error stdin \
+        | sed -e "s/${C}_0\([0-4]\)\./${C}.\1/g" > ${C}.gtf
+cat subopt/${C}_*.bed | liftUp -type=.bed stdout ../${C}.nonBridged.lift error stdin \
+        | sed -e "s/${C}_0\([0-4]\)\./${C}.\1/g" > ${C}.subopt.bed
+cat pep/${C}_*.pep | sed -e "s/${C}_0\([0-4]\)\./${C}.\1/g" > ${C}.pep
+ls -l ../../gtf/00?/${C}.gtf ../../pep/00?/${C}.pep ../../subopt/00?/${C}.bed
+ls -l ${C}.gtf ${C}.pep ${C}.subopt.bed
+done
+    # after verifying the sizes of the files seem same compared to what
+    #   happened in the main run:
+for C in chr3  chr8 chr13 chr14 chr19 chr20 chrX
+do
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun/${C}
+   ls -l ../../gtf/00?/${C}.gtf ../../pep/00?/${C}.pep ../../subopt/00?/${C}.bed
+    ls -l ${C}.gtf ${C}.pep ${C}.subopt.bed
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun
+done
+-rw-rw-r-- 1 chinhli genecats 0 Oct 15 14:05 ../../gtf/000/chr3.gtf
+-rw-rw-r-- 1 chinhli genecats 0 Oct 15 14:05 ../../pep/000/chr3.pep
+-rw-rw-r-- 1 chinhli genecats 0 Oct 15 14:05 ../../subopt/000/chr3.bed
+-rw-rw-r-- 1 chinhli genecats 2622960 Oct 16 15:51 chr3.gtf
+-rw-rw-r-- 1 chinhli genecats 1108696 Oct 16 15:51 chr3.pep
+-rw-rw-r-- 1 chinhli genecats 1419193 Oct 16 15:51 chr3.subopt.bed
+-rw-rw-r-- 1 chinhli genecats 0 Oct 15 16:46 ../../gtf/000/chr8.gtf
+....
+....
+-rw-rw-r-- 1 chinhli genecats  619333 Oct 16 15:49 chr20.subopt.bed
+-rw-rw-r-- 1 chinhli genecats 0 Oct 15 16:46 ../../gtf/000/chrX.gtf
+-rw-rw-r-- 1 chinhli genecats 0 Oct 15 16:46 ../../pep/000/chrX.pep
+-rw-rw-r-- 1 chinhli genecats 0 Oct 15 16:46 ../../subopt/000/chrX.bed
+-rw-rw-r-- 1 chinhli genecats 1347712 Oct 16 15:52 chrX.gtf
+-rw-rw-r-- 1 chinhli genecats  641978 Oct 16 15:52 chrX.pep
+-rw-rw-r-- 1 chinhli genecats  784120 Oct 16 15:52 chrX.subopt.bed
+
+
+    # this is tricky, it is counting on the file existing, empty or
+    # otherwise
+for C in chr3  chr8 chr13 chr14 chr19 chr20 chrX
+do
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun/${C}
+    D=`ls ../../gtf/00?/${C}.gtf`
+    rm -f "${D}"
+    cp -p ${C}.gtf "${D}"
+    D=`ls ../../pep/00?/${C}.pep`
+    rm -f "${D}"
+    cp -p ${C}.pep "${D}"
+    D=`ls ../../subopt/00?/${C}.bed`
+    rm -f "${D}"
+    cp -p ${C}.subopt.bed "${D}"
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun
+done
+
+    # verify size again:
+for C in chr3  chr8 chr13 chr14 chr19 chr20 chrX
+do
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun/${C}
+   ls -l ../../gtf/00?/${C}.gtf ../../pep/00?/${C}.pep ../../subopt/00?/${C}.bed
+    ls -l ${C}.gtf ${C}.pep ${C}.subopt.bed
+    cd /hive/data/genomes/rheMac3/bed/genscan/splitRun
+done
+-rw-rw-r-- 1 chinhli genecats 2622960 Oct 16 15:51 ../../gtf/000/chr3.gtf
+-rw-rw-r-- 1 chinhli genecats 1108696 Oct 16 15:51 ../../pep/000/chr3.pep
+-rw-rw-r-- 1 chinhli genecats 1419193 Oct 16 15:51 ../../subopt/000/chr3.bed
+-rw-rw-r-- 1 chinhli genecats 2622960 Oct 16 15:51 chr3.gtf
+-rw-rw-r-- 1 chinhli genecats 1108696 Oct 16 15:51 chr3.pep
+-rw-rw-r-- 1 chinhli genecats 1419193 Oct 16 15:51 chr3.subopt.bed
+-rw-rw-r-- 1 chinhli genecats  973693 Oct 16 15:51 chr8.subopt.bed
+....
+...
+...
+-rw-rw-r-- 1 chinhli genecats  619333 Oct 16 15:49 chr20.subopt.bed
+-rw-rw-r-- 1 chinhli genecats 1347712 Oct 16 15:52 ../../gtf/000/chrX.gtf
+-rw-rw-r-- 1 chinhli genecats  641978 Oct 16 15:52 ../../pep/000/chrX.pep
+-rw-rw-r-- 1 chinhli genecats  784120 Oct 16 15:52 ../../subopt/000/chrX.bed
+-rw-rw-r-- 1 chinhli genecats 1347712 Oct 16 15:52 chrX.gtf
+-rw-rw-r-- 1 chinhli genecats  641978 Oct 16 15:52 chrX.pep
+-rw-rw-r-- 1 chinhli genecats  784120 Oct 16 15:52 chrX.subopt.bed
+
+    # genes found have been copied over to ../../gtf. pep and s
+    # Now, we can continue
+    cd /hive/data/genomes/rheMac3/bed/genscan
+    time doGenscan.pl -continue=makeBed -workhorse=hgwdev -dbHost=hgwdev \
+        rheMac3 > makeBed.log 2>&1
+    #   real    7m58.322s
+
+    cat fb.rheMac3.genscan.txt
+    #   50606442 bases of 2639145830 (1.918%) in intersection
+    cat fb.rheMac3.genscanSubopt.txt
+    #   51718033 bases of 2639145830 (1.960%) in intersection
+
+
+#############################################################################

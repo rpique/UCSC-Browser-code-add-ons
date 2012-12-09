@@ -721,8 +721,8 @@ printf("%s\t%d\t%s\t%s %s\t%s\t%s\t%0.0f\t%0.1f\t%s\t%s\n",
     # add sarHar after hetGla1
     joinerCheck -database=sarHar1 -all all.joiner
 
-    mkdir /hive/data/genomes/sarHar1/goldenPath
-    cd /hive/data/genomes/sarHar1/goldenPath
+    cd /hive/data/genomes/sarHar1
+    makeDownloads.pl sarHar1 > do.log 2>&1
 
     #	now ready for pushQ entry
     mkdir /hive/data/genomes/sarHar1/pushQ
@@ -827,6 +827,21 @@ done
     # Read 347922 elements of size 6 from genscanSubopt.bed
     featureBits sarHar1 genscan
     # 26054613 bases of 2931539702 (0.889%) in intersection
+
+#########################################################################
+# construct lift file Ensembl names to UCSC names (DONE - 2012-09-07 - Chin)
+    cd /hive/data/genomes/sarHar1/jkStuff
+
+cat ../chrom.sizes | while read L
+do
+ucName=`echo "${L}" | awk '{print $1}'`
+ucSize=`echo "${L}" | awk '{print $2}'`
+ensName=`echo $L | sed -e 's/^chr[0-9A-Za-z]*_//; s/_random//; s/^chr//;
+s/^\([GA][LA][CZ0-9]*\)/\1.1/;' | awk '{print $1}'`
+ensSize=`echo $L | sed -e 's/^chr[0-9A-Za-z]*_//; s/_random//; s/^chr//;
+s/^\([GA][LA][CZ0-9]*\)/\1.1/;' | awk '{print $2}'`
+echo -e "0\t$ensName\t$ensSize\t$ucName\t$ucSize"
+done > ensToUcsc.lift
 
 #########################################################################
 

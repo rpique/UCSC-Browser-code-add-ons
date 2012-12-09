@@ -2,14 +2,14 @@
 
 
 # Affymetrix RNA-chip (wrangler: braney)
-include wgEncodeAffyRnaChip.ra
+include wgEncodeAffyRnaChip.ra beta,public
+include wgEncodeAffyRnaChip.patch.ra alpha
 
 # BU ORChID (wrangler: Brian)
 include wgEncodeBuOrchid.ra
 
 # BROAD Histone (wrangler: Vankat, assisted by Tim)
-include wgEncodeBroadChipSeq.new.ra alpha
-include wgEncodeBroadChipSeq.ra beta,public
+include wgEncodeBroadChipSeq.ra
 
 # BROAD Chromatin modelling by HMM HMM (wrangler: Tim)
 include wgEncodeBroadHmm.ra
@@ -61,8 +61,7 @@ include wgEncodeRikenCage.ra
 include wgEncodeMapability.ra
 
 # tag change for UwAffyExon
-include wgEncodeUwAffyExonArray.ra beta,public
-include wgEncodeUwAffyExonArray.patch.ra alpha
+include wgEncodeUwAffyExonArray.ra
 
 # UW Histone (wrangler: Venkat, assisted by Tim)
 include wgEncodeUwChIPSeq.ra

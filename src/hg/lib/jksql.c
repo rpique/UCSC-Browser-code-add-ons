@@ -1075,6 +1075,16 @@ sqlFreeResult(&sr);
 return TRUE;
 }
 
+bool sqlColumnExists(struct sqlConnection *conn, char *tableName, char *column)
+/* return TRUE if column exists in table. tableName can contain sql wildcards  */
+{
+    char query[1024];
+    safef(query, 1024, "SHOW COLUMNS FROM `%s` LIKE '%s'", tableName, column);
+    char buf[1024];
+    char *ret = sqlQuickQuery(conn, query, buf, 1024);
+    return (ret!=NULL);
+}
+
 int sqlTableSizeIfExists(struct sqlConnection *sc, char *table)
 /* Return row count if a table exists, -1 if it doesn't. */
 {
@@ -1341,11 +1351,8 @@ if (numScan != 3)
     errAbort("can't parse sql load info: %s", info);
 sqlFreeResult(&sr);
 
-if (!sameOk(cfgOption("detectMysqlLoadWarnings"), "off"))
-    {
-    /* mysql 5.0 bug: mysql_info returns unreliable warnings count, so use this instead: */
-    numWarnings = sqlWarnCount(conn);
-    }
+/* mysql 5.0 bug: mysql_info returns unreliable warnings count, so use this instead: */
+numWarnings = sqlWarnCount(conn);
 
 if ((numSkipped > 0) || (numWarnings > 0))
     {
@@ -2392,15 +2399,21 @@ char seedString[256] = "";
  * The temporary table is visible only to the current connection, so
  * doesn't have to be very uniquely named, and will disappear when the
  * connection is closed. */
+/* check if table has 'db.' prefix in it */
+char *plainTable = strrchr(table, '.');
+if (plainTable)
+    plainTable++;
+else
+    plainTable = table;
 safef(query, sizeof(query),
-      "create temporary table tmp%s select %s from %s limit 100000",
-      table, field, table);
+      "create temporary table hgTemp.tmp%s select %s from %s limit 100000",
+      plainTable, field, table);
 sqlUpdate(conn, query);
 if (seed != -1)
     safef(seedString,sizeof(seedString),"%d",seed);
-safef(query, sizeof(query), "select distinct %s from tmp%s "
+safef(query, sizeof(query), "select distinct %s from hgTemp.tmp%s "
       "order by rand(%s) limit %d",
-      field, table, seedString, count);
+      field, plainTable, seedString, count);
 sr = sqlGetResult(conn, query);
 while ((row = sqlNextRow(sr)) != NULL)
     {

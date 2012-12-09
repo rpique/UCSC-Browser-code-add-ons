@@ -28,14 +28,14 @@
 
 include ../../../inc/common.mk
 
-DBS = 	hg16 hg17 hg18 hg19 hg19Haps hg19Patch2 hg19Patch5 \
+DBS = 	hg16 hg17 hg18 hg19 hg19Haps hg19Patch2 hg19Patch5 hg19Patch9 \
 	venter1 \
 	panTro1 panTro2 panTro3 panTro4 \
 	gorGor1 gorGor2 gorGor3 \
         nomLeu1 nomLeu2 \
 	ponAbe2 \
-	rheMac2,rheMac3 \
-	papHam1 \
+	rheMac2 rheMac3 \
+	papHam1 papAnu2 \
 	macEug1 macEug2 \
 	calJac1 calJac3 \
 	otoGar1 otoGar3 tupBel1\
@@ -43,15 +43,17 @@ DBS = 	hg16 hg17 hg18 hg19 hg19Haps hg19Patch2 hg19Patch5 \
 	ailMel1 \
 	canFam1 canFam2 canFamPoodle1 canFam3 \
 	felCat3 felCat4  \
-	mm6 mm7 mm8 mm9 mm10 \
+	mm6 mm7 mm8 mm9 mm10 mm10Patch1 mm10Strains1 \
 	rn3 rn4 rn5 \
 	speTri1 speTri2 cavPor3 \
+        chiLan1 \
         hetGla1 hetGla2 \
         sarHar1 \
 	oryCun1 oryCun2 \
 	bosTau2 bosTau3 bosTau4 bosTau5 bosTau6 bosTau7 \
 	equCab1 \
 	equCab2 \
+	cerSim1 \
 	oviAri1 \
 	susScr1 susScr2 susScr3 \
 	eriEur1 sorAra1 turTru1 turTru2 vicPac1 pteVam1 tarSyr1 \
@@ -62,9 +64,10 @@ DBS = 	hg16 hg17 hg18 hg19 hg19Haps hg19Patch2 hg19Patch5 \
 	loxAfr1 loxAfr2 loxAfr3 \
 	echTel1 \
 	monDom1 monDom4 monDom5 \
+	allMis1 \
 	chrPic1 \
 	anoCar1 anoCar2 \
-	melUnd1 \
+	geoFor1 melUnd1 \
 	galGal2 galGal3 galGal4 \
 	melGal1 \
 	taeGut1 \
@@ -75,8 +78,8 @@ DBS = 	hg16 hg17 hg18 hg19 hg19Haps hg19Patch2 hg19Patch5 \
 	ornAna1 \
 	oreNil1 oreNil2 \
 	fr1 fr2 fr3 \
-	petMar1 \
-	braFlo1 \
+	petMar1 petMar2 \
+	braFlo1 braFlo2 \
 	cioSav1 \
 	danRer3 danRer4 danRer5 danRer6 danRer7 \
 	gasAcu1 \
@@ -118,7 +121,9 @@ DBS = 	hg16 hg17 hg18 hg19 hg19Haps hg19Patch2 hg19Patch5 \
 	choHof1 \
 	sacCer1 sacCer2 sacCer3 \
 	sc1 \
-	h1n1 
+	h1n1 \
+	centromers1
+
 
 GSID_DBS = \
 	hiv1 vax004 hivgne8 hivmn hivmn1 hivmn2 hivgne8v2 hivVax003Vax004

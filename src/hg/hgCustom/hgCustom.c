@@ -14,10 +14,11 @@
 #include "customFactory.h"
 #include "portable.h"
 #include "errCatch.h"
-#if (defined USE_BAM && defined KNETFILE_HOOKS)
+#if ((defined USE_BAM || defined USE_TABIX) && defined KNETFILE_HOOKS)
 #include "knetUdc.h"
 #include "udc.h"
-#endif//def USE_BAM && KNETFILE_HOOKS
+#endif//def (USE_BAM || USE_TABIX) && KNETFILE_HOOKS
+#include "net.h"
 #include "jsHelper.h"
 #include <signal.h>
 
@@ -133,6 +134,8 @@ else
   " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format1.7'>BED detail</A>,\n"
   " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format10'>Personal Genome SNP,</A>\n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/vcf.html'>VCF</A>,\n"
+  " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format13'>broadPeak</A>,\n"
+  " <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format12'>narrowPeak</A>,\n"
   " or <A TARGET=_BLANK HREF='../FAQ/FAQformat.html#format2'>PSL</A>\n"
   " formats. To configure the display, set\n"
   " <A TARGET=_BLANK HREF='../goldenPath/help/customTrack.html#TRACK'>track</A>\n"
@@ -359,7 +362,9 @@ cgiTableRowEnd();
 
 /* extra space */
 cgiSimpleTableRowStart();
+cgiSimpleTableFieldStart();
 cgiDown(0.7);
+cgiTableFieldEnd();
 cgiTableRowEnd();
 
 /* next row - label for description text entry */
@@ -398,7 +403,6 @@ else
     cgiTableFieldEnd();
     cgiTableRowEnd();
     cgiTableEnd();
-    cgiTableFieldEnd();
     }
 cgiTableFieldEnd();
 

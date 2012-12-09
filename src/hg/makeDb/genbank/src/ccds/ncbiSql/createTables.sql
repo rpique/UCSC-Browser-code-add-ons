@@ -60,7 +60,8 @@ CREATE TABLE [dbo].[GroupVersions] (
 	[location_count] [int] NOT NULL ,
 	[ccds_status_val_uid] [int] NOT NULL ,
 	[ccds_version] [int] NULL ,
-	[was_public] [bit] NOT NULL 
+	[was_public] [bit] NOT NULL ,
+        [build_uid] [int] NOT NULL 
 ) ON [PRIMARY]
 GO
 
@@ -176,7 +177,8 @@ CREATE TABLE [dbo].[CcdsStatistics] (
         [tax_id] [int] NOT NULL ,
         [ncbi_build_number] [int] NOT NULL ,
         [ncbi_build_version] [int] NOT NULL ,
-        [statistics_html] [text] COLLATE Latin1_General_BIN NULL
+        [statistics_html] [text] COLLATE Latin1_General_BIN NULL ,
+        [build_uid] [int] NOT NULL 
 ) ON [PRIMARY]
 go
 
@@ -185,10 +187,13 @@ CREATE TABLE [dbo].[Builds] (
         [tax_id] [int] NOT NULL ,
         [ncbi_build_number] [int] NOT NULL ,
         [ncbi_build_version] [int] NOT NULL,
-        [ensembl_build_number] [int] NULL ,
+        [ensembl_build_number] [int] NOT NULL ,
         [assembly_acc] [varchar] (16) COLLATE Latin1_General_BIN NOT NULL ,
         [assembly_version] [int] NOT NULL ,
-        [assembly_name] [varchar] (16) COLLATE Latin1_General_BIN NOT NULL
+        [assembly_name] [varchar] (16) COLLATE Latin1_General_BIN NOT NULL ,
+        [prev_build_uid] [int] NULL ,
+        [date_created] [datetime] NOT NULL ,
+        [date_made_public] [datetime] NULL
 
 ) ON [PRIMARY]
 go
@@ -220,7 +225,6 @@ CREATE TABLE [dbo].[ProspectiveGroups] (
         [chr_start] [int] NOT NULL ,
         [chr_stop] [int] NOT NULL ,
         [prospective_status_val_uid] [int] NOT NULL
-
 ) ON [PRIMARY]
 go
 

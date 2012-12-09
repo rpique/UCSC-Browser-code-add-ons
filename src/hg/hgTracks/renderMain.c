@@ -11,6 +11,7 @@
 #include "cheapcgi.h"
 #include "ra.h"
 #include "hdb.h"
+#include "net.h"
 #include "hgTracks.h"
 #include "imageV2.h"
 

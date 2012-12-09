@@ -36,7 +36,8 @@ static char *sacCerNames[] = {"Saccharomyces cerevisiae", NULL};
 static char *panTroNames[] = {"Pan troglodytes", "Pan troglodytes troglodytes", 
                               "Pan troglodytes verus", NULL};
 static char *gorGorNames[] = {"Gorilla gorilla", "Gorilla gorilla gorilla", "Gorilla gorilla uellensis", "Gorilla gorilla diehli", "Gorilla gorilla graueri", "Gorilla berengi", NULL};
-static char *papHamNames[] = {"Papio hamadryas", "Papio hamadryas hamadryas", NULL};
+static char *papAnuNames[] = {"Papio anubis", "Papio hamadryas", "Papio hamadryas hamadryas", NULL};
+static char *papHamNames[] = {"Papio hamadryas", "Papio hamadryas hamadryas", "Papio anubis", NULL};
 static char *ponAbeNames[] = {"Pongo abelii", "Pongo pygmaeus",
 		"Pongo pygmaeus pygmaeus", "Pongo pygmaeus abelii", NULL};
 static char *rheMacNames[] = {"Macaca mulatta", NULL};
@@ -85,13 +86,15 @@ static char *xenTroNames[] = {"Xenopus tropicalis",
 static char *anoCarNames[] = {"Anolis carolinensis", NULL};
 static char *gasAcuNames[] = {"Gasterosteus aculeatus", NULL};
 static char *oryLatNames[] = {"Oryzias latipes", NULL};
+static char *chiLanNames[] = {"Chinchilla lanigera", NULL};
 static char *equCabNames[] = {"Equus caballus", NULL};
+static char *cerSimNames[] = {"Ceratotherium simum", "Ceratotherium simum simum", "Ceratotherium simum cottoni", NULL};
 static char *oviAriNames[] = {"Ovis aries", NULL};
 static char *susScrNames[] = {"Sus scrofa", "Sus scrofa coreanus", "Sus scrofa domesticus",
                               "Sus scrofa domestica", "Sus scrofa ussuricus", NULL};
 static char *ornAnaNames[] = {"Ornithorhynchus anatinus", NULL};
 static char *petMarNames[] = {"Petromyzon marinus", NULL};
-static char *braFloNames[] = {"Branchiostoma floridae", NULL};
+static char *braFloNames[] = {"Branchiostoma floridae", "Branchiostoma belcheri", "Branchiostoma belcheri tsingtauense", "Branchiostoma californiense", "Branchiostoma japonicum", "Branchiostoma lanceolatum", NULL};
 static char *priPacNames[] = {"Pristionchus pacificus", NULL};
 static char *aplCalNames[] = {"Aplysia californica", NULL};
 /* hypothetical ancestor, will never match native */
@@ -109,6 +112,7 @@ static char *turTruNames[] = {"Tursiops truncatus", NULL};
 static char *eriEurNames[] = {"Erinaceus europaeus", NULL};
 static char *gadMorNames[] = {"Gadus morhua", NULL};
 static char *latChaNames[] = {"Latimeria chalumnae", NULL};
+static char *geoForNames[] = {"Geospiza fortis", NULL};
 static char *melUndNames[] = {"Melopsittacus undulatus", NULL};
 static char *micMurNames[] = {"Microcebus murinus", NULL};
 static char *ochPriNames[] = {"Ochotona princeps", NULL};
@@ -138,6 +142,7 @@ static struct dbToSpecies dbToSpeciesMap[] = {
     {"sacCer", sacCerNames},
     {"panTro", panTroNames},
     {"gorGor", gorGorNames},
+    {"papAnu", papAnuNames},
     {"papHam", papHamNames},
     {"ponAbe", ponAbeNames},
     {"rheMac", rheMacNames},
@@ -166,6 +171,7 @@ static struct dbToSpecies dbToSpeciesMap[] = {
     {"oryCun", oryCunNames},
     {"cavPor", cavPorNames},
     {"equCab", equCabNames},
+    {"cerSim", cerSimNames},
     {"oviAri", oviAriNames},
     {"susScr", susScrNames},
     {"droYak", droYakNames},
@@ -186,6 +192,7 @@ static struct dbToSpecies dbToSpeciesMap[] = {
     {"anoCar", anoCarNames},
     {"gasAcu", gasAcuNames},
     {"oryLat", oryLatNames},
+    {"chiLan", chiLanNames},
     {"ornAna", ornAnaNames},
     {"petMar", petMarNames},
     {"braFlo", braFloNames},
@@ -207,6 +214,7 @@ static struct dbToSpecies dbToSpeciesMap[] = {
     {"eriEur", eriEurNames},
     {"gadMor", gadMorNames},
     {"latCha", latChaNames},
+    {"geoFor", geoForNames},
     {"melUnd", melUndNames},
     {"micMur", micMurNames},
     {"ochPri", ochPriNames},

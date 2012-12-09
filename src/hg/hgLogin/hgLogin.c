@@ -15,7 +15,6 @@
 #include "web.h"
 #include "ra.h"
 #include "hgColors.h"
-#include <crypt.h>
 #include "net.h"
 #include "wikiLink.h"
 #include "hgLogin.h"
@@ -24,6 +23,8 @@
 
 /* ---- Global variables. ---- */
 char msg[4096] = "";
+char *incorrectUsernameOrPassword="The username or password you entered is incorrect.";
+char *incorrectUsername="The username you entered is incorrect.";
 /* The excludeVars are not saved to the cart. */
 char *excludeVars[] = { "submit", "Submit", "debug", "fixMembers", "update", 
      "hgLogin_password", "hgLogin_password2", "hgLogin_newPassword1",
@@ -71,6 +72,22 @@ if isEmpty(cfgOption(CFG_LOGIN_MAIL_RETURN_ADDR))
     return cloneString("NULL_mailReturnAddr");
 else
     return cloneString(cfgOption(CFG_LOGIN_MAIL_RETURN_ADDR));
+}
+
+int mailItOut(char *toAddr, char *subject, char *msg, char *fromAddr)
+/* send mail to toAddr address */
+{
+char cmd[4096];
+char fullMail[4096];
+safef(fullMail,sizeof(fullMail),
+    "From: %s\n"
+    "To: %s\n"
+    "Subject: %s\n"
+    "\n%s",
+    fromAddr, toAddr, subject, msg);
+safef(cmd,sizeof(cmd), "echo '%s' | /usr/sbin/sendmail -t -oi",fullMail);      
+int result = system(cmd);
+return result;
 }
 
 /* ---- password functions depend on optionally installed openssl lib ---- */
@@ -348,11 +365,9 @@ void sendActMailOut(char *email, char *subject, char *msg)
 /* send mail to email address */
 {
 char *hgLoginHost = wikiLinkHost();
-char cmd[4096];
-safef(cmd,sizeof(cmd),
-    "echo '%s' | mail -s \"%s\" %s  -- -f %s", 
-    msg, subject, email, returnAddr);
-int result = system(cmd);
+int result;
+result = mailItOut(email, subject, msg, returnAddr);
+
 if (result == -1)
     {
     hPrintf(
@@ -377,18 +392,42 @@ else
 void  displayMailSuccess()
 /* display mail success confirmation box */
 {
+char *sendMailTo = cartUsualString(cart, "hgLogin_sendMailTo", "");
+char *sendMailContain = cartUsualString(cart, "hgLogin_sendMailContain", "");
 hPrintf(
     "<div id=\"confirmationBox\" class=\"centeredContainer formBox\">"
-    "\n"
     "<h2>%s</h2>", brwName);
 hPrintf(
-    "<p id=\"confirmationMsg\" class=\"confirmationTxt\">An email has been sent to you \n"
-   "containing information that you requested.</p>"
-    "\n"
+    "<p id=\"confirmationMsg\" class=\"confirmationTxt\">An email has been sent to <B>%s</B> "
+  "containing %s information that you requested.<BR><BR>"
+    "  If <B>%s</B> is not your registered email address, you will not receive an email."
+    " If you can't find the message we sent you, please contact %s for help.</p>", sendMailTo, sendMailContain, sendMailTo, returnAddr);
+hPrintf(
     "<p><a href=\"hgLogin?hgLogin.do.displayLoginPage=1\">Return to Login</a></p>");
 cartRemove(cart, "hgLogin_helpWith");
 cartRemove(cart, "hgLogin_email");
 cartRemove(cart, "hgLogin_userName");
+cartRemove(cart, "hgLogin_sendMailTo");
+cartRemove(cart, "hgLogin_sendMailContain");
+}
+
+void  displayMailSuccessPwd()
+/* display mail success confirmation box */
+{
+char *username = cgiUsualString("user","");
+hPrintf(
+    "<div id=\"confirmationBoxPwd\" class=\"centeredContainer formBox\">"
+    "<h2>%s</h2>", brwName);
+hPrintf(
+    "<p id=\"confirmationMsgPwd\" class=\"confirmationTxt\">An email containing password reset information has been sent to the registered email address of <B>%s</B>.<BR><BR>"
+    " If you do not receive an email, please contact genome-www@soe.ucsc.edu for help.</p>", username);
+hPrintf(
+    "<p><a href=\"hgLogin?hgLogin.do.displayLoginPage=1\">Return to Login</a></p>");
+cartRemove(cart, "hgLogin_helpWith");
+cartRemove(cart, "hgLogin_email");
+cartRemove(cart, "hgLogin_userName");
+cartRemove(cart, "hgLogin_sendMailTo");
+cartRemove(cart, "hgLogin_sendMailContain");
 }
 
 void sendMailOut(char *email, char *subject, char *msg)
@@ -396,11 +435,8 @@ void sendMailOut(char *email, char *subject, char *msg)
 {
 char *hgLoginHost = wikiLinkHost();
 char *obj = cartUsualString(cart, "hgLogin_helpWith", "");
-char cmd[4096];
-safef(cmd,sizeof(cmd),
-    "echo '%s' | mail -s \"%s\" %s -- -f %s",
-    msg, subject, email, returnAddr);
-int result = system(cmd);
+int result;
+result = mailItOut(email, subject, msg, returnAddr);
 if (result == -1)
     {
     hPrintf( 
@@ -446,7 +482,7 @@ char query[256];
 
 /* find all the user names assocaited with this email address */
 char userList[256]="";
-safef(query,sizeof(query),"select * from gbMembers where email='%s'", email);
+safef(query,sizeof(query),"SELECT * FROM gbMembers WHERE email='%s'", email);
 sr = sqlGetResult(conn, query);
 int numUser = 0;
 while ((row = sqlNextRow(sr)) != NULL)
@@ -461,6 +497,35 @@ sqlFreeResult(&sr);
 mailUsername(email, userList);
 }
 
+void sendPwdMailOut(char *email, char *subject, char *msg, char *username)
+/* send password reset mail to user at registered email address */
+{
+char *hgLoginHost = wikiLinkHost();
+char *obj = cartUsualString(cart, "hgLogin_helpWith", "");
+int result;
+result = mailItOut(email, subject, msg, returnAddr);
+if (result == -1)
+    {
+    hPrintf(
+        "<h2>%s</h2>", brwName);
+    hPrintf(
+        "<p align=\"left\">"
+        "</p>"
+        "<h3>Error emailing %s to: %s</h3>"
+        "Click <a href=hgLogin?hgLogin.do.displayAccHelpPage=1>here</a> to return.<br>",
+        obj, email );
+    }
+else
+    {
+    hPrintf("<script  language=\"JavaScript\">\n"
+        "<!-- \n"
+        "window.location =\"http://%s/cgi-bin/hgLogin?hgLogin.do.displayMailSuccessPwd=1&user=%s\""
+        "//-->"
+        "\n"
+        "</script>", hgLoginHost, username);
+    }
+}
+
 void sendNewPwdMail(char *username, char *email, char *password)
 /* send user new password */
 {
@@ -472,7 +537,7 @@ safef(subject, sizeof(subject),"New temporary password for %s", brwName);
 safef(msg, sizeof(msg),
     "  Someone (probably you, from IP address %s) requested a new password for %s (%s). A temporary password for user \"%s\" has been created and was set to \"%s\". If this was your intent, you will need to log in and choose a new password now. Your temporary password will expire in 7 days.\n\n  If someone else made this request, or if you have remembered your password, and you no longer wish to change it, you may ignore this message and continue using your old password.\n\n%s\n%s",
     remoteAddr, brwName, brwAddr, username, password, signature, returnAddr);
-sendMailOut(email, subject, msg);
+sendPwdMailOut(email, subject, msg, username);
 }
 
 void displayAccHelpPage(struct sqlConnection *conn)
@@ -541,7 +606,7 @@ void sendNewPassword(struct sqlConnection *conn, char *username, char *password)
 struct sqlResult *sr;
 char query[256];
 /* find email address associated with this username */
-safef(query,sizeof(query),"select email from gbMembers where userName='%s'", username);
+safef(query,sizeof(query),"SELECT email FROM gbMembers WHERE userName='%s'", username);
 char *email = sqlQuickString(conn, query);
 if (!email || sameString(email,""))
     {
@@ -561,7 +626,7 @@ char query[256];
 char *password = generateRandomPassword();
 char encPwd[45] = "";
 encryptNewPwd(password, encPwd, sizeof(encPwd));
-safef(query,sizeof(query), "update gbMembers set lastUse=NOW(),newPassword='%s', newPasswordExpire=DATE_ADD(NOW(), INTERVAL 7 DAY), passwordChangeRequired='Y' where userName='%s'",
+safef(query,sizeof(query), "UPDATE gbMembers SET lastUse=NOW(),newPassword='%s', newPasswordExpire=DATE_ADD(NOW(), INTERVAL 7 DAY), passwordChangeRequired='Y' WHERE userName='%s'",
     sqlEscapeString(encPwd), sqlEscapeString(username));
 sqlUpdate(conn, query);
 sendNewPassword(conn, username, password);
@@ -572,7 +637,7 @@ void clearNewPasswordFields(struct sqlConnection *conn, char *username)
 /* clear the newPassword fields */
 {
 char query[256];
-safef(query,sizeof(query), "update gbMembers set lastUse=NOW(),newPassword='', newPasswordExpire='', passwordChangeRequired='N' where userName='%s'",
+safef(query,sizeof(query), "UPDATE gbMembers SET lastUse=NOW(),newPassword='', newPasswordExpire='', passwordChangeRequired='N' WHERE userName='%s'",
 sqlEscapeString(username));
 sqlUpdate(conn, query);
 cartRemove(cart, "hgLogin_changeRequired");
@@ -587,11 +652,12 @@ char msg[4096];
 char activateURL[256];
 char *hgLoginHost = wikiLinkHost();
 char *remoteAddr=getenv("REMOTE_ADDR");
+char *urlEncodedUsername=replaceChars(username," ","%20");
 
 safef(activateURL, sizeof(activateURL),
     "http://%s/cgi-bin/hgLogin?hgLogin.do.activateAccount=1&user=%s&token=%s\n",
     sqlEscapeString(hgLoginHost),
-    sqlEscapeString(username),
+    sqlEscapeString(urlEncodedUsername),
     sqlEscapeString(encToken));
 safef(subject, sizeof(subject),"%s account e-mail address confirmation", brwName);
 safef(msg, sizeof(msg),
@@ -606,7 +672,7 @@ void setupNewAccount(struct sqlConnection *conn, char *email, char *username)
 char query[256];
 char *token = generateRandomPassword();
 char *tokenMD5 = generateTokenMD5(token);
-safef(query,sizeof(query), "update gbMembers set lastUse=NOW(),emailToken='%s', emailTokenExpires=DATE_ADD(NOW(), INTERVAL 7 DAY), accountActivated='N' where userName='%s'",
+safef(query,sizeof(query), "UPDATE gbMembers SET lastUse=NOW(),emailToken='%s', emailTokenExpires=DATE_ADD(NOW(), INTERVAL 7 DAY), accountActivated='N' WHERE userName='%s'",
     sqlEscapeString(tokenMD5),
     sqlEscapeString(username)
     );
@@ -668,11 +734,11 @@ char query[256];
 char *token = cgiUsualString("token", "");
 char *username = cgiUsualString("user","");
 safef(query,sizeof(query),
-    "select emailToken from gbMembers where userName='%s'", username);
+    "SELECT emailToken FROM gbMembers WHERE userName='%s'", username);
 char *emailToken = sqlQuickString(conn, query);
 if (sameString(emailToken, token))
     {
-    safef(query,sizeof(query), "update gbMembers set lastUse=NOW(), dateActivated=NOW(), emailToken='', emailTokenExpires='', accountActivated='Y' where userName='%s'",
+    safef(query,sizeof(query), "UPDATE gbMembers SET lastUse=NOW(), dateActivated=NOW(), emailToken='', emailTokenExpires='', accountActivated='Y' WHERE userName='%s'",
     username);
     sqlUpdate(conn, query);
     freez(&errMsg);
@@ -787,18 +853,18 @@ if (newPassword1 && newPassword2 && !sameString(newPassword1, newPassword2))
 char *password;
 if (changeRequired && sameString(changeRequired, "YES"))
     {
-    safef(query,sizeof(query), "select newPassword from gbMembers where userName='%s'", user);
+    safef(query,sizeof(query), "SELECT newPassword FROM gbMembers WHERE userName='%s'", user);
     password = sqlQuickString(conn, query);
     } 
 else 
     {
-    safef(query,sizeof(query), "select password from gbMembers where userName='%s'", user);
+    safef(query,sizeof(query), "SELECT password FROM gbMembers WHERE userName='%s'", user);
     password = sqlQuickString(conn, query);
     }
 if (!password)
     {
     freez(&errMsg);
-    errMsg = cloneString("User not found.");
+    errMsg = cloneString(incorrectUsername);
     changePasswordPage(conn);
     return;
     }
@@ -811,7 +877,7 @@ if (!checkPwd(currentPassword, password))
     }
 char encPwd[45] = "";
 encryptNewPwd(newPassword1, encPwd, sizeof(encPwd));
-safef(query,sizeof(query), "update gbMembers set password='%s' where userName='%s'", sqlEscapeString(encPwd), sqlEscapeString(user));
+safef(query,sizeof(query), "UPDATE gbMembers SET password='%s' WHERE userName='%s'", sqlEscapeString(encPwd), sqlEscapeString(user));
 sqlUpdate(conn, query);
 clearNewPasswordFields(conn, user);
 
@@ -899,7 +965,7 @@ if (strlen(user) > 32)
     return;
     }
 
-safef(query,sizeof(query), "select password from gbMembers where userName='%s'", user);
+safef(query,sizeof(query), "SELECT password FROM gbMembers WHERE userName='%s'", user);
 
 char *password = sqlQuickString(conn, query);
 if (password)
@@ -973,7 +1039,7 @@ if (password && password2 && !sameString(password, password2))
 /* pass all the checks, OK to create the account now */
 char encPwd[45] = "";
 encryptNewPwd(password, encPwd, sizeof(encPwd));
-safef(query,sizeof(query), "insert into gbMembers set "
+safef(query,sizeof(query), "INSERT INTO gbMembers SET "
     "userName='%s',password='%s',email='%s', "
     "lastUse=NOW(),accountActivated='N'",
     sqlEscapeString(user),sqlEscapeString(encPwd),sqlEscapeString(email));
@@ -1020,6 +1086,16 @@ if (sameString(helpWith,"username"))
         }
     else 
         {
+        safef(query,sizeof(query),
+            "SELECT password FROM gbMembers WHERE email='%s'", email);
+        char *password = sqlQuickString(conn, query);
+        cartSetString(cart, "hgLogin_sendMailTo", email);
+        cartSetString(cart, "hgLogin_sendMailContain", "username(s)");
+        if (!password) /* Email address not found */
+            {
+            displayMailSuccess();
+            return;
+            }
         sendUsername(conn, email);
         return;
         }
@@ -1038,12 +1114,12 @@ if (sameString(helpWith,"password"))
     else 
         { 
         safef(query,sizeof(query), 
-            "select password from gbMembers where userName='%s'", username);
+            "SELECT password FROM gbMembers WHERE userName='%s'", username);
         char *password = sqlQuickString(conn, query);
         if (!password)
             {
             freez(&errMsg);
-            errMsg = cloneString("Username not found.");
+            errMsg = cloneString(incorrectUsername);
             displayAccHelpPage(conn);
             return;
             }
@@ -1059,9 +1135,9 @@ boolean usingNewPassword(struct sqlConnection *conn, char *userName, char *passw
 /* The user is using  requested new password */
 {
 char query[256];
-safef(query,sizeof(query), "select passwordChangeRequired from gbMembers where userName='%s'", userName);
+safef(query,sizeof(query), "SELECT passwordChangeRequired FROM gbMembers WHERE userName='%s'", userName);
 char *change = sqlQuickString(conn, query);
-safef(query,sizeof(query), "select newPassword from gbMembers where userName='%s'", userName);
+safef(query,sizeof(query), "SELECT newPassword FROM gbMembers WHERE userName='%s'", userName);
 char *newPassword = sqlQuickString(conn, query);
 if (change && sameString(change, "Y") && checkPwd(password, newPassword))
     return TRUE;
@@ -1103,9 +1179,9 @@ hPrintf("<script language=\"JavaScript\">"
     " document.write(\"Login successful, setting cookies now...\");"
     "</script>\n"
     "<script language=\"JavaScript\">"
-    "document.cookie =  \"wikidb_mw1_UserName=%s; domain=%s; expires=Thu, 31 Dec 2099, 20:47:11 UTC; path=/\"; "
+    "document.cookie = \"wikidb_mw1_UserName=%s; domain=%s; expires=Thu, 30-Dec-2037 23:59:59 GMT; path=/;\";"
     "\n"
-    "document.cookie =  \"wikidb_mw1_UserID=%d; domain=%s; expires=Thu, 31 Dec 2099, 20:47:11 UTC; path=/\";"
+    "document.cookie = \"wikidb_mw1_UserID=%d; domain=%s; expires=Thu, 30-Dec-2037 23:59:59 GMT; path=/;\";"
     " </script>"
     "\n", userName, domainName, userID, domainName);
 cartRemove(cart,"hgLogin_userName");
@@ -1136,14 +1212,12 @@ if (sameString(password,""))
     return;
     }
 
-safef(query,sizeof(query),"select * from gbMembers where userName='%s'", userName);
+safef(query,sizeof(query),"SELECT * FROM gbMembers WHERE userName='%s'", userName);
 sr = sqlGetResult(conn, query);
 if ((row = sqlNextRow(sr)) == NULL)
     {
     freez(&errMsg);
-    char temp[256];
-    safef(temp,sizeof(temp),"User name %s not found.",userName);
-    errMsg = cloneString(temp);
+    errMsg = cloneString(incorrectUsernameOrPassword);
     displayLoginPage(conn);
     return;
     }
@@ -1174,7 +1248,7 @@ else if (usingNewPassword(conn, userName, password))
     } 
 else
     {
-    errMsg = cloneString("Invalid user name or password.");
+    errMsg = cloneString(incorrectUsernameOrPassword);
     displayLoginPage(conn);
     return;
     }
@@ -1192,9 +1266,9 @@ hPrintf(
     "\n");
 char *domainName=getCookieDomainName();
 hPrintf("<script language=\"JavaScript\">"
-    "document.cookie =  \"wikidb_mw1_UserName=; domain=%s; expires=Thu, 01-Jan-70 00:00:01 GMT; path=/\"; "
+    "document.cookie = \"wikidb_mw1_UserName=; domain=%s; expires=Thu, 1-Jan-1970 0:0:0 GMT; path=/;\";"
     "\n"
-    "document.cookie =  \"wikidb_mw1_UserID=; domain=%s; expires=Thu, 01-Jan-70 00:00:01 GMT; path=/\";"
+    "document.cookie = \"wikidb_mw1_UserID=; domain=%s; expires=Thu, 1-Jan-1970 0:0:0 GMT; path=/;\";"
     "</script>\n", domainName, domainName);
 /* return to "returnto" URL */
 returnToURL(150);
@@ -1207,10 +1281,10 @@ void doMiddle(struct cart *theCart)
 {
 struct sqlConnection *conn = hConnectCentral();
 cart = theCart;
-safef(brwName,sizeof(brwName), browserName());
-safef(brwAddr,sizeof(brwAddr), browserAddr());
-safef(signature,sizeof(signature), mailSignature());
-safef(returnAddr,sizeof(returnAddr), mailReturnAddr());
+safecpy(brwName,sizeof(brwName), browserName());
+safecpy(brwAddr,sizeof(brwAddr), browserAddr());
+safecpy(signature,sizeof(signature), mailSignature());
+safecpy(returnAddr,sizeof(returnAddr), mailReturnAddr());
 
 if (cartVarExists(cart, "hgLogin.do.changePasswordPage"))
     changePasswordPage(conn);
@@ -1226,6 +1300,8 @@ else if (cartVarExists(cart, "hgLogin.do.displayActMailSuccess"))
     displayActMailSuccess();
 else if (cartVarExists(cart, "hgLogin.do.displayMailSuccess"))
     displayMailSuccess();
+else if (cartVarExists(cart, "hgLogin.do.displayMailSuccessPwd"))
+    displayMailSuccessPwd();
 else if (cartVarExists(cart, "hgLogin.do.displayLoginPage"))
     displayLoginPage(conn);
 else if (cartVarExists(cart, "hgLogin.do.displayLogin"))

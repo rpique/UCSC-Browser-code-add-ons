@@ -27,7 +27,9 @@ wgEncodeOpenChromChip.ra \
 wgEncodeOpenChromDnase.ra\
 wgEncodeOpenChromFaire.ra \
 wgEncodeOpenChromSynth.ra \
-wgEncodeReg.ra \
+wgEncodeRegDnaseClustered.ra \
+wgEncodeRegTfbsClustered.ra \
+wgEncodeRegTxn.ra \
 wgEncodeRikenCage.ra \
 wgEncodeSunyAlbanyGeneSt.ra \
 wgEncodeSunyAlbanyTiling.ra \
@@ -40,6 +42,7 @@ wgEncodeSydhTfbs.ra \
 wgEncodeUchicagoTfbs.ra \
 wgEncodeUmassDekker5C.ra \
 wgEncodeUncBsuProt.ra \
+wgEncodeUncBsuProtGenc.ra \
 wgEncodeUw5C.ra \
 wgEncodeUwAffyExonArray.ra \
 wgEncodeUwDgf.ra \

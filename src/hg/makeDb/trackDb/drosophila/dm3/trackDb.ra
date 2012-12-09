@@ -1,3 +1,6 @@
+track blastHg18KG override
+visibility hide
+
 track cytoBandIdeo
 shortLabel Chromosome Band (Low-res)
 longLabel Chromosome Bands (Low-resolution for Chromosome Ideogram)
@@ -70,6 +73,17 @@ visibility hide
 color 0,100,180
 type bed
 otherDb dm2
+
+track redfly
+shortLabel REDfly
+longLabel REDfly Database Transcriptional Regulatory Elements
+group genes
+priority 46.5
+visibility hide
+type bedDetail 11
+itemRgb on
+url http://redfly.ccr.buffalo.edu//search.php?redfly_id=$$
+urlLabel REDfly link
 
 track evofold
 shortLabel EvoFold

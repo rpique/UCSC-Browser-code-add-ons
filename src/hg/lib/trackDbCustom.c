@@ -102,7 +102,7 @@ hashAdd(bt->settingsHash, "release", cloneString(releaseTag));
 }
 
 static void trackDbAddInfo(struct trackDb *bt,
-	char *var, char *value, struct lineFile *lf)
+        char *var, char *value, struct lineFile *lf)
 /* Add info from a variable/value pair to browser table. */
 {
 if (sameString(var, "track"))
@@ -208,7 +208,7 @@ boolean canPack = (sameString("psl", s) || sameString("chain", s) ||
                    sameString("bed", s) || sameString("genePred", s) ||
 		   sameString("bigBed", s) || sameString("makeItems", s) ||
                    sameString("expRatio", s) || sameString("wigMaf", s) ||
-		   sameString("factorSource", s) || sameString("bed5FloatScore", s) ||
+                   sameString("factorSource", s) || sameString("bed5FloatScore", s) ||
 		   sameString("bed6FloatScore", s) || sameString("altGraphX", s) ||
 		   sameString("bam", s) || sameString("bedDetail", s) ||
 		   sameString("bed8Attrs", s) || sameString("gvf", s) ||
@@ -282,12 +282,12 @@ for (;;)
     {
     /* Seek to next line that starts with 'track' */
     for (;;)
-	{
+        {
         char *subRelease;
 
-	if (!lineFileNextFull(lf, &line, NULL, NULL, NULL))
+        if (!lineFileNextFull(lf, &line, NULL, NULL, NULL))
             { // NOTE: lineFileNextFull joins continuation lines
-	   done = TRUE;
+            done = TRUE;
 	   break;
 	   }
 	line = skipLeadingSpaces(line);
@@ -459,8 +459,8 @@ for (generation = tdb; generation != NULL; generation = generation->parent)
             struct slName *one = NULL;
             while ((one = slPopHead(&slFoundHere)) != NULL)
                 {
-                slNameStore(&slFoundVars, one->name); // Will only store if it is not already found!  This means closest to home will work
-                slNameFree(&one);
+                slNameStore(&slFoundVars, one->name); // Will only store if it is not already found!
+                slNameFree(&one);                     // This means closest to home will work
                 }
             }
         }
@@ -528,76 +528,6 @@ while (hel != NULL)
 return matchingSettings;
 }
 
-struct superTrackInfo {
-    boolean isSuper;
-    boolean isShow;
-    char *parentName;
-    enum trackVisibility defaultVis;
-};
-
-static struct superTrackInfo *getSuperTrackInfo(struct trackDb *tdb)
-/* Get info from supertrack setting.  There are 2 forms:
- * Parent:   'superTrack on [show]'
- * Child:    'superTrack <parent> [vis]
- * Return null if there is no such setting. */
-{
-char *setting = trackDbSetting(tdb, "superTrack");
-if (!setting)
-    return NULL;
-char *words[8];
-int wordCt = chopLine(cloneString(setting), words);
-if (wordCt < 1)
-    return NULL;
-struct superTrackInfo *stInfo;
-AllocVar(stInfo);
-if (sameString("on", words[0]))
-    {
-    /* parent */
-    stInfo->isSuper = TRUE;
-    if ((wordCt > 1) && sameString("show", words[1]))
-        stInfo->isShow = TRUE;
-    }
-else
-    {
-    /* child */
-    stInfo->parentName = cloneString(words[0]);
-    if (wordCt > 1)
-        stInfo->defaultVis = max(0, hTvFromStringNoAbort(words[1]));
-    }
-return stInfo;
-}
-
-char *trackDbGetSupertrackName(struct trackDb *tdb)
-/* Find name of supertrack if this track is a member */
-{
-char *ret = NULL;
-struct superTrackInfo *stInfo = getSuperTrackInfo(tdb);
-if (stInfo)
-    {
-    if (stInfo->parentName)
-        ret = cloneString(stInfo->parentName);
-    freeMem(stInfo);
-    }
-return ret;
-}
-
-void trackDbSuperMemberSettings(struct trackDb *tdb)
-/* Set fields in trackDb to indicate this is a member of a
- * supertrack. */
-{
-struct superTrackInfo *stInfo = getSuperTrackInfo(tdb);
-if(stInfo == NULL || stInfo->isSuper)
-    return;
-tdb->parentName = cloneString(stInfo->parentName);
-tdb->visibility = stInfo->defaultVis;
-tdbMarkAsSuperTrackChild(tdb);
-if(tdb->parent)
-    {
-    tdbMarkAsSuperTrack(tdb->parent);
-    }
-freeMem(stInfo);
-}
-
 char *maybeSkipHubPrefix(char *track)
 {
 if (!startsWith("hub_", track))
@@ -616,40 +546,53 @@ void trackDbSuperMarkup(struct trackDb *tdbList)
 {
 struct trackDb *tdb;
 struct hash *superHash = hashNew(0);
-struct superTrackInfo *stInfo;
+char *setting = NULL;
+char *words[3];
+int wordCt = 0;
 
 /* find supertracks, setup their settings */
 for (tdb = tdbList; tdb != NULL; tdb = tdb->next)
     {
-    stInfo = getSuperTrackInfo(tdb);
-    if (!stInfo)
+    setting = trackDbLocalSetting(tdb, "superTrack");
+    if (!setting)
         continue;
-    if (stInfo->isSuper)
+    wordCt = chopLine(cloneString(setting), words);
+    if (sameWord("on", words[0]))
         {
-        tdbMarkAsSuperTrack(tdb);
-        tdb->isShow = stInfo->isShow;
         if (!hashLookup(superHash, tdb->track))
+            {
             hashAdd(superHash, maybeSkipHubPrefix(tdb->track), tdb);
+            tdbMarkAsSuperTrack(tdb);
+            if ((wordCt > 1) && sameString("show", words[1]))
+                tdb->isShow = TRUE;
+            }
         }
-    freeMem(stInfo);
+    freeMem(words[0]);
     }
 /* adjust settings on supertrack members after verifying they have
  * a supertrack configured in this trackDb */
 for (tdb = tdbList; tdb != NULL; tdb = tdb->next)
     {
-    stInfo = getSuperTrackInfo(tdb);
-    if (!stInfo)
+    if (tdbIsSuperTrack(tdb) || tdb->parent != NULL)
         continue;
-    if(!stInfo->isSuper)
+    setting = trackDbLocalSetting(tdb, "parent");
+    if (!setting)
+        setting = trackDbLocalSetting(tdb, "superTrack");  // Old style
+    if (!setting)
+        continue;
+    wordCt = chopLine(cloneString(setting), words);
+    assert(differentString("on", words[0])); // already weeded out "superTrack on"
+    tdb->parent = hashFindVal(superHash, words[0]);
+    if (tdb->parent)
         {
-        tdb->parent = hashFindVal(superHash, stInfo->parentName);
-        if (tdb->parent)
-	    {
-            trackDbSuperMemberSettings(tdb);
-	    }
+        tdbMarkAsSuperTrackChild(tdb);
+        tdb->parentName = cloneString(words[0]);
+        if (wordCt > 1)
+            tdb->visibility = max(0, hTvFromStringNoAbort(words[1]));
         }
-    freeMem(stInfo);
+    freeMem(words[0]);
     }
+hashFree(&superHash);
 }
 
 char *trackDbOrigAssembly(struct trackDb *tdb)
@@ -695,7 +638,7 @@ else if(startsWith("bigWig", type))
     cType = cfgWig;
 else if(startsWith("bedGraph", type))
     cType = cfgWig;
-else if(startsWith("netAlign", type)
+else if (startsWith("netAlign", type)
      || startsWith("net", tdb->track)) // SPECIAL CASE from hgTrackUi which might not be needed
     cType = cfgNetAlign;
 else if(sameWord("bed5FloatScore",       type)
@@ -704,30 +647,29 @@ else if(sameWord("bed5FloatScore",       type)
     if (bedScoreHasCfgUi(tdb))
         cType = cfgBedScore;
     }
-else if(encodePeakHasCfgUi(tdb))
+else if (encodePeakHasCfgUi(tdb))
     cType = cfgPeak;
-else if(startsWithWord("genePred",type)
-     && !startsWith("encodeGencodeRaceFrags", tdb->track))  // SPECIAL CASE should be handled in trackDb!
+else if (startsWithWord("genePred",type)
+     && !startsWith("encodeGencodeRaceFrags", tdb->track)) // SPECIAL CASE should fix in trackDb!
     cType = cfgGenePred;
-else if(sameWord("bedLogR",type)
-     || sameWord("peptideMapping", type))
+else if (sameWord("bedLogR",type)
+     ||  sameWord("peptideMapping", type))
     cType = cfgBedScore;
-else if(startsWith("bed ", type) || startsWith("bigBed", type))
+else if (startsWith("bed ", type) || startsWith("bigBed", type) || startsWith("bedDetail", type))
     {
     if (trackDbSetting(tdb, "bedFilter") != NULL)
-           cType = cfgBedFilt;
+        cType = cfgBedFilt;
     else
-	{
-	char *words[3];
-	int wordCount = chopLine(cloneString( type), words);
-	if ((((wordCount > 1) && (atoi(words[1]) >= 5)) || 
-	    trackDbSetting(tdb, "scoreMin") != NULL)
-		&& 
-	   // Historically needed 'bed n .' but encode didn't follow bed n .
-	   ( (wordCount >= 3) || 
-		(!tdbIsTrackUiTopLevel(tdb) && trackDbSettingClosestToHome(tdb, "wgEncode")))) 
-	    {
-	    cType = cfgBedScore;
+        {
+        char *words[3];
+        int wordCount = chopLine(cloneString( type), words);
+        if ((  ((wordCount > 1) && (atoi(words[1]) >= 5))
+            || trackDbSetting(tdb, "scoreMin") != NULL)
+        &&  // Historically needed 'bed n .' but encode didn't follow bed n .
+            (  (wordCount >= 3)
+            || (!tdbIsTrackUiTopLevel(tdb) && trackDbSettingClosestToHome(tdb, "wgEncode"))))
+            {
+            cType = cfgBedScore;
 
 	    if (!bedScoreHasCfgUi(tdb))
 		cType = cfgNone;
@@ -750,10 +692,10 @@ else if (sameWord("vcfTabix",type))
     cType = cfgVcf;
 // TODO: Only these are configurable so far
 
-if(cType == cfgNone && warnIfNecessary)
+if (cType == cfgNone && warnIfNecessary)
     {
-    if (!startsWith("bed ", type) && !startsWith("bigBed", type) && !startsWith("gvf", type)
-	&& subgroupFind(tdb, "view", NULL))
+    if (!startsWith("bed ", type) && !startsWith("bedDetail", type) && !startsWith("bigBed", type) && !startsWith("gvf", type)
+        && subgroupFind(tdb, "view", NULL))
         warn("Track type \"%s\" is not yet supported in multi-view composites for %s.",type,tdb->track);
     }
 return cType;
@@ -772,14 +714,14 @@ if (ctPopup <= cfgNone && !tdbIsSubtrack(tdb)) // subtracks must receive CfgType
     ctPopup = cfgUndetermined; // cfgTypeFromTdb() does not work for every case.
 
 if (ctPopup > cfgNone)
-{
+    {
     if (regexMatch(tdb->track, "^snp[0-9]+")     // Special cases to be removed
     ||  regexMatch(tdb->track, "^cons[0-9]+way") // (matches logic in json setup in imageV2.c)
     ||  startsWith("hapmapSnps", tdb->track)
     ||  startsWith("hapmapAlleles", tdb->track)
     ||  trackDbSettingBlocksConfiguration(tdb,TRUE))
         ctPopup *= -1;
-}
+    }
 return ctPopup;
 }
 
@@ -817,7 +759,7 @@ char *trackDbSettingClosestToHomeOrDefault(struct trackDb *tdb, char *name, char
 /* Look for a trackDb setting (or default) from lowest level on up chain of parents. */
 {
 char *trackSetting = trackDbSetting(tdb,name);
-if(trackSetting == NULL)
+if (trackSetting == NULL)
     trackSetting = defaultVal;
 return trackSetting;
 }
@@ -835,7 +777,7 @@ return  (setting && (   sameWord(setting,"on")
 struct trackDb *subTdbFind(struct trackDb *parent,char *childName)
 /* Return child tdb if it exists in parent. */
 {
-if(parent == NULL)
+if (parent == NULL)
     return NULL;
 
 struct trackDb *found = NULL;
@@ -866,7 +808,7 @@ if (parent != NULL)
     else
         tdb = subTdbFind(parent,track);
     }
-if(tdb == NULL && db != NULL)
+if (tdb == NULL && db != NULL)
     {
     struct sqlConnection *conn = hAllocConn(db);
     tdb = hMaybeTrackInfo(conn, track);
@@ -895,9 +837,9 @@ for (;tdb->parent == NULL; tdb = tdb->parent)
 
     if (conn == NULL)
         conn = hAllocConn(db);
-    tdb->parent = hMaybeTrackInfo(conn, parentTrack); // Now there are 2 versions of this child!  And what to do about views?
+    // Now there are 2 versions of this child!  And what to do about views?
+    tdb->parent = hMaybeTrackInfo(conn, parentTrack);
     printf("tdbFillInAncestry(%s): has %d children.",parentTrack,slCount(tdb->parent->subtracks));
-    //tdb->parent = tdbFindOrCreate(db,tdb,parentTrack); // Now there are 2 versions of this child!  And what to do about views?
     }
 if (conn != NULL)
     hFreeConn(&conn);
@@ -925,11 +867,11 @@ char *tdbGetViewName(struct trackDb *tdb)
 // returns NULL the view name for view or child track (do not free)
 {
 char *view = NULL;
-if(tdbIsComposite(tdb))
+if (tdbIsComposite(tdb))
     return NULL;
-else if(tdbIsCompositeChild(tdb) && subgroupFind(tdb,"view",&view))
+else if (tdbIsCompositeChild(tdb) && subgroupFind(tdb,"view",&view))
     return view;
-else if(tdbIsView(tdb,&view))
+else if (tdbIsView(tdb,&view))
     return view;
 return NULL;
 }
@@ -979,13 +921,14 @@ for (tdb = superlessList; tdb != NULL; tdb = next)
     {
     next = tdb->next;
     char *subtrackSetting = trackDbLocalSetting(tdb, "parent");
-    if (subtrackSetting != NULL)
+    if (subtrackSetting != NULL
+    && !tdbIsSuperTrackChild(tdb)) // superChildren cannot be in both subtracks list AND tdbList
         {
 	char *parentName = cloneFirstWord(subtrackSetting);
 	struct trackDb *parent = hashFindVal(trackHash, parentName);
 	if (parent != NULL)
 	    {
-	    slAddHead(&parent->subtracks, tdb);
+	    slAddHead(&parent->subtracks, tdb); // composite/multiWig children are ONLY subtracks
 	    tdb->parent = parent;
 	    }
 	else
@@ -1394,7 +1337,7 @@ boolean trackDbSettingBlocksConfiguration(struct trackDb *tdb, boolean onlyAjax)
 // Configuration dialogs may be explicitly blocked in tracDb settings
 {
 if (SETTING_IS_OFF(trackDbSettingClosestToHome(tdb, "configurable")))
-     return TRUE; // never configurable
+    return TRUE;  // never configurable
 return (onlyAjax && SETTING_IS_OFF(trackDbSettingClosestToHome(tdb,"configureByPopup")));
 }
 
