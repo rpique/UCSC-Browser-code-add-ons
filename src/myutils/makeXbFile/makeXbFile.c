@@ -22,8 +22,8 @@ errAbort(
   "usage:\n"
   "   makeXbFile chromSizes.txt input.txt output.xb\n"
   "options:\n"
-  //  "   -stranded = Make a stranded xb file (default yes)\n"
-  "   -readSize = Size of the reads (20bp default) so the minus strand is shifted\n"
+  "   -ignoreStrand = Make a non-stranded xb file (default is stranded)\n"
+  "   -readSize = Size of the reads (20bp default) so the minus strand is shifted (not necessary if not stranded)\n"
   //  "   -numBytes = Number of bytes used to count reads at each position (default 1), counts up to 255\n"
   "chromSizes.txt File with the size of the chromosomes\n"
   "   chr1\t122143214\n"
@@ -37,11 +37,13 @@ errAbort(
   );
 }
 
-int readSize = 20;   
+int readSize = 20;
+boolean ignoreStrand = FALSE;
 
 static struct optionSpec options[] = {
-   {"readSize", OPTION_INT},
-   {NULL, 0},
+  {"ignoreStrand", OPTION_BOOLEAN},
+  {"readSize", OPTION_INT},
+  {NULL, 0},
 };
 
 
@@ -93,9 +95,6 @@ khash_t(hashChr_t) *loadChromSizes(char *chromFile, char ***chromNames, unsigned
   return hChr;
 }
 
-
-
-
 void makeXbFile(char *chromSizesFile, char *inputReadsFile, char *outXbFile)
 /* makeXbFile - Makes a binary file with chromosome sizes and data type XXX. */
 {
@@ -138,8 +137,11 @@ void makeXbFile(char *chromSizesFile, char *inputReadsFile, char *outXbFile)
   /* --------------------------------------------------------------------- */
 
   //Initializing memmory mapped file. 
-  xbl=xbInitMmap(1,kh_size(hChr),chromNames,chromSizes,outXbFile);
-  
+  if(ignoreStrand)
+    xbl=xbInitMmap(0,kh_size(hChr),chromNames,chromSizes,outXbFile);
+  else
+    xbl=xbInitMmap(1,kh_size(hChr),chromNames,chromSizes,outXbFile);
+
   /* --------------------------------------------------------------------- */
 
   verbose(2,"Reading in %s ...\n",inputReadsFile);
@@ -147,33 +149,54 @@ void makeXbFile(char *chromSizesFile, char *inputReadsFile, char *outXbFile)
   while ((wordCount = lineFileChop(lf, row)) != 0){
   //while(!feof(inF)){
     //fscanf(inF,"%s\t%d\t%c\%*[^\n]\n",chr_str,&left,&cStrand);
-    assert(wordCount>=3);
-    chr_str = row[0];
-    left = lineFileNeedNum(lf, row, 1);
-    cStrand = row[2][0];
-    
-    khit = kh_get(hashChr_t, hChr , chr_str);
-    count++;
-    if(kh_exist(hChr,khit)){
-      iChr=kh_val(hChr,khit);
-      if(cStrand=='+' && (left>0) && (left<=chromSizes[iChr])){
-	if(xbl->vec[(iChr<<1)].a[left-1]==254)
-	  TotalClippedPositions++;
-	if(xbl->vec[(iChr<<1)].a[left-1]<255)
-	  xbl->vec[(iChr<<1)].a[left-1]++;
+    if(ignoreStrand){
+      assert(wordCount>=2);
+      chr_str = row[0];
+      left = lineFileNeedNum(lf, row, 1);
+      khit = kh_get(hashChr_t, hChr , chr_str);
+      count++;
+      if(kh_exist(hChr,khit)){
+	iChr=kh_val(hChr,khit);
+	if(left<=chromSizes[iChr]){
+	  if(xbl->vec[iChr].a[left-1]==254)
+	    TotalClippedPositions++;
+	  if(xbl->vec[iChr].a[left-1]<255)
+	    xbl->vec[iChr].a[left-1]++;
+	}
+	else
+	  verbose(2,"Unrecognized entry: %s,%d\n",chr_str,left);
       }
-      else if(cStrand=='-' && (left>0) && (left+readSize-1<=chromSizes[iChr])){
-	if(xbl->vec[(iChr<<1)+1].a[left-1+readSize-1]==254)
-	  TotalClippedPositions++;
-	if(xbl->vec[(iChr<<1)+1].a[left-1+readSize-1]<255)
-	  xbl->vec[(iChr<<1)+1].a[left-1+readSize-1]++;
+      else
+	verbose(2,"Unrecognized entry: %s,%d\n",chr_str,left);
+    }
+    else{
+      assert(wordCount>=3);
+      chr_str = row[0];
+      left = lineFileNeedNum(lf, row, 1);
+      cStrand = row[2][0];
+    
+      khit = kh_get(hashChr_t, hChr , chr_str);
+      count++;
+      if(kh_exist(hChr,khit)){
+	iChr=kh_val(hChr,khit);
+	if(cStrand=='+' && (left>0) && (left<=chromSizes[iChr])){
+	  if(xbl->vec[(iChr<<1)].a[left-1]==254)
+	    TotalClippedPositions++;
+	  if(xbl->vec[(iChr<<1)].a[left-1]<255)
+	    xbl->vec[(iChr<<1)].a[left-1]++;
+	}
+	else if(cStrand=='-' && (left>0) && (left+readSize-1<=chromSizes[iChr])){
+	  if(xbl->vec[(iChr<<1)+1].a[left-1+readSize-1]==254)
+	    TotalClippedPositions++;
+	  if(xbl->vec[(iChr<<1)+1].a[left-1+readSize-1]<255)
+	    xbl->vec[(iChr<<1)+1].a[left-1+readSize-1]++;
+	}
+	else
+	  verbose(2,"Unrecognized entry: %s,%d,%c\n",chr_str,left,cStrand);
       }
       else
 	verbose(2,"Unrecognized entry: %s,%d,%c\n",chr_str,left,cStrand);
     }
-    else
-      verbose(2,"Unrecognized entry: %s,%d,%c\n",chr_str,left,cStrand);
-
     if((count%20000000)==0)
       verbose(2,"\n%ldM",count/1000000);
     if((count%1000000)==0)
@@ -190,7 +213,6 @@ void makeXbFile(char *chromSizesFile, char *inputReadsFile, char *outXbFile)
   msync(xbl->pmmap,xbl->mmapLength,MS_SYNC);
   verbose(2,"... completed\n");
   munmap(xbl->pmmap,xbl->mmapLength);
-  
 }
 
 int main(int argc, char *argv[])
@@ -201,6 +223,7 @@ int main(int argc, char *argv[])
     usage();
   
   readSize = optionInt("readSize", readSize);
+  ignoreStrand = optionExists("ignoreStrand");
   
   makeXbFile(argv[1],argv[2],argv[3]);
   return 0;

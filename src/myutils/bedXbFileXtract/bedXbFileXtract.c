@@ -88,29 +88,45 @@ void extractBedFromXbFile(xbList_t *xbl, char *bedFileName, char *outFileName)
       
       if((left >= 0) && (right < (xbl->sizes[iChr]))){
 	if(cStrand=='+'){
-	  for(j=left;j<=right;j++) 
-	    fprintf(outF,"\t%d",xbl->vec[(iChr<<1)].a[j]);
-	  for(j=left;j<=right;j++)
-	    fprintf(outF,"\t%d",xbl->vec[(iChr<<1)+1].a[j]);
-	  fprintf(outF,"\n");
+	  if(xbl->isStranded){
+	    for(j=left;j<=right;j++) 
+	      fprintf(outF,"\t%d",xbl->vec[(iChr<<1)].a[j]);
+	    for(j=left;j<=right;j++)
+	      fprintf(outF,"\t%d",xbl->vec[(iChr<<1)+1].a[j]);
+	    fprintf(outF,"\n");
+	  }else{
+	    for(j=left;j<=right;j++) 
+	      fprintf(outF,"\t%d",xbl->vec[iChr].a[j]);
+	    fprintf(outF,"\n");
+	  }
 	}
 	else if(cStrand=='-'){
-	  for(j=right;j>=left;j--)
-	    fprintf(outF,"\t%d",xbl->vec[(iChr<<1)+1].a[j]);
-	  for(j=right;j>=left;j--)
-	    fprintf(outF,"\t%d",xbl->vec[(iChr<<1)].a[j]);	    
-	  fprintf(outF,"\n");
+	  if(xbl->isStranded){
+	    for(j=right;j>=left;j--)
+	      fprintf(outF,"\t%d",xbl->vec[(iChr<<1)+1].a[j]);
+	    for(j=right;j>=left;j--)
+	      fprintf(outF,"\t%d",xbl->vec[(iChr<<1)].a[j]);	    
+	    fprintf(outF,"\n");
+	  }else{
+	    for(j=right;j>=left;j--)
+	      fprintf(outF,"\t%d",xbl->vec[iChr].a[j]);
+	    fprintf(outF,"\n");
+	  }
 	}
 	else{
 	  verbose(1,"# Unrecognized strand parameter!!!\n");	
 	  skipLine=1;
-	} 
-	
+	}
 	if(skipLine==0){
-	  for(j=left;j<=right;j++)
-            cF+=xbl->vec[iChr].a[j];
-          for(j=left;j<=right;j++)
-            cR+=xbl->vec[iChr].a[j];
+	  if(xbl->isStranded){
+	    for(j=left;j<=right;j++)
+	      cF+=xbl->vec[(iChr<<1)].a[j];
+	    for(j=left;j<=right;j++)
+	      cR+=xbl->vec[(iChr<<1)+1].a[j];
+	  }else{
+	    for(j=left;j<=right;j++)
+	      cF+=xbl->vec[iChr].a[j];
+	  }
 	}
       }
       else{
