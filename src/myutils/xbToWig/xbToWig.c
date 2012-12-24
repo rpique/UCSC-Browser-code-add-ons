@@ -116,10 +116,17 @@ void xbToWigCombined(char *xbFile, char *outFile)
     verbose(1,"# Processing %s smoothing=%d\n",xbl->names[iChr],smoothing);
     fprintf(of,"variableStep chrom=%s\n",xbl->names[iChr]);
     for(j=0;j<xbl->sizes[iChr];j++){
-      cF+=xbl->vec[(iChr<<1)].a[j];
-      cR+=xbl->vec[(iChr<<1)+1].a[j];
+      if(xbl->isStranded){
+	cF+=xbl->vec[(iChr<<1)].a[j];
+	cR+=xbl->vec[(iChr<<1)+1].a[j];
+      }else{
+	cF+=xbl->vec[iChr].a[j];
+      }
       if(smoothing==0){
-	sum=(xbl->vec[(iChr<<1)].a[j]+xbl->vec[(iChr<<1)+1].a[j]);      
+	if(xbl->isStranded)
+	  sum = ( xbl->vec[(iChr<<1)].a[j] + xbl->vec[(iChr<<1)+1].a[j] );
+	else
+	  sum=xbl->vec[iChr].a[j];   
 	if(sum>0)
 	  fprintf(of,"%d\t%d\n",j+1,sum);
       }
