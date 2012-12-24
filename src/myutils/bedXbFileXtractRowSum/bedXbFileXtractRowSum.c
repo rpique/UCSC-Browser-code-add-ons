@@ -102,11 +102,16 @@ void extractBedFromXbFile(xbList_t *xbl, char *bedFileName, char *outFileName)
       right=right+window;
       
       if((left-shiftF >= 0) && (right+shiftR < (xbl->sizes[iChr]))){
-	for(j=left-shiftF;j<=right-shiftF;j++)
-	  rowsum += xbl->vec[(iChr<<1)].a[j];
-	for(j=left+shiftR;j<=right+shiftR;j++)
-	  rowsum += xbl->vec[(iChr<<1)+1].a[j];
-	fprintf(outF,"%d\n",rowsum);
+	if(xbl->isStranded){
+	  for(j=left-shiftF;j<=right-shiftF;j++)
+	    rowsum += xbl->vec[(iChr<<1)].a[j];
+	  for(j=left+shiftR;j<=right+shiftR;j++)
+	    rowsum += xbl->vec[(iChr<<1)+1].a[j];
+	  fprintf(outF,"%d\n",rowsum);
+	}else{
+	  for(j=left-shiftF;j<=right-shiftF;j++)
+	    rowsum += xbl->vec[iChr].a[j];	  
+	}
       }else{
 	verbose(1,"# Skipping segment off-limits\n");
 	skipLine=1;
