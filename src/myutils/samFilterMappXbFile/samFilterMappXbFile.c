@@ -50,7 +50,7 @@ void samFilterMappXbFile(char *xbFileName, char *samFileName, char *outFileName)
   int readLen;
   
 
-  char *row[100];  // I don't know what is an appropriate number!
+  char *row[1000];  // I don't know what is an appropriate number!
   int wordCount;
   char *chr_str;
   
@@ -70,53 +70,62 @@ void samFilterMappXbFile(char *xbFileName, char *samFileName, char *outFileName)
   
   // cF=0;cR=0;
   while ((wordCount = lineFileChop(lf, row)) != 0){
-    if(wordCount>=10);
-    chr_str = row[2];
-    left = lineFileNeedNum(lf, row, 3)-1;
-    //    right = lineFileNeedNum(lf, row, 2);
-    flag = lineFileNeedNum(lf, row, 1);
-    readLen = strlen(row[9]);
+    if(wordCount>=10){
+      chr_str = row[2];
+      left = lineFileNeedNum(lf, row, 3)-1;
+      //    right = lineFileNeedNum(lf, row, 2);
+      flag = lineFileNeedNum(lf, row, 1);
+      readLen = strlen(row[9]);
     
-    cStrand='+';
-    if(flag|0x0010)
-      cStrand='-';
-
+      cStrand='+';
+      if(flag|0x0010)
+	cStrand='-';
     
-    //    for(j=0;j<wordCount;j++)
-    //  fprintf(outF,"%s\t",row[j]);
+      //    for(j=0;j<wordCount;j++)
+      //  fprintf(outF,"%s\t",row[j]);
 
-    /* SHOULD I DO SOMETHING ABOUT STRAND?*/
-    /* No; because I use the first position or the forward even if the match is in the reverse. */
-    khit = kh_get(hashChr_t, hChr , chr_str);
-    if(kh_exist(hChr,khit)){
-      iChr=kh_val(hChr,khit);
-      if((left>0) && (left<=xbl->sizes[iChr])){      
-	mappState=0;
-	for(j=left;j<(left+20-readLen+1);j++)
-	  if(xbl->vec[iChr].a[j]==1)
-	    mappState++;
-	// PRINT sam line
-	if(mappState<1)
-	  sprintf(row[4],"%d",0);
-	//if(mappState!=1)
-	//  sprintf(row[4],"%s","X");
-        for(j=0;j<wordCount;j++)
-	  fprintf(outF,"%s\t",row[j]);
-	fprintf(outF,"\n");
+      /* SHOULD I DO SOMETHING ABOUT STRAND?*/
+      /* No; because I use the first position or the forward even if the match is in the reverse. */
+      khit = kh_get(hashChr_t, hChr , chr_str);
+      if(kh_exist(hChr,khit)){
+	iChr=kh_val(hChr,khit);
+	if((left>0) && (left<=xbl->sizes[iChr])){
+	  mappState=0;
+	  //fprintf(stdout,"|%d,%s,%d,%d,%s|",count,chr_str,left,readLen,row[4]);
+	  for(j=left;j<(left+readLen-20);j++){
+	    if(xbl->vec[iChr].a[j]==1)
+	      mappState++;
+	    //fprintf(stdout,"%d,",xbl->vec[iChr].a[j]);
+	  }
+	  //fprintf(stdout,".%d\n",mappState);
+	  // PRINT sam line
+	  if(mappState<1)
+	    sprintf(row[4],"%d",mappState);
+	  //if(mappState!=1)
+	  //  sprintf(row[4],"%s","X");
+	  for(j=0;j<(wordCount-1);j++)
+	    fprintf(outF,"%s\t",row[j]);
+	  fprintf(outF,"%s\n",row[j]);
+	}else{
+	  verbose(2,"# Skipping segment off-limits\n");
+	  //verbose(1,"# Unreq %s:%d-%d in line %d !!!\n",chr_str,left,right,count);
+	  skipLine=1;
+	}
       }else{
 	verbose(2,"# Skipping segment off-limits\n");
 	//verbose(1,"# Unreq %s:%d-%d in line %d !!!\n",chr_str,left,right,count);
 	skipLine=1;
-      }
+      }  
     }else{
-      verbose(2,"# Skipping segment off-limits\n");
-      //verbose(1,"# Unreq %s:%d-%d in line %d !!!\n",chr_str,left,right,count);
-      skipLine=1;
-    }             
+      // This should help to pass through the header part of the bam/sam file
+      for(j=0;j<(wordCount-1);j++)
+	fprintf(outF,"%s\t",row[j]);
+      fprintf(outF,"%s\n",row[j]);
+    }
     if(verboseLevel()==2){
-      if((count%10000)==0){
+      if((count%100000)==0){
 	verboseDot();
-	if((count%800000)==0)
+	if((count%8000000)==0)
 	  verbose(2,"\n");
       }
     }
