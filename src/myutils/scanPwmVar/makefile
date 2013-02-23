@@ -1,6 +1,9 @@
 include ../../inc/common.mk
 
 L += -lm
+
+COPT= -fopenmp -O4
+
 MYLIBDIR = ../../lib/${MACHTYPE}
 MYLIBS =  ${MYLIBDIR}/jkweb.a ../mylib/${MACHTYPE}/rprlib.a
 

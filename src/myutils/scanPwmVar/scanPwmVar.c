@@ -207,19 +207,8 @@ int loadSnpFile(char *snpFile, khash_t(hashChr_t) *hChr,  snplist_t *snplistp, i
 
 //    scankmersnp(seq,h,&replist,kh_val(hChr , k), kv_A(snplist,k));   
 int scanPwmSeqSNP(struct dnaSeq *seq, struct pssm *pwm, snpvec_t *snpvecp){
-  int i,j,n,k,Start,End,count;
-  char nonATGCbase;
-  double score;
-  double MaxRefScore;
-  double MaxAltScore;
-  char MaxRefStrand;
-  char MaxAltStrand;
-  char oldval;
-  int iMaxRef;
-  int iMaxAlt;
   struct pssm revp,*rpwm;
-
-  snp_t snpaux;
+  int j,count;
 
   rpwm=&revp;
   allocateMemoryToMatrix(rpwm);
@@ -228,10 +217,27 @@ int scanPwmSeqSNP(struct dnaSeq *seq, struct pssm *pwm, snpvec_t *snpvecp){
   
   count=-1;
 
+#pragma omp parallel for reduction(+:count)
   for(j=0; j< kv_size(*snpvecp); j++){    
+    int i,n,k,Start,End;
+    snp_t snpaux;
+    char nonATGCbase;
+    double score;
+    double MaxRefScore;
+    double MaxAltScore;
+    char MaxRefStrand;
+    char MaxAltStrand;
+    char oldval;
+    int iMaxRef;
+    int iMaxAlt;
+
     snpaux=kv_A(*snpvecp,j);
     //assert(((snpaux.ref) & 0xDF) == ((seq->dna[snpaux.pos]) & 0xDF)); //Asserting Reference matches SNP
     assert(snpaux.pos < seq->size); //SNP out of limits
+    if(((snpaux.ref) & 0xDF) != ((seq->dna[snpaux.pos]) & 0xDF)){ //Asserting Reference matches SNP
+      verbose(1,"## %s:%d,%c -- ",seq->name,snpaux.pos,snpaux.ref);
+      warn("SNP not matching the reference\n");
+    } 
 
     Start = snpaux.pos - pwm->w + 1;
     if(Start<0)
@@ -253,7 +259,6 @@ int scanPwmSeqSNP(struct dnaSeq *seq, struct pssm *pwm, snpvec_t *snpvecp){
     oldval = seq->dna[snpaux.pos];
     seq->dna[snpaux.pos] = snpaux.ref; // This restores the to the previous state... 
 
-    //#pragma omp parallel for private(nonATGCbase,j,score) reduction(+:count)
     for(i=Start,n=0;i<=End;i++,n++){
       nonATGCbase=0;
       for(k=i;k<=(i+pwm->w-1);k++)
@@ -303,22 +308,25 @@ int scanPwmSeqSNP(struct dnaSeq *seq, struct pssm *pwm, snpvec_t *snpvecp){
     }    
     
     //    if( ((MaxRefScore>=thresh) || (MaxAltScore>=thresh)) &&  ((MaxRefScore>=0) || (MaxAltScore>=0)) ){ 
+
     if( ((MaxRefScore>=thresh) || (MaxAltScore>=thresh)) ){ 
       n=(iMaxRef - Start);
       k=(iMaxAlt - Start);
       if(MaxRefStrand=='+')
 	n = pwm->w - 1 - n;
       if(MaxAltStrand=='+')
-	k = pwm->w - 1 - k;      
+	k = pwm->w - 1 - k;
+#pragma omp critical
+      if(1){
       fprintf(stdout,
-	      "%s\t%d\t%d\tR"
-	      "\t%f\t%c\t%d"
-	      "\t%f\t%c\t%d"
-	      "\t%d\t%c\t%c"
-	      , seq->name,iMaxRef,iMaxRef+pwm->w-1
-	      ,MaxRefScore,MaxRefStrand,n
-	      ,MaxAltScore,MaxAltStrand,k
-	      ,snpaux.pos,snpaux.ref,snpaux.alt);
+	"%s\t%d\t%d\tR"
+	"\t%f\t%c\t%d"
+	"\t%f\t%c\t%d"
+	"\t%d\t%c\t%c"
+	, seq->name,iMaxRef,iMaxRef+pwm->w-1
+	,MaxRefScore,MaxRefStrand,n
+	,MaxAltScore,MaxAltStrand,k
+	,snpaux.pos,snpaux.ref,snpaux.alt);
       fprintf(stdout,"\t");
       for(i = (Start - 2); i < snpaux.pos; i++) // First section...
 	fprintf(stdout,"%c",seq->dna[i]);
@@ -328,7 +336,8 @@ int scanPwmSeqSNP(struct dnaSeq *seq, struct pssm *pwm, snpvec_t *snpvecp){
       fprintf(stdout,"\n");
       count++;
     }
-    
+    }
+      
     seq->dna[snpaux.pos]=snpaux.ref; // This restores the to the previous state... 
     seq->dna[snpaux.pos]=oldval; // This restores the to the previous state... 
 
@@ -339,22 +348,10 @@ int scanPwmSeqSNP(struct dnaSeq *seq, struct pssm *pwm, snpvec_t *snpvecp){
 }
 
 int scanPwmSeqInDel(struct dnaSeq *seq, struct pssm *pwm, indelvec_t *indelvecp){
-  int i,j,n,k,Start,End,count;
-  char nonATGCbase;
-  double score;
-  double MaxRefScore;
-  double MaxAltScore;
-  char MaxRefStrand;
-  char MaxAltStrand;
-  //  char oldval;
-  int iMaxRef;
-  int iMaxAlt;
+  int j,count;
   struct pssm revp,*rpwm;
-
-  char buff[1000];
-
+ 
   //snp_t snpaux;
-  indel_t indel;
 
   rpwm=&revp;
   allocateMemoryToMatrix(rpwm);
@@ -363,15 +360,29 @@ int scanPwmSeqInDel(struct dnaSeq *seq, struct pssm *pwm, indelvec_t *indelvecp)
   
   count=-1;
 
+#pragma omp parallel for reduction(+:count)
   for(j=0; j< kv_size(*indelvecp); j++){    
+    int i,n,k,Start,End;
+    char nonATGCbase;
+    double score;
+    double MaxRefScore;
+    double MaxAltScore;
+    char MaxRefStrand;
+    char MaxAltStrand;
+    //  char oldval;
+    int iMaxRef;
+    int iMaxAlt;
+
+    char buff[2500]; // I should change to dynamic memory. for large indels? 
+    indel_t indel;
     indel=kv_A(*indelvecp,j);
 
     //assert(((snpaux.ref) & 0xDF) == ((seq->dna[snpaux.pos]) & 0xDF)); //Asserting Reference matches SNP
     //assert(indelaux.pos < seq->size); //SNP out of limits
     // Assert Indel matches de reference....
     if(strncasecmp(&seq->dna[indel.pos],indel.ref,indel.reflen)!=0){
-      verbose(1,"## %s:%d,%s\n",seq->name,indel.pos,(indel.ref));
-      errAbort("Indel not matching the reference\n");
+      verbose(1,"## %s:%d --",seq->name,indel.pos);
+      warn("Indel not matching the reference\n");
       //or use continue and issue a warning
     }
 
@@ -462,29 +473,32 @@ int scanPwmSeqInDel(struct dnaSeq *seq, struct pssm *pwm, indelvec_t *indelvecp)
 	n = pwm->w - 1 - n;
       if(MaxAltStrand=='+')
 	k = pwm->w - 1 - k;      
-      fprintf(stdout,
-	      "%s\t%d\t%d\tR"
-	      "\t%f\t%c\t%d"
-	      "\t%f\t%c\t%d"
-	      "\t%d\t%s\t%s"
-	      , seq->name,iMaxRef,iMaxRef+pwm->w-1
-	      ,MaxRefScore,MaxRefStrand,n
-	      ,MaxAltScore,MaxAltStrand,k
-	      ,indel.pos,indel.ref,indel.alt);
-      fprintf(stdout,"\t");
-      for(i = (Start - 2); i < indel.pos; i++) // First section...
-	fprintf(stdout,"%c",seq->dna[i]);
-      fprintf(stdout,"-?-");
-      for(i = (indel.pos+indel.reflen); i <= (End + pwm->w + 1); i++)
-	fprintf(stdout,"%c",seq->dna[i]);      
-      fprintf(stdout,"\n");
-      count++;
+#pragma omp critical
+      if(1){
+	fprintf(stdout,
+		"%s\t%d\t%d\tR"
+		"\t%f\t%c\t%d"
+		"\t%f\t%c\t%d"
+		"\t%d\t%s\t%s"
+		, seq->name,iMaxRef,iMaxRef+pwm->w-1
+		,MaxRefScore,MaxRefStrand,n
+		,MaxAltScore,MaxAltStrand,k
+		,indel.pos,indel.ref,indel.alt);
+	fprintf(stdout,"\t");
+	for(i = (Start - 2); i < indel.pos; i++) // First section...
+	  fprintf(stdout,"%c",seq->dna[i]);
+	fprintf(stdout,"-?-");
+	for(i = (indel.pos+indel.reflen); i <= (End + pwm->w + 1); i++)
+	  fprintf(stdout,"%c",seq->dna[i]);      
+	fprintf(stdout,"\n");
+	count++;
+      }
     }
     
     //    lastpos=snpaux.pos;
     
   }
-    return 1;
+  return 1;
 }
 
 
@@ -664,8 +678,8 @@ if (argc != 4)
  addPseudoCounts= optionDouble("p",addPseudoCounts);
  ompNumThreads= optionInt("omp",ompNumThreads);
 
-
- // omp_set_num_threads(ompNumThreads); //Adjust this to env variable.... or option
+ 
+ omp_set_num_threads(ompNumThreads); //Adjust this to env variable.... or option
 
 
 // wigOutput = optionExists("wigOutput");

@@ -58,7 +58,11 @@ typedef struct
 
 #include "khash.h"
 
+#ifndef CUT_MAPPER_CORE_H
+
 KHASH_MAP_INIT_STR(hashChr_t, unsigned char)
+
+#endif
 
 
 khash_t(hashChr_t) *xbChrNamesKhash(xbList_t *xbl){
@@ -76,6 +80,8 @@ khash_t(hashChr_t) *xbChrNamesKhash(xbList_t *xbl){
   }
   return hChr;
 }
+
+
 
 int getChrNumber(khash_t(hashChr_t) *hChr,char *chr_str){
   khiter_t khit;

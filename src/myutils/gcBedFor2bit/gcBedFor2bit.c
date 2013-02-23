@@ -51,12 +51,12 @@ void processSeqsFromBed(struct twoBitFile *tbf, char *bedFileName, FILE *outFile
   //  char buff[500];
   struct dnaSeq *seq;
 
-  int countGC=0;
-  int countACGT=0;
 
   //while(!feof(inFile)){
   //fscanf(inFile,"%s\t%d\t%d\t%*s\t%*s\t%c\%[^\n]\n",chr_str,&left,&right,&cStrand,buff);
   while ((wordCount = lineFileChop(lf, row)) != 0){
+    int countGC=0;
+    int countACGT=0;
     assert(wordCount>=3);
     chr_str = row[0];
     left = lineFileNeedNum(lf, row, 1);
