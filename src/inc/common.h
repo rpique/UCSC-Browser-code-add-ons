@@ -429,6 +429,14 @@ void slUniqify(void *pList, CmpFunction *compare, void (*free)());
  * pointers to pointers to elements.  Free should take a simple
  * pointer to dispose of duplicate element, and can be NULL. */
 
+void slSortMerge(void *pA, void *b, CmpFunction *compare);
+// Merges and sorts a pair of singly linked lists using slSort.
+
+void slSortMergeUniq(void *pA, void *b, CmpFunction *compare, void (*free)());
+// Merges and sorts a pair of singly linked lists leaving only unique
+// items via slUniqufy.  duplicate itens are defined by the compare routine
+// returning 0. If free is provided, items dropped from list can disposed of.
+
 boolean slRemoveEl(void *vpList, void *vToRemove);
 /* Remove element from doubly linked list.  Usage:
  *    slRemove(&list, el);
@@ -1427,6 +1435,9 @@ time_t dateToSeconds(const char *date,const char*format);
 
 boolean dateIsOld(const char *date,const char*format);
 // Is this string date older than now?
+
+boolean dateIsOlderBy(const char *date,const char*format, time_t seconds);
+// Is this string date older than now by this many seconds?
 
 char *dateAddTo(char *date,char *format,int addYears,int addMonths,int addDays);
 /* Add years,months,days to a formatted date and returns the new date as a cloned string

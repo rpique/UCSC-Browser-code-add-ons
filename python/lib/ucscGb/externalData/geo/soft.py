@@ -41,7 +41,7 @@ mdbWhitelist = [
 def isRawFile(file):
     return (file.extension == 'fastq' or file.extension == 'csfasta' or file.extension == 'csqual')
     
-def isSupplimentaryFile(file):
+def isSupplementaryFile(file):
     return (not isRawFile(file)) and file.extension != 'fasta'
     
 def sampleTitle(stanza, expVars, warn=False, rep=False):
@@ -58,6 +58,7 @@ def sampleTitle(stanza, expVars, warn=False, rep=False):
 def linkName(file, track):
     return '%s_%s' % (track.database, file.name)
     
+# This function is deprecated. It is specific to ENCODE 2 and should not be used in ENCODE 3
 def createMappings(metadb, all=False, rep=False):
     expIds = dict()
     geoMapping = dict()
@@ -124,7 +125,7 @@ def createMappings(metadb, all=False, rep=False):
     
     return expIds, expVars, geoMapping, series, datatype
     
-    
+# This function is deprecated. It is specific to ENCODE 2 and should not be used in ENCODE 3
 def createSeries(softfile, compositeTrack, expIds, expVars, geoMapping, series, datatype, replace, audit, argseries, all=False, rep=False):
     
     if 'geoSeriesAccession' in series and not all:
@@ -176,7 +177,8 @@ def createSeries(softfile, compositeTrack, expIds, expVars, geoMapping, series, 
                 seriesStanza['!Series_sample_id'].append(sampleTitle(expIds[idNum][0], expVars, False, rep))
         
     softfile[series['composite']] = seriesStanza
-    
+
+# This function is deprecated. It is specific to ENCODE 2 and should not be used in ENCODE 3
 def createHighThroughputSoftFile(compositeTrack, cv, expIds, expVars, geoMapping, series, datatype, replace, audit, tarpath, argseries, all=False, rep=False):
     
     print 'Creating HighThroughput soft file'
@@ -306,7 +308,7 @@ def createHighThroughputSoftFile(compositeTrack, cv, expIds, expVars, geoMapping
             for fname in stanza['fileName'].split(','):
                 file = compositeTrack.files[fname]
         
-                if isSupplimentaryFile(file):
+                if isSupplementaryFile(file):
                     sample['!Sample_supplementary_file_' + str(count)] = linkName(file, compositeTrack)
                     
                     if not all:
@@ -421,7 +423,7 @@ def createHighThroughputSoftFile(compositeTrack, cv, expIds, expVars, geoMapping
         
     return softfile, fileList
         
-        
+# This function is deprecated. It is specific to ENCODE 2 and should not be used in ENCODE 3        
 def createMicroArraySoftFile(compositeTrack, cv, expIds, expVars, geoMapping, series, datatype, replace, audit, tarpath, argseries, all=False):
     
     print 'Creating HighThroughput soft file'
@@ -478,7 +480,7 @@ def createMicroArraySoftFile(compositeTrack, cv, expIds, expVars, geoMapping, se
             for fname in stanza['fileName'].split(','):
                 file = compositeTrack.files[fname]
         
-                if isSupplimentaryFile(file):
+                if isSupplementaryFile(file):
                     sample['!Sample_supplementary_file_' + str(count)] = linkName(file, compositeTrack)
                     
                     if file.md5sum != None:

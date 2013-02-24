@@ -38,7 +38,7 @@
 #include "pgSnp.h"
 #include "memgfx.h"
 
-#define SMALLBUF 128
+#define SMALLBUF 256
 #define MAX_SUBGROUP 9
 #define ADD_BUTTON_LABEL        "add"
 #define CLEAR_BUTTON_LABEL      "clear"
@@ -3936,7 +3936,7 @@ if (metadataForTable(db,trackDb,NULL) != NULL)
     if (date != NULL)
         date = strSwapChar(date, ' ', 0);   // Truncate time (not expected, but just in case)
 
-    if (excludePast && !isEmpty(date) && dateIsOld(date,"%F"))
+    if (excludePast && !isEmpty(date) && dateIsOld(date, MDB_ENCODE_DATE_FORMAT))
         freez(&date);
     }
 return date;
@@ -3978,8 +3978,10 @@ char buffer[SMALLBUF];
 char *displaySubs = NULL;
 int subCount = slCount(subtrackRefList);
 #define LARGE_COMPOSITE_CUTOFF 30
-if (subCount > LARGE_COMPOSITE_CUTOFF)
+if (subCount > LARGE_COMPOSITE_CUTOFF && membersForAll->dimensions != NULL)
     {
+    // ignore displaySubtracks setting for large composites with a matrix as
+    // matrix effectively shows all
     safef(buffer,SMALLBUF,"%s.displaySubtracks",parentTdb->track);
     displaySubs = cartUsualString(cart, buffer,"some"); // track specific defaults to only selected
     }
@@ -4395,7 +4397,7 @@ for (subtrackRef = subtrackRefList; subtrackRef != NULL; subtrackRef = subtrackR
         char *dateDisplay = encodeRestrictionDate(db,subtrack,FALSE); // includes dates in the past
         if (dateDisplay)
             {
-            if (dateIsOld(dateDisplay,"%F"))
+            if (dateIsOld(dateDisplay, MDB_ENCODE_DATE_FORMAT))
                 printf("</TD>\n<TD align='center' nowrap style='color: #BBBBBB;'>&nbsp;%s&nbsp;",
                        dateDisplay);
             else

@@ -40,6 +40,7 @@ organization = (hIsGisaidServer() ? "GISAID" : organization);
  * somehow can't be moved effectively into doMiddle. */
 htmlPushEarlyHandlers();
 cgiSpoof(&argc, argv);
+setUdcCacheDir();   /* should be set before cart for hgTracks */
 char * link = webTimeStampedLinkToResourceOnFirstCall("HGStyle.css",TRUE); // resource file link
 if (link)                                                                  // wrapped in html
     htmlSetStyle(link);
@@ -50,9 +51,12 @@ if (hIsGsidServer())
 else
     cartHtmlShell("UCSC Genome Browser v"CGI_VERSION, doMiddle, hUserCookie(), excludeVars, oldVars);
 if (measureTiming)
+    measureTime("Time to write and close cart");
+if (measureTiming)
     {
     fprintf(stdout, "<span class='timing'>Overall total time: %ld millis<br /></span>\n",
             clock1000() - enteredMainTime);
     }
+cgiExitTime("hgTracks", enteredMainTime);
 return 0;
 }

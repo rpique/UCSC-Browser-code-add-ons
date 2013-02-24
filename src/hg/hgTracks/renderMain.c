@@ -106,8 +106,10 @@ verboseTime(2,"After makeActiveImage");
 
 int main(int argc, char *argv[])
 {
+setUdcCacheDir(); /* early is helpful for hgTracks */
 if(argc == 1)
     {
+    long enteredMainTime = clock1000();
     // CGI call
 
     // htmlPushEarlyHandlers(); XXXX do I need to do this?
@@ -143,6 +145,7 @@ if(argc == 1)
         // XXXX support track filtering? - if(cartVarExists(cart, "hgt.trackNameFilter"))
         }
     doMiddle(cart);
+    cgiExitTime("hgRenderTracks", enteredMainTime);
     }
 else
     {

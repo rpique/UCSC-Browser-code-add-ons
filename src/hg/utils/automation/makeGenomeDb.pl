@@ -102,7 +102,7 @@ ncbiGenomeId nnnnn
 
 ncbiAssemblyId nnnnn
   - A numeric NCBI identifier for the assembly. To determine this, do an
-    NCBI Assembly query at http://www.ncbi.nlm.nih.gov/genome/assembly/,
+    NCBI Assembly query at http://www.ncbi.nlm.nih.gov/assembly/,
     using the scientific name \"Xxxxxx yyyyyy\" and choose a project ID that 
     match the assembly name.
 
@@ -199,6 +199,9 @@ subsetLittleIds Y
   - ok if agp little ids (col6) are a subset of fasta sequences
     rather than requiring an exact match 
 
+doNotCheckDuplicates Y
+  - do not stop build if duplicate sequences are found in genome
+
 " if ($detailed);
   print STDERR "\n";
   exit $status;
@@ -225,7 +228,7 @@ my ($db, $scientificName, $assemblyDate, $assemblyLabel, $assemblyShortLabel, $o
 my ($fakeAgpMinContigGap, $fakeAgpMinScaffoldGap,
     $clade, $genomeCladePriority);
 # Optional config parameters:
-my ($commonName, $agpFiles, $qualFiles, $mitoSize, $subsetLittleIds);
+my ($commonName, $agpFiles, $doNotCheckDuplicates, $qualFiles, $mitoSize, $subsetLittleIds);
 # Other globals:
 my ($gotMito, $gotAgp, $gotQual, $topDir, $chromBased, $forceDescription);
 my ($bedDir, $scriptDir, $endNotes);
@@ -315,6 +318,7 @@ sub parseConfig {
   $commonName = &optionalVar('commonName', \%config);
   $commonName =~ s/^(\w)(.*)/\u$1\L$2/;  # Capitalize only the first word
   $agpFiles = &optionalVar('agpFiles', \%config);
+  $doNotCheckDuplicates = &optionalVar('doNotCheckDuplicates', \%config);
   $qualFiles = &optionalVar('qualFiles', \%config);
   $mitoSize = &optionalVar('mitoSize', \%config);
   $subsetLittleIds = &optionalVar('subsetLittleIds', \%config);
@@ -513,14 +517,19 @@ _EOF_
 
   # Having made the unmasked .2bit, make chrom.sizes and chromInfo.tab:
   # verify no dots allowed in chrom names
+  if (! defined $doNotCheckDuplicates || ($doNotCheckDuplicates eq "N")) {
   $bossScript->add(<<_EOF_
-
 twoBitDup $db.unmasked.2bit > jkStuff/twoBitDup.txt
 if (`wc -l < jkStuff/twoBitDup.txt` > 0) then
   echo "ERROR: duplicate sequence found in $db.unmasked.2bit"
   exit 1
 endif
+_EOF_
+  );
+  }
 
+
+  $bossScript->add(<<_EOF_
 twoBitInfo $db.unmasked.2bit stdout | sort -k2nr > chrom.sizes
 
 # if no dots in chrom names, should have only one kind of field size:
@@ -1009,8 +1018,8 @@ sub makeDescription {
 <B>NCBI Genome information:</B> <A HREF="http://www.ncbi.nlm.nih.gov/genome/$ncbiGenomeId" TARGET="_blank">
 NCBI genome/$ncbiGenomeId ($scientificName)</A><BR>
 <B>NCBI Assembly information:</B>
-<A HREF="http://www.ncbi.nlm.nih.gov/genome/assembly/$ncbiAssemblyId" TARGET="_blank">
-NCBI genome/assembly/$ncbiAssemblyId ($assemblyLabel)</A><BR>
+<A HREF="http://www.ncbi.nlm.nih.gov/assembly/$ncbiAssemblyId" TARGET="_blank">
+NCBI assembly/$ncbiAssemblyId ($assemblyLabel)</A><BR>
 
 <B>BioProject information:</B></I> <A HREF="http://www.ncbi.nlm.nih.gov/bioproject/$ncbiBioProject" TARGET="_blank"> NCBI Bioproject: $ncbiBioProject</A>
 </P>
@@ -1115,7 +1124,7 @@ Genome assembly procedures are covered in the NCBI
 <A HREF="http://www.ncbi.nlm.nih.gov/projects/genome/assembly/assembly.shtml"
 TARGET=_blank>assembly documentation.</A><BR>
 NCBI also provides
-<A HREF="http://www.ncbi.nlm.nih.gov/genome/assembly/$ncbiAssemblyId"
+<A HREF="http://www.ncbi.nlm.nih.gov/assembly/$ncbiAssemblyId"
 TARGET="_blank">specific information about this assembly.</A>
 </P>
 <P>
@@ -1217,7 +1226,7 @@ Genome assembly procedures are covered in the NCBI
 <A HREF="http://www.ncbi.nlm.nih.gov/projects/genome/assembly/assembly.shtml"
 TARGET=_blank>assembly documentation.</A><BR>
 NCBI also provides
-<A HREF="http://www.ncbi.nlm.nih.gov/genome/assembly/$ncbiAssemblyId"
+<A HREF="http://www.ncbi.nlm.nih.gov/assembly/$ncbiAssemblyId"
 TARGET="_blank">specific information about this assembly.</A>
 </P>
 <P>
@@ -1329,6 +1338,8 @@ $HgAutomate::git archive --remote=git://genome-source.cse.ucsc.edu/kent.git \\
   --prefix=kent/ HEAD src/hg/makeDb/trackDb/loadTracks \\
 src/hg/makeDb/trackDb/$dbDbSpeciesDir \\
 src/hg/makeDb/trackDb/trackDb.chainNet.ra \\
+src/hg/makeDb/trackDb/chainNetPetMar1.ra \\
+src/hg/makeDb/trackDb/chainNetPetMar2.ra \\
 src/hg/makeDb/trackDb/trackDb.nt.ra \\
 src/hg/makeDb/trackDb/trackDb.genbank.ra \\
 src/hg/makeDb/trackDb/trackDb.genbank.new.ra \\

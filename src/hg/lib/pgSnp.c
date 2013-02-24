@@ -284,9 +284,12 @@ for (i=i0; (iInc*i)<(iInc*iN); i=i+iInc)
             int end = codStart - 1;
             cStart = gene->chromStart + gene->chromStarts[i-1] + gene->blockSizes[i-1] - (end - st);
             cEnd = gene->chromStart + gene->chromStarts[i-1] + gene->blockSizes[i-1];
-            struct dnaSeq *s = hDnaFromSeq(db, gene->chrom, cStart, cEnd, dnaUpper);
-            dyStringPrintf(seq, "%s", s->dna);
-            //freeDnaSeq(&s);
+            if (cStart < cEnd)
+                {
+                struct dnaSeq *s = hDnaFromSeq(db, gene->chrom, cStart, cEnd, dnaUpper);
+                dyStringPrintf(seq, "%s", s->dna);
+                //freeDnaSeq(&s);
+                }
             }
         else if (!posStrand && rv->cdEnd >= (codStart + gene->blockSizes[i]))
             {
@@ -294,11 +297,14 @@ for (i=i0; (iInc*i)<(iInc*iN); i=i+iInc)
             int end = rv->cdEnd;
             cEnd = gene->chromStart + gene->chromStarts[i-1] + gene->blockSizes[i-1];
             cStart = gene->chromStart + gene->chromStarts[i-1] + gene->blockSizes[i-1] - (end - st);
-//error here?
-            struct dnaSeq *s = hDnaFromSeq(db, gene->chrom, cStart, cEnd, dnaUpper);
-            dyStringPrintf(seq, "%s", s->dna);
-//printf("TESTING got seq=%s<br>\n", s->dna);
-            //freeDnaSeq(&s);
+            if (cStart < cEnd)
+                {
+                struct dnaSeq *s = hDnaFromSeq(db, gene->chrom, cStart, cEnd, dnaUpper);
+                dyStringPrintf(seq, "%s", s->dna);
+                //error here?
+                //printf("TESTING got seq=%s<br>\n", s->dna);
+                //freeDnaSeq(&s);
+                }
             }
         /* get sequence needed from this exon */
         int st = rv->cdStart;
@@ -748,14 +754,15 @@ for (i = 0;  i < rec->infoCount;  i++)
 	    for (j = 0;  j < rec->infoElements[i].count && j < alDescCount-1;  j++)
 		{
 		if (rec->infoElements[i].missingData[j])
-		    continue;
-		int ac = rec->infoElements[i].values[j].datInt;
-		alCounts[1+j] = ac;
-		if (gotTotalCount)
-		    alCounts[0] -= ac;
+		    alCounts[1+j] = -1;
+		else
+		    {
+		    int ac = rec->infoElements[i].values[j].datInt;
+		    alCounts[1+j] = ac;
+		    if (gotTotalCount)
+			alCounts[0] -= ac;
+		    }
 		}
-	    while (j++ < alDescCount-1)
-		alCounts[1+j] = -1;
 	    if (gotTotalCount)
 		dyStringPrintf(dy, "%d", alCounts[0]);
 	    else
@@ -769,7 +776,11 @@ for (i = 0;  i < rec->infoCount;  i++)
 	break;
 	}
 if (gotTotalCount && !gotAltCounts)
+    {
     dyStringPrintf(dy, "%d", alCounts[0]);
+    for (i = 1;  i < alDescCount;  i++)
+	dyStringAppend(dy, ",-1");
+    }
 else if (!gotTotalCount && !gotAltCounts && rec->file->genotypeCount > 0)
     {
     vcfParseGenotypes(rec);

@@ -17,6 +17,7 @@
 #include "wikiLink.h"
 #include "customTrack.h"
 #include "customFactory.h"
+#include "udc.h"
 #include "hgSession.h"
 
 
@@ -1284,9 +1285,12 @@ cartCheckout(&cart);
 int main(int argc, char *argv[])
 /* Process command line. */
 {
+long enteredMainTime = clock1000();
 htmlPushEarlyHandlers();
 cgiSpoof(&argc, argv);
+setUdcCacheDir();
 hgSession();
+cgiExitTime("hgSession", enteredMainTime);
 return 0;
 }
 
