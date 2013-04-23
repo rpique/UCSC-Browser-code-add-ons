@@ -28,6 +28,7 @@
 #include <signal.h>
 #include "geoMirror.h"
 #include <regex.h>
+#include "trackHub.h"
 /* phoneHome business */
 
 
@@ -256,12 +257,12 @@ if (endsWith(scriptName, "hgGateway") && geoMirrorEnabled())
 	printf("<TR><TD COLSPAN=3 id='redirectTd' onclick=\"javascript:document.getElementById('redirectTd').innerHTML='';\">"
 	    "<div style=\"margin: 10px 25%%; border-style:solid; border-width:thin; border-color:#97D897;\">"
 	    "<h3 style=\"background-color: #97D897; text-align: left; margin-top:0px; margin-bottom:0px;\">"
-	    "<img style=\"float:left; margin-top:4px; margin-left:3px; margin-right:4px;\" src=\"http://uswest.ensembl.org/i/info_blue_13.png\">"
-	    "You've been redirected to your nearest mirror - %s"
-	    "<img title=\"Hide hint panel\" alt=\"Hide hint panel\" style=\"float:right; margin-top:3px; margin-right:3px\" src=\"http://uswest.ensembl.org/i/close.gif\">"
+	    "&nbsp;You've been redirected to your nearest mirror - %s"
+	    "<idiv style=\"float:right;\">[x]</idiv>"
 	    "</h3> "
 	    "<ul style=\"margin:5px;\">"
 	    "<li>Take me back to <a href=\"%s\">%s</a>"
+	    "<idiv style=\"float:right;\"><a href=\"../goldenPath/help/genomeEuro.html\">What is this?</a></idiv>"
 	    "</li>"
 	    "</ul>"
 	    "</div>"
@@ -507,6 +508,19 @@ while ((row = sqlNextRow(sr)) != NULL)
 sqlFreeResult(&sr);
 hDisconnectCentral(&conn);
 
+struct slPair *names = trackHubGetCladeLabels();
+
+for(; names; names = names->next)
+    {
+    clades[numClades] = names->name;
+    labels[numClades] = names->val;
+    if (sameWord(defaultClade, clades[numClades]))
+	defaultLabel = clades[numClades];
+    numClades++;
+    if (numClades >= ArraySize(clades))
+        internalErr();
+    }
+
 cgiMakeDropListFull(cladeCgiName, labels, clades, numClades,
                     defaultLabel, onChangeText);
 }
@@ -534,7 +548,7 @@ for (cur = dbList; cur != NULL; cur = cur->next)
 	(!doCheck || hDbExists(cur->name)))
         {
         hashAdd(hash, cur->genome, cur);
-        orgList[numGenomes] = cur->genome;
+        orgList[numGenomes] = trackHubSkipHubName(cur->genome);
         values[numGenomes] = cur->genome;
         numGenomes++;
 	if (numGenomes >= ArraySize(orgList))
@@ -651,7 +665,7 @@ for (cur = dbList; cur != NULL; cur = cur->next)
 
     if (allowInactive ||
         ((cur->active || sameWord(cur->name, db))
-                && sqlDatabaseExists(cur->name)))
+                && (trackHubDatabase(db) || sqlDatabaseExists(cur->name))))
         {
         assemblyList[numAssemblies] = cur->description;
         values[numAssemblies] = cur->name;

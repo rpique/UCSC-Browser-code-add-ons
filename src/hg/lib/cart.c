@@ -23,6 +23,8 @@
 #include "hgMaf.h"
 #include "hui.h"
 #include "geoMirror.h"
+#include "hubConnect.h"
+#include "trackHub.h"
 
 static char *sessionVar = "hgsid";	/* Name of cgi variable session is stored in. */
 static char *positionCgiName = "position";
@@ -238,18 +240,17 @@ dyStringFree(&dy);
 }
 
 #ifndef GBROWSE
-static void cartCopyCustomTracks(struct cart *cart, struct hash *oldVars)
+void cartCopyCustomTracks(struct cart *cart)
 /* If cart contains any live custom tracks, save off a new copy of them,
- * to prevent clashes by multiple loaders of the same session.  */
+ * to prevent clashes by multiple uses of the same session.  */
 {
 struct hashEl *el, *elList = hashElListHash(cart->hash);
-char *db=NULL, *ignored;
-getDbAndGenome(cart, &db, &ignored, oldVars);
 
 for (el = elList; el != NULL; el = el->next)
     {
     if (startsWith(CT_FILE_VAR_PREFIX, el->name))
 	{
+	char *db = &el->name[strlen(CT_FILE_VAR_PREFIX)];
 	struct slName *browserLines = NULL;
 	struct customTrack *ctList = NULL;
 	char *ctFileName = (char *)(el->val);
@@ -407,6 +408,14 @@ hashElFreeList(&helList);
 assert(hashNumEntries(hash) == 0);
 }
 
+INLINE char *getDb(struct cart *cart, struct hash *oldVars)
+/* Quick wrapper around getDbGenomeClade for when we only want db. */
+{
+char *db=NULL, *ignoreOrg, *ignoreClade;
+getDbGenomeClade(cart, &db, &ignoreOrg, &ignoreClade, oldVars);
+return db;
+}
+
 #ifndef GBROWSE
 void cartLoadUserSession(struct sqlConnection *conn, char *sessionOwner,
 			 char *sessionName, struct cart *cart,
@@ -452,7 +461,7 @@ if ((row = sqlNextRow(sr)) != NULL)
 	 * command that sent us here): */
 	loadCgiOverHash(cart, oldVars);
 #ifndef GBROWSE
-	cartCopyCustomTracks(cart, oldVars);
+	cartCopyCustomTracks(cart);
 #endif /* GBROWSE */
 	if (isNotEmpty(actionVar))
 	    cartRemove(cart, actionVar);
@@ -512,7 +521,7 @@ if (oldVars)
  * command that sent us here): */
 loadCgiOverHash(cart, oldVars);
 #ifndef GBROWSE
-cartCopyCustomTracks(cart, oldVars);
+cartCopyCustomTracks(cart);
 #endif /* GBROWSE */
 
 if (isNotEmpty(actionVar))
@@ -634,6 +643,9 @@ if (! (cgiScriptName() && endsWith(cgiScriptName(), "hgSession")))
 	}
     }
 #endif /* GBROWSE */
+
+/* wire up the assembly hubs so we can operate without sql */
+hubConnectLoadHubs(cart);
 
 if (exclude != NULL)
     {
@@ -1474,7 +1486,7 @@ void cartVaWebStart(struct cart *cart, char *db, char *format, va_list args)
  * from cart. */
 {
 pushWarnHandler(htmlVaWarn);
-webStartWrapper(cart, db, format, args, FALSE, FALSE);
+webStartWrapper(cart, trackHubSkipHubName(db), format, args, FALSE, FALSE);
 inWeb = TRUE;
 }
 
@@ -1591,13 +1603,13 @@ if(pos != NULL && oldVars != NULL)
     }
 *extra = 0;
 if (pos == NULL && org != NULL)
-    safef(titlePlus,sizeof(titlePlus), "%s%s - %s",org, extra, title );
+    safef(titlePlus,sizeof(titlePlus), "%s%s - %s",trackHubSkipHubName(org), extra, title );
 else if (pos != NULL && org == NULL)
     safef(titlePlus,sizeof(titlePlus), "%s - %s",pos, title );
 else if (pos == NULL && org == NULL)
     safef(titlePlus,sizeof(titlePlus), "%s", title );
 else
-    safef(titlePlus,sizeof(titlePlus), "%s%s %s - %s",org, extra,pos, title );
+    safef(titlePlus,sizeof(titlePlus), "%s%s %s - %s",trackHubSkipHubName(org), extra,pos, title );
 popWarnHandler();
 setThemeFromCart(cart);
 htmStartWithHead(stdout, head, titlePlus);

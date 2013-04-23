@@ -18,6 +18,7 @@
 #include "hgTables.h"
 #include "joiner.h"
 #include "hubConnect.h"
+#include "trackHub.h"
 
 
 int trackDbCmpShortLabel(const void *va, const void *vb)
@@ -408,12 +409,15 @@ for (name = nameList; name != NULL; name = name->next)
 	hPrintf(">%s\n", name->name);
     }
 hPrintf("</SELECT>\n");
-char *restrictDate = encodeRestrictionDateDisplay(database,selTdb);
-if (restrictDate)
+if (!trackHubDatabase(database))
     {
-    hPrintf("<A HREF=\'%s\' TARGET=BLANK>restricted until:</A>&nbsp;%s",
-                ENCODE_DATA_RELEASE_POLICY, restrictDate);
-    freeMem(restrictDate);
+    char *restrictDate = encodeRestrictionDateDisplay(database,selTdb);
+    if (restrictDate)
+	{
+	hPrintf("<A HREF=\'%s\' TARGET=BLANK>restricted until:</A>&nbsp;%s",
+		    ENCODE_DATA_RELEASE_POLICY, restrictDate);
+	freeMem(restrictDate);
+	}
     }
 return selTable;
 }
@@ -670,7 +674,10 @@ char *regionType = cartUsualString(cart, hgtaRegionType, hgtaRegionTypeGenome);
 char *range = cartUsualString(cart, hgtaRange, "");
 if (isPositional)
     {
-    boolean doEncode = sqlTableExists(conn, "encodeRegions");
+    boolean doEncode = FALSE; 
+
+    if (!trackHubDatabase(database))
+	doEncode = sqlTableExists(conn, "encodeRegions");
 
     hPrintf("<TR><TD><B>region:</B>\n");
 
@@ -933,7 +940,7 @@ hPrintf("%s",
   "features and usage. "
   "For more complex queries, you may want to use "
   "<A HREF=\"http://main.g2.bx.psu.edu\" target=_BLANK>Galaxy</A> or "
-  "our <A HREF=\"http://genome.ucsc.edu/FAQ/FAQdownloads#download29\">public "
+  "our <A HREF=\"http://genome.ucsc.edu/goldenPath/help/mysql.html\">public "
   "MySQL server</A>. "
   "To examine the biological function of your set through annotation "
   "enrichments, send the data to "

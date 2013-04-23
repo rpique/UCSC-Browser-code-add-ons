@@ -58,7 +58,7 @@ for (val = col->values; val != NULL; val = val->next)
     if (val->next != NULL)
         dyStringAppend(dy, ", ");
     }
-dyStringPrintf(dy, ") ");
+dyStringPrintf(dy, ")");
 }
 
 struct dyString *asColumnToSqlType(struct asColumn *col)
@@ -461,6 +461,18 @@ if (asObj!= NULL)
              break;
     }
 return asCol;
+}
+
+int asColumnFindIx(struct asColumn *list, char *name)
+/* Return index of first element of asColumn list that matches name.
+ * Return -1 if not found. */
+{
+struct asColumn *ac;
+int ix = 0;
+for (ac = list; ac != NULL; ac = ac->next, ix++)
+    if (sameString(name, ac->name))
+        return ix;
+return -1;
 }
 
 boolean asCompareObjs(char *name1, struct asObject *as1, char *name2, struct asObject *as2, int numColumnsToCheck,

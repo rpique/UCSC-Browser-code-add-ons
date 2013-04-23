@@ -6,6 +6,9 @@
 
 #include "common.h"
 #include "md5.h"
+#include "hex.h"
+#include "linefile.h"
+#include "hash.h"
 
 
 #define GET_UINT32(n,b,i)					\
@@ -215,6 +218,61 @@ void md5_finish( struct md5_context *ctx, uint8 digest[16] )
     PUT_UINT32( ctx->state[1], digest,  4 );
     PUT_UINT32( ctx->state[2], digest,  8 );
     PUT_UINT32( ctx->state[3], digest, 12 );
+}
+
+
+void md5ForFile(char * fileName, unsigned char md5[16])
+/* read f in buffer pieces and update md5 hash */
+{
+struct md5_context ctx;
+unsigned char buffer[MD5READBUFSIZE];
+int bufRead = 0;
+FILE *f = mustOpen(fileName,"rb");
+
+md5_starts(&ctx);
+
+while ((bufRead = fread(&buffer, 1, MD5READBUFSIZE, f)) > 0)
+    {
+    md5_update(&ctx, buffer, bufRead);
+    }
+
+md5_finish(&ctx, md5);
+carefulClose(&f);
+}
+
+char *md5ToHex(unsigned char md5[16])
+/* return md5 as hex string */
+{
+char hex[33];
+char *h;
+int i;
+for (i = 0, h=hex; i < 16; ++i, ++h)
+    {
+    byteToHex( md5[i], h++);  // note h is incremented here and also at the top of the loop
+    }
+hex[32] = 0;
+return cloneString(hex);
+}
+
+char *md5HexForFile(char * fileName)
+/* read f in buffer pieces and return hex string for md5sum */
+{
+// MD5 COMPUTE
+unsigned char md5[16];       /* Keep the md5 checksum here. */
+md5ForFile(fileName,md5);
+return md5ToHex(md5);
+}
+
+struct hash *md5FileHash(char *fileName)
+/* Read md5sum file and return a hash keyed by file names with md5sum values. */
+{
+struct lineFile *lf = lineFileOpen(fileName, TRUE);
+char *row[2];
+struct hash *hash = hashNew(0);
+while (lineFileRow(lf, row))
+    hashAdd(hash, row[1], cloneString(row[0]));
+lineFileClose(&lf);
+return hash;
 }
 
 #ifdef TEST

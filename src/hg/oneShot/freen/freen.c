@@ -4,72 +4,42 @@
 #include "localmem.h"
 #include "hash.h"
 #include "options.h"
-#include "ra.h"
 #include "jksql.h"
-#include "trackDb.h"
-#include "hui.h"
-#include "rainbow.h"
+#include "pipeline.h"
 
 void usage()
 {
 errAbort("freen - test some hairbrained thing.\n"
-         "usage:  freen input\n");
+         "usage:  freen input output stderr\n");
 }
 
-struct rgbColor saturatedRainbowTable[28] = {
-/* This table was built by hand for the default Autodesk Animator palette. */
-    {255, 0, 64},
-    {255, 0, 0},
-    {255, 64, 0},
-    {255, 128, 0},
-    {255, 164, 0},
-    {255, 210, 0},
-    {255, 255, 0},
-    {210, 255, 0},
-    {164, 255, 0},
-    {128, 255, 0},
-    {0, 255, 0},
-    {0, 255, 128},
-    {0, 255, 164},
-    {0, 255, 210},
-    {0, 255, 255},
-    {0, 210, 255},
-    {0, 164, 255},
-    {0, 128, 255},
-    {0, 64, 255},
-    {0, 0, 255},
-    {64, 0, 255},
-    {128, 0, 255},
-    {164, 0, 255},
-    {210, 0, 255},
-    {255, 0, 255},
-    {255, 0, 210},
-    {255, 0, 164},
-    {255, 0, 128},
-    };
 
-int lighten(int col)
-/* Return shade blended with 50% parts 255. */
-{
-return round(col * 0.5 + 255 * 0.5);
-}
-
-void freen(char *input)
+void freen(char *input, char *output, char *errOutput)
 /* Test some hair-brained thing. */
 {
-int i;
-for (i=0; i<28; ++i)
-   {
-   struct rgbColor *c = &saturatedRainbowTable[i];
-   printf("   {%d,%d,%d},\n", lighten(c->r), lighten(c->g), lighten(c->b));
-   }
+FILE *f = mustOpen(output, "w");
+char *progAndOpts[] = {"wordLine", "-xxx", "stdin", NULL};
+struct pipeline *pl = pipelineOpen1(progAndOpts, pipelineRead|pipelineNoAbort, input,  errOutput);
+struct lineFile *lf = lineFileAttach(input, TRUE, pipelineFd(pl));
+char *line;
+int count = 0;
+while (lineFileNext(lf, &line, NULL))
+    {
+    count += 1;
+    }
+fprintf(f, "count is %d\n", count);
+uglyf("Seem to be done\n");
+int err = pipelineWait(pl);
+uglyf("Past the wait err = %d\n", err);
+pipelineFree(&pl);
+uglyf("Past the free\n");
 }
 
 int main(int argc, char *argv[])
 /* Process command line. */
 {
-if (argc != 2)
+if (argc != 4)
     usage();
-freen(argv[1]);
+freen(argv[1], argv[2], argv[3]);
 return 0;
 }

@@ -1,16 +1,18 @@
-setenv BRANCHNN 279
-setenv TODAY 2013-02-12             # v279 final
-setenv LASTWEEK 2013-01-22          # v278 final 
-setenv REVIEWDAY 2013-01-29         # v279 preview
-setenv LASTREVIEWDAY  2013-01-08    # v278 preview
-setenv REVIEW2DAY 2013-02-05        # v279 preview2
-setenv LASTREVIEW2DAY 2013-01-15    # v278 preview2
+setenv BRANCHNN 282
+setenv TODAY 2013-04-16             # v282 final
+setenv LASTWEEK 2013-03-25          # v281 final 
+setenv REVIEWDAY 2013-04-02         # v282 preview
+setenv LASTREVIEWDAY 2013-03-12     # v281 preview
+setenv REVIEW2DAY 2013-04-09        # v282 preview2
+setenv LASTREVIEW2DAY 2013-03-19    # v281 preview2
+
 
 
 
 setenv BUILDHOME /cluster/bin/build
 setenv WEEKLYBLD ${BUILDHOME}/build-kent/src/utils/qa/weeklybld
 setenv BOX32 titan
+setenv REPLYTO ann@soe.ucsc.edu
 
 setenv GITSHAREDREPO hgwdev.cse.ucsc.edu:/data/git/kent.git
 setenv CVSROOT /projects/compbio/cvsroot

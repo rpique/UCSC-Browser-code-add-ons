@@ -278,6 +278,9 @@ int sqlQuickNum(struct sqlConnection *conn, char *query);
 int sqlNeedQuickNum(struct sqlConnection *conn, char *query);
 /* Get numerical result or die trying. */
 
+long long sqlQuickLongLong(struct sqlConnection *conn, char *query);
+/* Get long long numerical result from simple query. Returns 0 if query not found */
+
 double sqlQuickDouble(struct sqlConnection *conn, char *query);
 /* Get floating point numerical result from simple query */
 
@@ -424,7 +427,7 @@ void sqlMonitorSetIndent(unsigned indent);
 void sqlMonitorDisable(void);
 /* Disable tracing or profiling of SQL queries. */
 
-int sqlDateToUnixTime(char *sqlDate);
+long sqlDateToUnixTime(char *sqlDate);
 /* Convert a SQL date such as "2003-12-09 11:18:43" to clock time
  * (seconds since midnight 1/1/1970 in UNIX). */
 

@@ -1565,6 +1565,21 @@ sqlFreeResult(&sr);
 return ret;
 }
 
+long long sqlQuickLongLong(struct sqlConnection *conn, char *query)
+/* Get long long numerical result from simple query. Returns 0 if query not found */
+{
+struct sqlResult *sr;
+char **row;
+long long ret = 0;
+
+sr = sqlGetResult(conn, query);
+row = sqlNextRow(sr);
+if (row != NULL && row[0] != NULL)
+    ret = sqlLongLong(row[0]);
+sqlFreeResult(&sr);
+return ret;
+}
+
 double sqlQuickDouble(struct sqlConnection *conn, char *query)
 /* Get floating point numerical result from simple query */
 {
@@ -2171,7 +2186,7 @@ while ((c = *wild++) != 0)
 return retVal;
 }
 
-int sqlDateToUnixTime(char *sqlDate)
+long sqlDateToUnixTime(char *sqlDate)
 /* Convert a SQL date such as "2003-12-09 11:18:43" to clock time
  * (seconds since midnight 1/1/1970 in UNIX). */
 {

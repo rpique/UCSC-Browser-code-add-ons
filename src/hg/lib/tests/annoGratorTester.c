@@ -4,11 +4,14 @@
 #include "annoGratorGpVar.h"
 #include "annoStreamBigBed.h"
 #include "annoStreamDb.h"
+#include "annoStreamTab.h"
 #include "annoStreamVcf.h"
 #include "annoStreamWig.h"
 #include "annoGrateWigDb.h"
 #include "annoFormatTab.h"
+#include "annoFormatVep.h"
 #include "dystring.h"
+#include "memalloc.h"
 #include "pgSnp.h"
 #include "udc.h"
 #include "vcf.h"
@@ -27,6 +30,7 @@ static const char *vcfEx1 = "vcfEx1";
 static const char *vcfEx2 = "vcfEx2";
 static const char *bigBedToTabOut = "bigBedToTabOut";
 static const char *snpBigWigToTabOut = "snpBigWigToTabOut";
+static const char *vepOut = "vepOut";
 
 void usage()
 /* explain usage and exit */
@@ -46,9 +50,10 @@ errAbort(
     "    %s\n"
     "    %s\n"
     "    %s\n"
+    "    %s\n"
     , pgSnpDbToTabOut, pgSnpKgDbToTabOutShort, pgSnpKgDbToTabOutLong,
     snpConsDbToTabOutShort, snpConsDbToTabOutLong,
-    vcfEx1, vcfEx2, bigBedToTabOut, snpBigWigToTabOut
+    vcfEx1, vcfEx2, bigBedToTabOut, snpBigWigToTabOut, vepOut
     );
 }
 
@@ -60,7 +65,7 @@ struct streamerInfo
 /* Enough info to create a streamer or grator that gets data from sql, file or URL. */
     {
     struct streamerInfo *next;
-    char *db;			// If non-NULL, then we are using this SQL database
+    char *sqlDb;		// If non-NULL, then we are using this SQL database
     char *tableFileUrl;		// If db is non-NULL, table name; else file or URL
     enum annoRowType type;	// Data type (wig or words?)
     struct asObject *asObj;	// not used if type is arWig
@@ -71,10 +76,10 @@ struct annoStreamer *streamerFromInfo(struct streamerInfo *info)
 {
 struct annoStreamer *streamer = NULL;
 if (info->type == arWig)
-    streamer = annoStreamWigDbNew(info->db, info->tableFileUrl, BIGNUM);
-else if (info->db != NULL)
-    streamer = annoStreamDbNew(info->db, info->tableFileUrl, info->asObj);
-else if (info->type == arVcf)
+    streamer = annoStreamWigDbNew(info->sqlDb, info->tableFileUrl, BIGNUM);
+else if (info->sqlDb != NULL)
+    streamer = annoStreamDbNew(info->sqlDb, info->tableFileUrl, info->asObj);
+else if (info->type == arVcf) //#*** arVcf is bogus -- use autoSql comparison
     {
     boolean looksLikeTabix = endsWith(info->tableFileUrl, ".gz");
     streamer = annoStreamVcfNew(info->tableFileUrl, looksLikeTabix, BIGNUM);
@@ -84,14 +89,17 @@ else if (endsWith(info->tableFileUrl, ".bb"))
     streamer = annoStreamBigBedNew(info->tableFileUrl, BIGNUM);
     }
 else
-    errAbort("Make a generic file streamer for %s!", info->tableFileUrl);
+    {
+    streamer = annoStreamTabNew(info->tableFileUrl, info->asObj);
+    }
 return streamer;
 }
 
-void dbToTabOut(struct streamerInfo *infoList, struct twoBitFile *tbf, char *outFile,
-		char *chrom, uint start, uint end, bool doGpFx)
-/* Get data from one or more database tables and print all fields to tab-sep output. */
+void sourcesFromInfoList(struct streamerInfo *infoList, bool doGpFx,
+			 struct annoStreamer **retPrimary, struct annoGrator **retGrators)
+/* Translate streamerInfo parameters into primary source and list of secondary sources. */
 {
+assert(infoList && retPrimary && retGrators);
 struct streamerInfo *primaryInfo = infoList;
 struct streamerInfo *gratorInfoList = infoList->next;
 struct annoStreamer *primary = streamerFromInfo(primaryInfo);
@@ -102,25 +110,42 @@ for (grInfo = gratorInfoList;  grInfo != NULL;  grInfo = grInfo->next)
     struct annoGrator *grator = NULL;
     if (grInfo->type == arWig)
 	{
-	if (grInfo->db == NULL)
+	if (grInfo->sqlDb == NULL)
 	    grator = annoGrateBigWigNew(grInfo->tableFileUrl);
 	else
-	    grator = annoGrateWigDbNew(grInfo->db, grInfo->tableFileUrl, BIGNUM);
+	    grator = annoGrateWigDbNew(grInfo->sqlDb, grInfo->tableFileUrl, BIGNUM);
 	}
     else
 	{
 	struct annoStreamer *src = streamerFromInfo(grInfo);
-	if (doGpFx)
-	    grator = annoGratorGpVarNew(src);
+	if (doGpFx && gratorList == NULL) //#*** doGpFx should not be applied to all grators!
+	    // #*** again, the real solution here is autoSql recognition
+	    grator = annoGratorGpVarNew(src, FALSE);
 	else
 	    grator = annoGratorNew(src);
 	}
     slAddHead(&gratorList, grator);
     }
 slReverse(&gratorList);
+*retPrimary = primary;
+*retGrators = gratorList;
+}
+
+void dbToTabOut(struct streamerInfo *infoList, struct twoBitFile *tbf, char *outFile,
+		char *chrom, uint start, uint end, bool doGpFx)
+/* Get data from one or more database tables and print all fields to tab-sep output. */
+{
+struct streamerInfo *primaryInfo = infoList;
+struct annoStreamer *primary = NULL;
+struct annoGrator *gratorList = NULL;
+sourcesFromInfoList(infoList, doGpFx, &primary, &gratorList);
 struct annoFormatter *tabOut = annoFormatTabNew(outFile);
 //#*** If we're using db==NULL as a flag, we still need to get assembly name in there.... take from 2bit filename???
-char *assemblyName = primaryInfo->db ? primaryInfo->db : "hardcoded, Doh!";
+char *assemblyName = primaryInfo->sqlDb;
+if (assemblyName == NULL && primaryInfo->next != NULL)
+    assemblyName = primaryInfo->next->sqlDb;
+if (assemblyName == NULL)
+    assemblyName = "[annoGratorTester needs better way of determining assemblyName!]";
 struct annoGratorQuery *query = annoGratorQueryNew(assemblyName, NULL, tbf,
 						   primary, gratorList, tabOut);
 annoGratorQuerySetRegion(query, chrom, start, end);
@@ -133,6 +158,7 @@ int main(int argc, char *argv[])
 optionInit(&argc, argv, optionSpecs);
 if (argc < 2 || argc > 3)
     usage();
+pushCarefulMemHandler(LIMIT_2or6GB);
 char *db = argv[1];
 char *test = NULL;
 boolean doAllTests = (argc == 2);
@@ -147,7 +173,8 @@ if (!doAllTests)
 	sameString(argv[2], vcfEx1) ||
 	sameString(argv[2], vcfEx2) ||
 	sameString(argv[2], bigBedToTabOut) ||
-	sameString(argv[2], snpBigWigToTabOut))
+	sameString(argv[2], snpBigWigToTabOut) ||
+	sameString(argv[2], vepOut))
 	test = cloneString(argv[2]);
     else
 	{
@@ -269,6 +296,43 @@ if (doAllTests || sameString(test, snpBigWigToTabOut))
 				       arWig, NULL };
     snp135Info.next = &bigWigInfo;
     dbToTabOut(&snp135Info, tbf, "stdout", "chr21", 34716800, 34733700, FALSE);
+    }
+
+if (doAllTests || sameString(test, vepOut))
+    {
+    struct streamerInfo vepSamplePgSnp = { NULL, NULL, "input/annoGrator/vepSample.pgSnp.tab",
+					   arWords, asParseFile("../pgSnp.as") };
+    struct streamerInfo kgInfo = { NULL, db, "ensGene", arWords,
+				   asParseFile("../genePredExt.as") };
+    struct streamerInfo snpInfo = { NULL, db, "snp135", arWords, asParseFile("../snp132Ext.as") };
+    vepSamplePgSnp.next = &kgInfo;
+    kgInfo.next = &snpInfo;
+    // Instead of dbToTabOut, we need to make a VEP config data structure and
+    // use it to create an annoFormatVep.
+    struct streamerInfo *primaryInfo = &vepSamplePgSnp;
+    struct annoStreamer *primary = NULL;
+    struct annoGrator *gratorList = NULL;
+    sourcesFromInfoList(primaryInfo, TRUE, &primary, &gratorList);
+    struct annoFormatVepConfig config = { primary,
+					  (struct annoStreamer *)gratorList,        // gpVar source
+					  ((struct annoStreamer *)gratorList)->next,// dbSNP source
+					  NULL				// no extra columns for now
+					};
+
+    struct annoFormatter *vepOut = annoFormatVepNew("stdout", &config);
+    //#*** If we're using db==NULL as a flag, we still need to get assembly name in there.... take from 2bit filename???
+    char *assemblyName = primaryInfo->sqlDb;
+    if (assemblyName == NULL && primaryInfo->next != NULL)
+	assemblyName = primaryInfo->next->sqlDb;
+    if (assemblyName == NULL)
+	assemblyName = "[annoGratorTester needs better way of determining assemblyName!]";
+    struct annoGratorQuery *query = annoGratorQueryNew(assemblyName, NULL, tbf,
+						       primary, gratorList, vepOut);
+    annoGratorQuerySetRegion(query, "chr1", 876900, 886920);
+    annoGratorQueryExecute(query);
+    annoGratorQuerySetRegion(query, "chr5", 135530, 145535);
+    annoGratorQueryExecute(query);
+    annoGratorQueryFree(&query);
     }
 
 return 0;
