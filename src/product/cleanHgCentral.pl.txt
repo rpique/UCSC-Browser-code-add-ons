@@ -12,11 +12,11 @@ use DBI;
 $db_server = 'localhost';
 $db_database = 'hgcentral';
 $db_mysql_user = 'readwrite';
-$db_password = 'readwrite-users-password';
+$db_password = 'access';
 
 ##  An email address to use when hgcentral tables are detected to be
 ##	too large
-$NOTIFY='youremail@bigU.edu';
+$NOTIFY='rpique@wayne.edu';
 
 $DB_TYPE="mysql";
 
