@@ -70,7 +70,8 @@ void samFilterMappXbFile(char *xbFileName, char *samFileName, char *outFileName)
   
   // cF=0;cR=0;
   while ((wordCount = lineFileChop(lf, row)) != 0){
-    if(wordCount>=10){
+    if(row[0][0]!='@'){
+    //if(wordCount>=10){
       chr_str = row[2];
       left = lineFileNeedNum(lf, row, 3)-1;
       //    right = lineFileNeedNum(lf, row, 2);
@@ -92,7 +93,7 @@ void samFilterMappXbFile(char *xbFileName, char *samFileName, char *outFileName)
 	if((left>0) && (left<=xbl->sizes[iChr])){
 	  mappState=0;
 	  //fprintf(stdout,"|%d,%s,%d,%d,%s|",count,chr_str,left,readLen,row[4]);
-	  for(j=left;j<(left+readLen-20);j++){
+	  for(j=left;j<=(left+readLen-20);j++){
 	    if(xbl->vec[iChr].a[j]==1)
 	      mappState++;
 	    //fprintf(stdout,"%d,",xbl->vec[iChr].a[j]);
