@@ -18,7 +18,7 @@ static char const rcsid[] = "$Id: newProg.c,v 1.30 2010/03/24 21:18:33 hiram Exp
 unsigned int idx = 0xFF; /* 4-mer index (0-255)*/
 boolean hashOneSnpOpt = 0;
 boolean hashAllSnpOpt = 0;
-
+boolean hashHamming1 =0; 
 
 void usage()
 /* Explain usage and exit. */
@@ -31,21 +31,21 @@ void usage()
 	   "   -idx= index to generate (0-255)\n"
 	   "   -one  hash the alt. genome, switching one SNP by one\n"
 	   "   -all  hash the alt. genome, switching all SNPs once\n"
+	   "   -m1   hash also all kmers with hamming distance 1 to allow mismatches\n"
 	   "   -xxx=XXX\n" 
 	   );
 }
 
-
-
 static struct optionSpec options[] = {
   {"idx", OPTION_INT},
   {"one", OPTION_BOOLEAN},
-  {"all", OPTION_BOOLEAN},  
+  {"all", OPTION_BOOLEAN},
+  {"m1" , OPTION_BOOLEAN},
   {NULL, 0},
 };
 
-/* ******************************************************************************************** */
-/* ******************************************************************************************** */
+/* ******************************************************************************** */
+/* ******************************************************************************** */
 
 void hashKmer(unsigned long int Kmer,
 	      khash_t(hashPos_t) *h, 
@@ -107,30 +107,29 @@ void hashKmer(unsigned long int Kmer,
 /* ******************************************************************************************** */
 /* ******************************************************************************************** */
 
-//This function modifies the previous one to only add repeats.
-void hashKmerCheckRepeatPos(unsigned long int Kmer,
+//This function modifies the hashKmer one to only add repeats.
+void hashKmerWithRepeats(unsigned int Suffix,
 	      khash_t(hashPos_t) *h, 
 	      replist_t *replistp,
 	      unsigned char chr,
 	      int pos){
-  unsigned char Prefix;
-  unsigned int Suffix;
   unsigned int rloc;
   
   khiter_t khit;
   int hret;
   int k;
+
+  //DNA buff[kmerSize+1];
   
   repvec_t *repvecp;
   chrpos_t auxPos;
   
   auxPos.chr=chr;
   auxPos.pos=pos;
+
+  //unPackKmer(Suffix,16,buff);
+  //verbose(1,"### %d:%d\t    %s\t%x\t%x\n",chr,pos,buff,idx,Suffix);
   
-  // function(Kmer,Strand,h,replistp,chr)
-  Prefix=getPrefix(Kmer); // ((ForKmer&kmermask)>>32);
-  Suffix=getSuffix(Kmer); // &0xFFFFFFFF;
-  if(Prefix==idx){
     khit = kh_put(hashPos_t, h , Suffix, &hret);
     if (!hret){
       //Already in the hash
@@ -176,9 +175,46 @@ void hashKmerCheckRepeatPos(unsigned long int Kmer,
     else{
       kh_value(h , khit).pos = pos; //-(i-kmerSize+1);
       kh_value(h , khit).chr = chr;
-    }	
-  } 
+    }
 }
+
+
+void hashKmerCheckRepeatPos(unsigned long int Kmer,
+	      khash_t(hashPos_t) *h, 
+	      replist_t *replistp,
+	      unsigned char chr,
+	      int pos){
+  unsigned char Prefix;
+  unsigned int Suffix;
+  int k,i;
+
+  //DNA buff[kmerSize+1];
+  //unPackKmer(Kmer,kmerSize,buff);
+
+  Prefix=getPrefix(Kmer); // ((ForKmer&kmermask)>>32);
+  Suffix=getSuffix(Kmer); // &0xFFFFFFFF;
+
+  //verbose(1,"## %d:%d\t%s\t%lx\t%x\t%x\n",chr,pos,buff,Kmer,Prefix,Suffix);
+
+  if(Prefix==idx){ // hashKmerWithRepeats....
+    hashKmerWithRepeats(Suffix,h,replistp,chr,pos);
+    if(hashHamming1)
+      //Hash all 16*3 Suffixes at hamming distance 1. 
+      for(k=0; k<32; k+=2){
+	hashKmerWithRepeats(Suffix^(1<<k),h,replistp,chr,pos);
+	hashKmerWithRepeats(Suffix^(2<<k),h,replistp,chr,pos);
+	hashKmerWithRepeats(Suffix^(3<<k),h,replistp,chr,pos);
+      } 
+  }else{
+    if(hashHamming1)
+      //Identify if Prefix is at hamming distance one of idx
+      for(k=0; k<8; k+=2)
+	for(i=1; i<4; i++)
+	  if(idx==(Prefix ^ (i<<k)))
+	    hashKmerWithRepeats(Suffix,h,replistp,chr,pos);
+  }
+}
+
 
 /* ******************************************************************************************** */
 /* ******************************************************************************************** */
@@ -289,6 +325,11 @@ int scankmersnp(struct dnaSeq *seq,khash_t(hashPos_t) *h, replist_t *replistp,un
     snpaux=kv_A(*snpvecp,j);
     //  assert(lastpos<snpaux.pos); //Asserting in order...  ACTUALLY NOT NECESSARY 
     //  verbose(2,"%d,%d, %c %c\n",(int)chr,snpaux.pos,(seq->dna[snpaux.pos]),(snpaux.ref));
+    //2013-08-21  0:24 RPR potential bug....
+    mask=0xFFFFFFFF;
+    ForKmer=0;
+    RevKmer=0;
+
 
     if(!(((snpaux.ref) & 0xDF) == ((seq->dna[snpaux.pos]) & 0xDF)))
       continue;
@@ -370,6 +411,11 @@ int scankmerindel(struct dnaSeq *seq,khash_t(hashPos_t) *h, replist_t *replistp,
   for(j=0; j< kv_size(*indelvecp); j++){
     aux=kv_A(*indelvecp,j);
     //verbose(2,"%d,%d, %c %c\n",(int)chr,snpaux.pos,(seq->dna[snpaux.pos]),(snpaux.ref));
+    //2013-08-21  0:24 RPR potential bug....
+    mask=0xFFFFFFFF;
+    ForKmer=0;
+    RevKmer=0;
+
 
     // Assert Indel matches de reference....
     if(strncasecmp(&seq->dna[aux.pos],aux.ref,aux.reflen)!=0){
@@ -475,6 +521,7 @@ int scankmerindel(struct dnaSeq *seq,khash_t(hashPos_t) *h, replist_t *replistp,
 //   scankmersnp(seq,h,&replist,kh_val(hChr , k), kv_A(snplist,k));   
 //   This hashes the complete alternate genome. (If two SNPs < 20bp  it will hash the kmers with the two alternate)
 //   This function also changes the sequence!, so we have to be careful. that we use it last!
+//   We could hash haplotypes instead... but whatever... 
 int scankmersnp2(struct dnaSeq *seq,khash_t(hashPos_t) *h, replist_t *replistp,unsigned char chr,snpvec_t *snpvecp){
   int i,j,Start,End;
   
@@ -515,6 +562,11 @@ int scankmersnp2(struct dnaSeq *seq,khash_t(hashPos_t) *h, replist_t *replistp,u
     End = min(snpaux.pos + kmerSize, seq->size); //+seq->size;//100;//seq->size-kmerSize;
     if((End-Start+1) < kmerSize)
       continue; //Region too small to fit the kmer..
+
+    //2013-08-21  0:24 RPR potential bug....
+    mask=0xFFFFFFFF;
+    ForKmer=0;
+    RevKmer=0;
     
     //#pragma omp parallel for private(nonATGCbase,j,score) reduction(+:count)
     for(i=Start;i<=End;i++){
@@ -573,7 +625,7 @@ void cutMapperMakeIndex(char *fileSeq, char *fileSNPs,char *outFolder)
   //  struct twoBitSpec *tbs;
   
   struct dnaSeq *seq; 
-  int j;
+  unsigned int j;
   khiter_t k;
   size_t vsize;
   size_t cumsize=0;
@@ -680,7 +732,7 @@ void cutMapperMakeIndex(char *fileSeq, char *fileSNPs,char *outFolder)
       //if(chrnum>5)break;
     }
     verbose(1,"Finished hashing alternative genomes\n");
-    verbose(2,"khash: n_buckets=%d, size=%d, n_occupied=%d, upper_bound=%d \n",kh_n_buckets(h),kh_size(h),((h)->n_occupied),((h)->upper_bound));
+    verbose(2,"khash: n_buckets=%u, size=%u, n_occupied=%u, upper_bound=%u \n",kh_n_buckets(h),kh_size(h),((h)->n_occupied),((h)->upper_bound));
 
     dnaLoadClose(&dl);
   
@@ -702,7 +754,7 @@ void cutMapperMakeIndex(char *fileSeq, char *fileSNPs,char *outFolder)
   verbose(1,"Dumping repeats into file %s\n",cbuff);
   verbose(1," size int= %ld  chrpos_t= %ld\n",sizeof(int),sizeof(chrpos_t));
   f=mustOpen(cbuff,"wb");
-  verbose(1," Number of repeated kmers %d\n",(unsigned int)kv_size(replist));
+  verbose(1," Number of repeated kmers %u\n",(unsigned int)kv_size(replist));
   fwrite(&kv_size(replist),sizeof(size_t),1,f);
   for (k = 0; k < kv_size(replist); ++k){
     repvecp=&kv_A(replist,k);
@@ -714,7 +766,7 @@ void cutMapperMakeIndex(char *fileSeq, char *fileSNPs,char *outFolder)
   }
   carefulClose(&f);
   kv_destroy(replist);
-  verbose(1," Repeats written, %d repeats. \n", (unsigned)cumsize);
+  verbose(1," Repeats written, %u repeats. \n", (unsigned)cumsize);
 
   //Dump hash table into file
   sprintf(cbuff,"%s/Hash%03d.bin",outFolder,idx);
@@ -738,14 +790,14 @@ void cutMapperMakeIndex(char *fileSeq, char *fileSNPs,char *outFolder)
   sprintf(cbuff,"%s/repeats%03d.bin",outFolder,idx);
   t = clock();
   repeatFileOpen(cbuff,&replist);
-  verbose(1," Loaded in %f seconds\n",(double)(clock() - t)/CLOCKS_PER_SEC);
+  verbose(1,"%s Loaded in %f seconds\n",cbuff,(double)(clock() - t)/CLOCKS_PER_SEC);
   
   //Rehash! 
   sprintf(cbuff,"%s/Hash%03d.bin",outFolder,idx);
   t = clock();
   h = hashFileOpen(cbuff);
-  verbose(1," Loaded in %f seconds\n",(double)(clock() - t)/CLOCKS_PER_SEC);
-  verbose(1,"khash: n_buckets=%d, size=%d, n_occupied=%d, upper_bound=%d \n",
+  verbose(1,"%s Loaded in %f seconds\n",cbuff,(double)(clock() - t)/CLOCKS_PER_SEC);
+  verbose(1,"khash: n_buckets=%u, size=%u, n_occupied=%u, upper_bound=%u \n",
 	  kh_n_buckets(h),kh_size(h),((h)->n_occupied),((h)->upper_bound));
 
   /* --------------------------------------------------------------------- */
@@ -789,6 +841,7 @@ int main(int argc, char *argv[])
     usage();
   hashOneSnpOpt = optionExists("one");
   hashAllSnpOpt = optionExists("all");
+  hashHamming1 = optionExists("m1");
   idx=optionInt("idx", -1);
 
   if(idx<0 || idx>255)
