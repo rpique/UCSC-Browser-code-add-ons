@@ -62,16 +62,17 @@ void unPackKmer(unsigned long int kmer,int k,char *s){
   s[k]='\0';
 }
 
-/*
+
 // If I was to do this function as a define then it would be general purpose, as in khash.h
-khash_t(hashPos_t) *hashFileOpen(char *fileName){
+khash_t(hashPos_t) *hashFileOpen2(char *fileName){
   chrpos_t auxPos;  
   uint32_t auxKey;
   khint_t size;
   khiter_t khit;
   int hret;
   FILE *f;
-  int i=0;
+  unsigned int i=0;
+  int pDots=1000000;
   
   khash_t(hashPos_t) *h = kh_init(hashPos_t);  
   
@@ -79,12 +80,16 @@ khash_t(hashPos_t) *hashFileOpen(char *fileName){
   // We save the size of the hash at the beginning of the hash file.
   fread(&size,sizeof(khint_t),1,f);
   // We set hash size.. so it does not need to reincrease...
-  kh_resize(hashPos_t, h, size);
-  verbose(1," Reading hash table from %s with %d entries\n",fileName,size);
+  // Maybe a proble with big hashes? Does it makes a difference?
+  // kh_resize(hashPos_t, h, size);
+  verbose(2,"#v1 Reading hash table from %s with %d entries\n",fileName,size);
 
+  pDots=size/50;
   //while(!feof(f)){
   while((size>0) & !feof(f)){
     i++;
+    if((i % pDots)==1)
+      verboseDot();
     fread(&auxKey,sizeof(uint32_t),1,f);
     fread(&auxPos,sizeof(chrpos_t),1,f);
     khit = kh_put(hashPos_t, h , auxKey, &hret);
@@ -93,15 +98,18 @@ khash_t(hashPos_t) *hashFileOpen(char *fileName){
     kh_value(h , khit)=auxPos;
     size--;
   }
+  verbose(1,"\n");
   
   assert(size==0);
   carefulClose(&f);
-  verbose(1," Hash read completed succesfully.\n");
+  verbose(3,"# ... completed succesfully.\n");
+  verbose(2,"# khash: n_buckets=%u, size=%u, n_occupied=%u, upper_bound=%u \n",
+	  kh_n_buckets(h),kh_size(h),((h)->n_occupied),((h)->upper_bound));
 
   return h;
 }
 
-*/
+
 // If I was to do this function as a define then it would be general purpose, as in khash.h
 // Read in one gulp, faster... ?
 // Not much faster, only a little bit, maybe I can try mmap
@@ -113,10 +121,10 @@ khash_t(hashPos_t) *hashFileOpen(char *fileName){
   khint_t size;
   khiter_t khit;
   int hret;
-  int tsize=(sizeof(uint32_t)+sizeof(chrpos_t));
+  unsigned long int tsize=(sizeof(uint32_t)+sizeof(chrpos_t));
   FILE *f=mustOpen(fileName,"r+b");
   //int fdi=fileno(f);
-  int i=0;
+  unsigned int i=0;
   
   khash_t(hashPos_t) *h = kh_init(hashPos_t);  
   
@@ -129,7 +137,7 @@ khash_t(hashPos_t) *hashFileOpen(char *fileName){
   //What if I do it with an mmap ???
   
   buff = (char *)calloc(tsize, size);
-  verbose(2,"# Reading hash table from %s with %d entries...\n", fileName, size);
+  verbose(2,"#v2 Reading hash table from %s with %u entries...\n", fileName, size);
   //Read in one big gulp... 
   assert(fread(buff,tsize,size,f)==size);
   carefulClose(&f);
@@ -141,7 +149,7 @@ khash_t(hashPos_t) *hashFileOpen(char *fileName){
   buff=pmap+sizeof(khint_t);
   verbose(2,"... mmap OK\n");
   */
-    
+  verbose(2,"#v2 Reconstructing hash table from %s with %u entries...\n", fileName, size);
   //while(!feof(f))
   while(size>0){
     auxKey=*((uint32_t *)(buff+i*tsize));
@@ -163,7 +171,7 @@ khash_t(hashPos_t) *hashFileOpen(char *fileName){
 
 
   verbose(3,"# ... completed succesfully.\n");
-  verbose(2,"# khash: n_buckets=%d, size=%d, n_occupied=%d, upper_bound=%d \n",
+  verbose(2,"# khash: n_buckets=%u, size=%u, n_occupied=%u, upper_bound=%u \n",
 	  kh_n_buckets(h),kh_size(h),((h)->n_occupied),((h)->upper_bound));
 
   return h;
@@ -495,7 +503,7 @@ khash_t(hashChr_t) *loadChromSizes(char *chromFile, char ***chromNames, unsigned
     
   while(!feof(f)){
     chrnum++;
-    assert(chrnum<256);
+    assert(chrnum<250);
     fscanf(f,"%s\t%u\t", buff, &size);
     verbose(2,"#%d) %s\t%u\n",chrnum, buff, size);
     //buff2=cloneString(buff);
