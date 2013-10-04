@@ -77,9 +77,9 @@ export PNGINCL="-I/usr/include/libpng12"
 export USE_BAM=1
 export KNETFILE_HOOKS=0
 # export SAMDIR=${BROWSERHOME}/samtools-0.1.11
-export SAMDIR=${HOME}/samtools
-export SAMINC=${SAMDIR}
-export SAMLIB=${SAMDIR}/libbam.a
+export SAMDIR=${KENTHOME}
+export SAMINC=${SAMDIR}/include/bam
+export SAMLIB=${SAMDIR}/lib/libbam.a
 # export SAMINC=${SAMDIR}
 # export SAMLIB=${SAMDIR}/libbam.a
 # Optional support of the tabix compression and binary index format

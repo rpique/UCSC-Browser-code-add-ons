@@ -137,7 +137,7 @@ khash_t(hashPos_t) *hashFileOpen(char *fileName){
   //What if I do it with an mmap ???
   
   buff = (char *)calloc(tsize, size);
-  verbose(2,"#v2 Reading hash table from %s with %u entries...\n", fileName, size);
+  verbose(2,"#v2 Reading hash table from %s with %u entries with %d bytes...\n", fileName, size, (int)tsize);
   //Read in one big gulp... 
   assert(fread(buff,tsize,size,f)==size);
   carefulClose(&f);
@@ -158,7 +158,11 @@ khash_t(hashPos_t) *hashFileOpen(char *fileName){
     //    verbose(2,"Key %u, Pos %d,%d, khit%d, hret%d\n",auxKey,(int)auxPos.chr
     if(hret!=1)errAbort("ERROR: %d\t%d\t%x\t%d\t%d\t%d\t%d\n",i,size,auxKey,(int) auxPos.chr,(int) auxPos.pos,hret,khit);
     //assert(hret==1); //It should be unique in the dump!
-    kh_value(h , khit)=auxPos;
+    kh_value(h , khit) = auxPos;
+    /*    if(auxPos.chr != 255){ 
+      assert(auxPos.chr<95);
+      assert(auxPos.chr>0);
+      }*/
     size--;
     i++;
   }
@@ -169,6 +173,7 @@ khash_t(hashPos_t) *hashFileOpen(char *fileName){
   carefulClose(&f);
   */
 
+  assert(size==0);
 
   verbose(3,"# ... completed succesfully.\n");
   verbose(2,"# khash: n_buckets=%u, size=%u, n_occupied=%u, upper_bound=%u \n",

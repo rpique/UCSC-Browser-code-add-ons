@@ -10,7 +10,7 @@
 
 #include "cutMapperCore.h"
 
-#include "cutMapperResampler.h"
+//#include "cutMapperResampler.h"
 
 static char const rcsid[] = "$Id: newProg.c,v 1.30 2010/03/24 21:18:33 hiram Exp $";
 
@@ -22,25 +22,24 @@ void usage()
   "usage:\n"
   "   cutMapperOmpMapSam indexFolder file.fastQ mappedreads.txt\n"
   "options:\n"
-  "   -sensitivity=folder --> Sensitivity folder containing the files, default not used?, \n"
+  //  "   -sensitivity=folder --> Sensitivity folder containing the files, default not used?, \n"
   "                sensitivity files should be located as <folder/chr???.sensitivites.txt \n"
   "   -omp=1 - multi-core implementation (default 1 == one thread)"
   "   -verbose=1,2,3 (default 1) \n"
   );
 }
 
-boolean applySensitivity=FALSE;
-char *sensitivityFolder;
-double **sens;
+//boolean applySensitivity=FALSE;
+//char *sensitivityFolder;
+//double **sens;
 
 int ompNumThreads= 1;
 
 boolean rmdup=FALSE;
 
 
-
 static struct optionSpec options[] = {
-  {"sensitivity", OPTION_STRING},
+  //  {"sensitivity", OPTION_STRING},
   {"omp" , OPTION_INT},
   {"rmdup", OPTION_BOOLEAN},
   {NULL, 0},
@@ -72,7 +71,7 @@ void reParseFastqFileAndMap(char *inFastq, khash_t(hashPos_t) **hReads, FILE *f,
   //int hret;
   int j;
   
-  int rloc;
+  int rloc=0;
 
   j=0;
 
@@ -94,19 +93,23 @@ void reParseFastqFileAndMap(char *inFastq, khash_t(hashPos_t) **hReads, FILE *f,
     wantNewLine(lf, inFastq, ++line, &qName, "fastq sequence name (quality line)");
     wantNewLine(lf, inFastq, ++line, &qual, "quality line");
     seqQual=cloneString(qual);
-    //Cut the strings to 20-mers
+    //Cut the strings to 20-mers 
     seqQual[kmerSize]='\0';
     seqString[kmerSize]='\0';
+    verbose(3,"[%s %3d] Mapping Kmer %lx: %s\t%s\n", __func__, __LINE__,kmer,seqName+1,seqString);
     if(kmer != -1){ // otherWise check how many N, and hash them in a different way... ? 4 times??
       Prefix=getPrefix(kmer); // ((ForKmer&kmermask)>>32);
       Suffix=getSuffix(kmer); // &0xFFFFFFFF;
       khit = kh_get(hashPos_t, hReads[Prefix] , Suffix);
+      verbose(3,"[%s %3d] Mapping Kmer %lx: %x\t%x (%lx)\n", __func__, __LINE__,kmer,Prefix,Suffix,khit);
       if ( kh_exist(hReads[Prefix], khit)){
-    	  //In the hash... OUTPUT READ
-    	  if(kh_value(hReads[Prefix], khit).chr==255){//Non uniquely mappable //255 Use 254 for debugging
-    		  numRep++;
-    	  }
-    	  else{ //Uniquely mappable
+	//In the hash... OUTPUT READ
+	verbose(3,"[%s %3d] Mapping Kmer %lx: %x\t%x (%lx) %d:%d\t%s\n", __func__, __LINE__,kmer,Prefix,Suffix,khit,(int)kh_value(hReads[Prefix], khit).chr,kh_value(hReads[Prefix], khit).pos,seqString);
+	if(kh_value(hReads[Prefix], khit).chr==255){//Non uniquely mappable //255 Use 254 for debugging
+	  numRep++;
+	  verbose(3,"[%s %3d] Reapeating 255 Kmer %lx: %x\t%x (%lx)\n", __func__, __LINE__,kmer,Prefix,Suffix,khit);
+	}
+	else{ //Uniquely mappable
 	  //unPackKmer((((unsigned long int)j)<<32) + Suffix, 20, kmerString);
 	  numUni++;
 	  rloc=kh_value(hReads[Prefix], khit).pos;
@@ -115,6 +118,9 @@ void reParseFastqFileAndMap(char *inFastq, khash_t(hashPos_t) **hReads, FILE *f,
 	    reverseBytes(seqQual,strlen(seqString));
 	    reverseComplement(seqString,strlen(seqString));
 	  }
+	  // assert(kh_value(hReads[Prefix], khit).chr < 95 );
+	  // assert(kh_value(hReads[Prefix], khit).chr > 0  );
+
 	  fprintf(f,"%s\t%d\t%s\t%d\t%d\t%dM\t*\t0\t0\t%s\t%s\tX0:i:1\n",
 		  seqName+1, //1) Query template NAME
 		  (rloc<0) ? 16 : 0, //2) bitwise FLAG
@@ -129,18 +135,22 @@ void reParseFastqFileAndMap(char *inFastq, khash_t(hashPos_t) **hReads, FILE *f,
 		  seqQual      //11) ASCII of Phred-scaled base QUALity+33
 		  //12) Optional 
 		  );
+
+	  verbose(3,"[%s %3d] Kmer %lx: %s\t%d\t%d\t%d\t%s\n", __func__, __LINE__,kmer,seqName+1,(rloc<0) ? 16 : 0, (int) kh_value(hReads[Prefix], khit).chr,(int) abs(rloc),seqString);
 	  
 	  // fprintf(f,"%d\n",kh_value(hReads[Prefix], khit).pos);
 
-	}// else unmappable	  
+	}// else unmappable
 	//fprintf(f,"");
+      	if(rmdup){ // This will remove the from the hash.
+      	  kh_del(hashPos_t, hReads[Prefix], khit);
+      	  //verbose(3,"[%s %3d] Remove Kmer %lx from hash\n", __func__, __LINE__,kmer);
+	}
       }
       else{
 	//UnMappable!!
+	verbose(3,"[%s %3d] Unmappable2 Kmer %lx: %s\t%d\t%d\t%d\t%s\n", __func__, __LINE__,kmer,seqName+1,(rloc<0) ? 16 : 0, (int) kh_value(hReads[Prefix], khit).chr,(int) abs(rloc),seqString);
 	numUnm++;
-      }
-      if(rmdup){ // This will remove the from the hash.
-	kh_del(hashPos_t, hReads[Prefix], khit);
       }
     }
     else{
@@ -180,7 +190,7 @@ void cutMapperOmpMapSam(char *inFastq, char *indexFolder, char *uniFile)
   char cbuff[strlen(indexFolder)+256];
   //char kmerString[21];
   
-  int j,k;
+  unsigned int j,k;
   //int i;
   int TotalMappedReads=0;
   int UniquelyMappedReads=0;
@@ -211,6 +221,7 @@ void cutMapperOmpMapSam(char *inFastq, char *indexFolder, char *uniFile)
       rloc=kh_val(hChr,j);
       verbose(2,"%d %s %s %d\n",rloc,kh_key(hChr,j),chromNames[rloc],chromSizes[rloc]);
     }
+  verbose(1,"#Loaded %d chromosomes\n",kh_size(hChr));
   //Initializing hash maps, for mapped reads!
   for(j=0;j<256;j++) 
     hMapped[j]=kh_init(hashPos_t);   
@@ -221,8 +232,8 @@ void cutMapperOmpMapSam(char *inFastq, char *indexFolder, char *uniFile)
     hReads[j]=kh_init(hCount_t);   
 
   /* --------------------------------------------------------------------- */
-  if(applySensitivity)
-    sens=read_sens(chromNames,kh_size(hChr),sensitivityFolder);
+  //  if(applySensitivity)
+  //   sens=read_sens(chromNames,kh_size(hChr),sensitivityFolder);
   
   /* --------------------------------------------------------------------- */
 
@@ -242,12 +253,14 @@ void cutMapperOmpMapSam(char *inFastq, char *indexFolder, char *uniFile)
     int hret;
     char cbuff2[strlen(indexFolder)+256];
 
-    khint_t khit,khit2,indexSize;  
+    char bluff[40];
 
-    khash_t(hashPos_t) *hIndex;  
+    khint_t khit,khit2,indexSize;
+
+    khash_t(hashPos_t) *hIndex;
     //    repvec_t *repvecp;  
     //    replist_t replist;
-    
+
     //Load Hash! 
     sprintf(cbuff2,"%s/Hash%03d.bin",indexFolder,j);
     t = clock();
@@ -255,6 +268,22 @@ void cutMapperOmpMapSam(char *inFastq, char *indexFolder, char *uniFile)
     verbose(1,"# Opened hash for index %d in %f seconds (%f total)\n",j,
 	    (double)(clock() - t)/CLOCKS_PER_SEC,
 	    (double)(clock() - t0)/CLOCKS_PER_SEC);    
+
+    /*
+    for(k = kh_begin(hIndex); k < kh_end(hIndex); ++k){
+      if(kh_exist(hIndex, k)){ // I found it!
+	unsigned int Suffix = kh_key(hIndex, k);
+	if(kh_value(hIndex, k).chr<255 & (Suffix==0x8ee01093)){
+	  unPackKmer((((unsigned long int)j)<<32) + (unsigned long int)Suffix, 20, bluff);
+	  verbose(3,"[%s %3d] %x\t%x (%u) %d:%d\t %s\n", __func__, __LINE__,j,Suffix,k,
+		  (int)kh_value(hIndex, k).chr, kh_value(hIndex, k).pos,bluff);
+	  assert(kh_value(hIndex, k).chr>0);
+	  assert(kh_value(hIndex, k).chr<96);
+	}
+      }
+    }
+    */
+    
     
     /* --------------------------------------------------------------------- */
 
@@ -265,18 +294,25 @@ void cutMapperOmpMapSam(char *inFastq, char *indexFolder, char *uniFile)
       if (kh_exist(hReads[j], k)){
 	unsigned int Suffix=kh_key(hReads[j], k);
 	unsigned int num=kh_val(hReads[j], k);
-	//Look up the key, on the Suffix hash table hIndex
+	// Look up the key, on the Suffix hash table hIndex
 	khit = kh_get(hashPos_t, hIndex , Suffix);
-	if(kh_exist(hIndex, khit)){ // I found it!
+	if(kh_exist(hIndex, khit)){// && (kh_end(hIndex) < khit)){ // I found it!
 	  TotalMappedReads+=num;
 	  if(kh_value(hIndex, khit).chr==255){//Non uniquely mappable
 	    LessThan10Reps+=num;
 	  }
-	  else{ //Uniquely mappable
+	  else{ // Uniquely mappable
 	    UniquelyMappedReads+=num;
 	    khit2 = kh_put(hashPos_t, hMapped[j], Suffix, &hret);
 	    assert(hret==1);
-	    kh_val(hMapped[j],khit2) = kh_val(hIndex, khit);	    
+	    kh_val(hMapped[j],khit2) = kh_val(hIndex, khit);
+	    //unPackKmer((((unsigned long int)j)<<32) + (unsigned long int)Suffix, 20, bluff);
+	    //verbose(3,"[%s %3d] %x\t%x (%u,%u) %d:%d\t %s\n", __func__, __LINE__,j,Suffix,khit,khit2,
+	    //	    (int)kh_value(hMapped[j], khit2).chr,kh_value(hMapped[j], khit2).pos,bluff);
+	    assert(kh_value(hIndex, khit).chr==kh_val(hMapped[j],khit2).chr);
+	    assert(kh_value(hIndex, khit).pos==kh_val(hMapped[j],khit2).pos);
+	    assert(kh_value(hMapped[j], khit2).chr < kh_size(hChr));
+	    assert(kh_value(hMapped[j], khit2).chr > 0);
 	  }
 	}
 	else{
@@ -287,7 +323,7 @@ void cutMapperOmpMapSam(char *inFastq, char *indexFolder, char *uniFile)
 
     /* --------------------------------------------------------------------- */
 
-
+    
     verbose(1, "# Mapped index %d: Cum. total mapped %d,"
 	    " Cum Total unique %d, Cum Total <10rep %d,"
 	    " Cum Total Unmappable %d (%f %%)\n"
@@ -360,10 +396,10 @@ int main(int argc, char *argv[])
   optionInit(&argc, argv, options);
 
   rmdup = optionExists("rmdup");
-  applySensitivity= optionExists("sensitivity");
-  if(applySensitivity)
-    sensitivityFolder=optionVal("sensitivity","");
-  verbose(1,"%s \n",sensitivityFolder);
+  //  applySensitivity= optionExists("sensitivity");
+  //  if(applySensitivity)
+  //   sensitivityFolder=optionVal("sensitivity","");
+  //  verbose(1,"%s \n",sensitivityFolder);
 
   ompNumThreads= optionInt("omp",ompNumThreads);
 

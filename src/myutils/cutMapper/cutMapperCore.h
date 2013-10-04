@@ -36,8 +36,8 @@ typedef struct{
 //KHASH_MAP_INIT_INT(32, int)
 
 KHASH_MAP_INIT_INT(hCount_t, int)            // Hash number of times read seen. 
-KHASH_MAP_INIT_INT(hashPos_t, chrpos_t)      // 
-KHASH_MAP_INIT_STR(hashChr_t, unsigned char)
+KHASH_MAP_INIT_INT(hashPos_t, chrpos_t)      // Hash position for the a read or kmer
+KHASH_MAP_INIT_STR(hashChr_t, unsigned char) // Hash chromosome number
 
 #include "kvec.h"
 
@@ -54,7 +54,7 @@ typedef kvec_t(indelvec_t)indellist_t;    //List of indel vectors.
 #define prefixSize 4
 #define suffixSize 16
 #define KmerMask  0x000000FFFFFFFFFF
-#define getPrefix(Kmer) ((Kmer&0x000000FFFFFFFFFF)>>32)
+#define getPrefix(Kmer) ((Kmer & KmerMask)>>32)
 #define getSuffix(Kmer) ((Kmer)&0xFFFFFFFF)
 
 

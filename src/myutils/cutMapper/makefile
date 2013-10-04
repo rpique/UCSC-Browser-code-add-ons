@@ -6,18 +6,27 @@ include ../../inc/common.mk
 
 L += -lm ${SOCKETLIB} -lz
 MYLIBDIR = ../../lib/${MACHTYPE}
-MYLIBS = ${MYLIBDIR}/jkweb.a
+MYLIBS = ${MYLIBDIR}/jkweb.a 
 
 ##L += -lm
 ##MYLIBDIR = ../../lib/${MACHTYPE}
 ##MYLIBS =  ${MYLIBDIR}/jkweb.a
 
+##CC:= /wsu/arch/x86_64/mpich2-1.2/bin/mpicc
+
+##CC:= /wsu/arch/x86_64/mvapich-1.2rc1/bin/mpicc
+
+COPT= -fopenmp -O4
+
+##CC:= mpicc
 
 A = cutMapperMapReads  \
     cutMapperMakeIndex \
     cutMapperMakeMapp  \
     cutMapperFastQtoJfd \
-    cutMapperMap
+    cutMapperMap \
+    cutMapperMapSam \
+    cutMapperOmpMapSam
 
 O = cutMapperCore.o \
     cutMapperResampler.o 
@@ -26,7 +35,19 @@ O_files=$(patsubst %.c,%.o,$(wildcard *.c))
 
 ##%.o:
 
+cutMapperOmpMapSam:  cutMapperOmpMapSam.o $O ${MYLIBS}
+	${CC} ${COPT} ${CFLAGS} -o ${DESTDIR}${BINDIR}/$@${EXE} $^ ${L}
+
+
+##cutMapperMpiMapReadsSam:  cutMapperMpiMapReadsSam.o $O ${MYLIBS}
+##	${CC} ${COPT} ${CFLAGS} -o ${DESTDIR}${BINDIR}/$@${EXE} $^ ${L}
+
+
 cutMapperMap: cutMapperMap.o $O ${MYLIBS}
+	${CC} ${COPT} ${CFLAGS} -o ${DESTDIR}${BINDIR}/$@${EXE} $^ ${L}
+##	${STRIP} ${DESTDIR}${BINDIR}/${A}${EXE}
+
+cutMapperMapSam: cutMapperMapSam.o $O ${MYLIBS}
 	${CC} ${COPT} ${CFLAGS} -o ${DESTDIR}${BINDIR}/$@${EXE} $^ ${L}
 ##	${STRIP} ${DESTDIR}${BINDIR}/${A}${EXE}
 

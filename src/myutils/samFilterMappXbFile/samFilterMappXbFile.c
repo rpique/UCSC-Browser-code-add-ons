@@ -44,9 +44,11 @@ void samFilterMappXbFile(char *xbFileName, char *samFileName, char *outFileName)
   int iChr,j;
   int left;//,right;
   int count=0;
+  int countUnique=0;
   char cStrand;
   int flag;
   int mappState;
+  int mappInput;
   int readLen;
   
 
@@ -73,9 +75,12 @@ void samFilterMappXbFile(char *xbFileName, char *samFileName, char *outFileName)
     if(row[0][0]!='@'){
     //if(wordCount>=10){
       chr_str = row[2];
+      // Hello...
       left = lineFileNeedNum(lf, row, 3)-1;
       //    right = lineFileNeedNum(lf, row, 2);
       flag = lineFileNeedNum(lf, row, 1);
+      mappInput = lineFileNeedNum(lf, row, 4);
+
       readLen = strlen(row[9]);
     
       cStrand='+';
@@ -91,17 +96,23 @@ void samFilterMappXbFile(char *xbFileName, char *samFileName, char *outFileName)
       if(kh_exist(hChr,khit)){
 	iChr=kh_val(hChr,khit);
 	if((left>0) && (left<=xbl->sizes[iChr])){
-	  mappState=0;
+	  mappState=255;
 	  //fprintf(stdout,"|%d,%s,%d,%d,%s|",count,chr_str,left,readLen,row[4]);
 	  for(j=left;j<=(left+readLen-20);j++){
-	    if(xbl->vec[iChr].a[j]==1)
-	      mappState++;
+	    if((xbl->vec[iChr].a[j]>0) && (xbl->vec[iChr].a[j] < 128))
+	      if(xbl->vec[iChr].a[j]<mappState)
+		mappState=xbl->vec[iChr].a[j];
 	    //fprintf(stdout,"%d,",xbl->vec[iChr].a[j]);
 	  }
 	  //fprintf(stdout,".%d\n",mappState);
 	  // PRINT sam line
-	  if(mappState<1)
+	  if(mappState>127){
+	    sprintf(row[4],"%d",0);
+	  }else{
+	    mappState=(int)(-10 * log((1-exp(log(1-0.001)*(double)(mappState-1))) + 1E-10)/log(10));
 	    sprintf(row[4],"%d",mappState);
+	    countUnique++;
+	  }
 	  //if(mappState!=1)
 	  //  sprintf(row[4],"%s","X");
 	  for(j=0;j<(wordCount-1);j++)
@@ -141,7 +152,7 @@ void samFilterMappXbFile(char *xbFileName, char *samFileName, char *outFileName)
 
   carefulClose(&outF);
   //verbose(1,"# Mapped %ld on F, %ld on R strands \n",cF,cR);
-  verbose(1,"# Succesfully processed %d segments\n",count);
+  verbose(1,"# Succesfully processed %d segments, %d unique\n",count,countUnique);
 
   //free xbl?
 }

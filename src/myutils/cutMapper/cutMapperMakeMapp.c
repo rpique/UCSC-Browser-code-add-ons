@@ -40,7 +40,7 @@ void cutMapperMakeMapp(char *indexFolder, char *outBinFile)
 
   int i,j;
   khiter_t k;
-  int n,num,pos,sum;
+  int n,pos,sum;
 
   unsigned long long hist[256];
 
@@ -48,9 +48,6 @@ void cutMapperMakeMapp(char *indexFolder, char *outBinFile)
   char **chromNames;
   unsigned *chromSizes;
   unsigned int rloc;
-
-  int AllZero;
-  int AllEqual;
 
   xbList_t *xbl;
 
@@ -120,6 +117,30 @@ void cutMapperMakeMapp(char *indexFolder, char *outBinFile)
 
     kh_destroy(hashPos_t,h);    
   }
+
+  /* Check mappabilty before going to the repeats...*/
+
+  t = clock();
+  verbose(1,"Calculating mappability histogram \n");
+  for(j=0;j<256;j++)
+    hist[j]=0;
+  for(j=1;j<kh_size(hChr);j++){
+    verbose(2,"## for %d) %s \n",j,chromNames[j]);
+    for(k=0;k<chromSizes[j];k++)
+      hist[xbl->vec[j].a[k]]++;
+  }
+  for(j=0;j<140;j++)
+    fprintf(stdout,"%d\t",j);
+  fprintf(stdout,"\n");
+  for(j=0;j<140;j++)
+    fprintf(stdout,"%llu\t",hist[j]);
+  fprintf(stdout,"\n");
+  verbose(1,"# Time for this step = %f seconds (%f total)\n",
+	    (double)(clock() - t)/CLOCKS_PER_SEC,
+	    (double)(clock() - t0)/CLOCKS_PER_SEC);
+
+
+  /* blah blah blah blah */
   
   verbose(1,"Calculating extended mappability map\n");  
   //for(j=57;j<58;j++){ 
@@ -136,26 +157,10 @@ void cutMapperMakeMapp(char *indexFolder, char *outBinFile)
     for(k = 0; k < kv_size(replist);k++){
       repvecp=&kv_A(replist,k);
       n=kv_size(*repvecp);
-      //Traverse repeats: if any has not 0 
-      num=0;
-      AllZero=1;
-      AllEqual=1;
       for(i=0;i<n;i++){
-	//Check if 255 or more locations would map at this position.
 	pos=abs(kv_A(*repvecp,i).pos)-1;
-	AllZero=(AllZero && (xbl->vec[kv_A(*repvecp,i).chr].a[pos]==0));
-	AllEqual=(AllEqual && (xbl->vec[kv_A(*repvecp,i).chr].a[pos]==n));
-      }
-      if(AllZero)
-	for(i=0;i<n;i++){
-	  pos=abs(kv_A(*repvecp,i).pos)-1;
+	if(xbl->vec[kv_A(*repvecp,i).chr].a[pos]<n)
 	  xbl->vec[kv_A(*repvecp,i).chr].a[pos]=n;
-	}
-      else if(!AllEqual){
-	for(i=0;i<n;i++){
-	  pos=abs(kv_A(*repvecp,i).pos)-1;
-	  xbl->vec[kv_A(*repvecp,i).chr].a[pos]=130; //Flag SNP overlapping
-	}	  
       }
     } 
     //Destroy repeats
@@ -164,52 +169,6 @@ void cutMapperMakeMapp(char *indexFolder, char *outBinFile)
     kv_destroy(replist);
   }
 
-  verbose(1,"Calculating extended mappability map 2\n");  
-  //for(j=57;j<58;j++){ 
-  for(j=0;j<256;j++){ 
-    //Load repeats!!
-    sprintf(cbuff,"%s/repeats%03d.bin",indexFolder,j);
-    t = clock();
-    repeatFileOpen(cbuff,&replist);
-    verbose(1,"#2) Opened repeats index %d in %f seconds (%f total)\n",j,
-	    (double)(clock() - t)/CLOCKS_PER_SEC,
-	    (double)(clock() - t0)/CLOCKS_PER_SEC);
-    
-    //Loop through repeat table!
-    for(k = 0; k < kv_size(replist);k++){
-      repvecp=&kv_A(replist,k);
-      n=kv_size(*repvecp);
-      //Traverse repeats: if any has not 0 
-      num=0;
-      AllZero=1;
-      AllEqual=1;
-      for(i=0;i<n;i++){
-	//Check if 255 or more locations would map at this position.
-	pos=abs(kv_A(*repvecp,i).pos);
-	AllZero=(AllZero && (xbl->vec[kv_A(*repvecp,i).chr].a[pos]==0));
-	AllEqual=(AllEqual && (xbl->vec[kv_A(*repvecp,i).chr].a[pos]==n));
-      }
-      if(AllZero)
-	for(i=0;i<n;i++){
-	  //Check if 255 or more locations would map at this position.
-	  pos=abs(kv_A(*repvecp,i).pos)-1;
-	  xbl->vec[kv_A(*repvecp,i).chr].a[pos]=n;
-	}
-      else if(!AllEqual){
-	for(i=0;i<n;i++){
-	  //Check if 255 or more locations would map at this position.
-	  pos=abs(kv_A(*repvecp,i).pos)-1;
-	  xbl->vec[kv_A(*repvecp,i).chr].a[pos]=131; //Flag SNP overlapping
-	}	  
-      }
-    } 
-    //Destroy repeats
-    for (k = 0; k < kv_size(replist); ++k)
-      kv_destroy(kv_A(replist,k));
-    kv_destroy(replist);
-  }
-
-  
   //
   t = clock();
   verbose(1,"Calculating mappability histogram \n");
