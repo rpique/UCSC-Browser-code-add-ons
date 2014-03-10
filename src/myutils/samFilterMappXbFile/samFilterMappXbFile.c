@@ -28,6 +28,11 @@ static struct optionSpec options[] = {
 };
 
 
+double eLow=0.001;
+double eRate=0.01;
+double eMult=10;
+double eBase=10;
+
 
 void samFilterMappXbFile(char *xbFileName, char *samFileName, char *outFileName)
 /* samFilterMappXbFile - Filter for mappability sam aligned reads using and mappability Xb file. */
@@ -109,7 +114,9 @@ void samFilterMappXbFile(char *xbFileName, char *samFileName, char *outFileName)
 	  if(mappState>127){
 	    sprintf(row[4],"%d",0);
 	  }else{
-	    mappState=(int)(-10 * log((1-exp(log(1-0.001)*(double)(mappState-1))) + 1E-10)/log(10));
+	    mappState=(int)(-eMult * log((1 - exp(log(1-eRate) * (double)(mappState-1))) + eLow) / log(eBase));
+	    if(mappState > mappInput)
+	      mappState=mappInput;
 	    sprintf(row[4],"%d",mappState);
 	    countUnique++;
 	  }
